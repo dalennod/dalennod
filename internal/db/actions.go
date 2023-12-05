@@ -18,6 +18,17 @@ var (
 	modified time.Time
 )
 
+type Bookmark struct {
+	ID       int
+	URL      string
+	Title    string
+	Note     string
+	Keywords string
+	BGroup   string
+	Archived int
+	Modified time.Time
+}
+
 func Add(database *sql.DB, url, title, note, keywords, bGroup string, archive int) {
 	stmt, err := database.Prepare("INSERT INTO bookmarks (url, title, note, keywords, bGroup, archived) VALUES (?, ?, ?, ?, ?, ?);")
 	if err != nil {
@@ -44,8 +55,8 @@ func Remove(database *sql.DB, id int) {
 	logger.Info.Println(execResult.RowsAffected())
 }
 
-func ViewAll(database *sql.DB, o string) string {
-	var result string
+func ViewAll(database *sql.DB, o string) []Bookmark {
+	var result []Bookmark
 
 	rows, err := database.Query("SELECT * FROM bookmarks;")
 	if err != nil {
@@ -57,7 +68,7 @@ func ViewAll(database *sql.DB, o string) string {
 		if o != "s" {
 			fmt.Printf("%d : %s, %s, %s, %s, %s, %d, %v\n", id, url, title, note, keywords, bGroup, archived, modified)
 		}
-		result += fmt.Sprintf("%d : %s, %s, %s, %s, %s, %d, %v <br>", id, url, title, note, keywords, bGroup, archived, modified)
+		result = append(result, Bookmark{id, url, title, note, keywords, bGroup, archived, modified})
 	}
 	// logger.Info.Println(result)
 	return result

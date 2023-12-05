@@ -4,13 +4,14 @@ import (
 	"dalennod/internal/db"
 	"dalennod/internal/logger"
 	"database/sql"
-	"fmt"
+	"html/template"
 	"net/http"
 )
 
 const PORT string = "41415"
 
 var data *sql.DB
+var tmpl *template.Template = template.Must(template.ParseFiles("index.html"))
 
 func Start(database *sql.DB) {
 	data = database
@@ -24,5 +25,7 @@ func Start(database *sql.DB) {
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte(fmt.Sprintf("<h1>%s</h1>", db.ViewAll(data, "s"))))
+	// w.Write([]byte(fmt.Sprintf("<h1>%s</h1>", db.ViewAll(data, "s"))))
+	var bookmarks []db.Bookmark = db.ViewAll(data, "s")
+	tmpl.Execute(w, bookmarks)
 }
