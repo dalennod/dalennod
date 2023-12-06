@@ -14,7 +14,7 @@ func main() {
 	// db := setup.CreateDB(dbSavePath)
 
 	var database *sql.DB = setup.CreateDB(setup.GetOS())
-	go server.Start(database)
+	server.Start(database)
 	db.UserInput(database)
 
 }
