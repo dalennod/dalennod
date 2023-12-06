@@ -1,16 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dalennod</title>
+    <link rel="stylesheet" href="assets/styles.css">
 </head>
+
 <body>
     Dalennod
-    {{ range. }}
-    <p>
-        {{.ID}}, {{.URL}}, {{.Title}}, {{.Note}}, {{.Keywords}}, {{.BGroup}}, {{.Archived}}, {{.Modified}}
-    </p>
-    {{ end }}
+    <div class="grid-view-list">
+        {{ range. }}
+        <p id="grid-child">
+            {{.ID}}: <a href="{{.URL}}" target="_blank">{{.Title}}</a>
+            <br> Note: {{.Note}}
+            <br> Keywords: {{.Keywords}}
+            <br> Group: {{.BGroup}}
+            <br> Archived: {{.Archived}}
+            <br> Last modified: {{.Modified}}
+        </p>
+        {{ end }}
+    </div>
 </body>
+
 </html>

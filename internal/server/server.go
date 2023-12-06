@@ -10,11 +10,17 @@ import (
 
 const PORT string = "41415"
 
-var data *sql.DB
-var tmpl *template.Template = template.Must(template.ParseFiles("index.html"))
+var (
+	data *sql.DB
+	tmpl *template.Template
+)
 
 func Start(database *sql.DB) {
 	data = database
+	tmpl = template.Must(template.ParseFiles("index.html"))
+
+	var fileServer http.Handler = http.FileServer(http.Dir("assets"))
+	http.Handle("/assets/", http.StripPrefix("/assets/", fileServer))
 
 	http.HandleFunc("/", root)
 	err := http.ListenAndServe(":"+PORT, nil)

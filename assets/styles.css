@@ -1,0 +1,10 @@
+.grid-view-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-gap: 15px;
+}
+
+body {
+    font-family: sans-serif;
+    line-height: 1.2;
+}
