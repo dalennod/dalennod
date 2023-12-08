@@ -75,13 +75,23 @@ func ViewAll(database *sql.DB, o string) []Bookmark {
 }
 
 func ViewSingleRow(database *sql.DB, id int) {
-	rows, err := database.Query(fmt.Sprintf("SELECT * FROM bookmarks WHERE id=%d;", id))
+	// rows, err := database.Query(fmt.Sprintf("SELECT * FROM bookmarks WHERE id=%d;", id))
+	// if err != nil {
+	// 	logger.Error.Fatalln(err)
+	// }
+
+	stmt, err := database.Prepare("SELECT * FROM bookmarks where id=(?);")
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
 
-	for rows.Next() {
-		rows.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &modified)
+	execRes, err := stmt.Query(id)
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+
+	for execRes.Next() {
+		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &modified)
 		fmt.Printf("%d : %s, %s, %s, %s, %s, %d, %v\n", id, url, title, note, keywords, bGroup, archived, modified)
 	}
 }
