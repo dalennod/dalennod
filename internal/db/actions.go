@@ -55,6 +55,13 @@ func Remove(database *sql.DB, id int) {
 	logger.Info.Println(execResult.RowsAffected())
 }
 
+func RemoveAll(database *sql.DB) {
+	_, err := database.Query("DELETE FROM bookmarks;")
+	if err != nil {
+		logger.Error.Println(err)
+	}
+}
+
 func ViewAll(database *sql.DB, o string) []Bookmark {
 	var result []Bookmark
 
