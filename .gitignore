@@ -2,3 +2,4 @@ logs
 dalennod*
 nohup.out
 tmp
+*.sh
