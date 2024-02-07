@@ -65,7 +65,7 @@ func addInput() {
 	switch archived {
 	case "y", "Y":
 		Add(db, url, title, note, keywords, group, 1)
-		archive.SendSnapshot(url) // need error checking
+		archive.SendSnapshot(url)
 	case "n", "N":
 		Add(db, url, title, note, keywords, group, 0)
 	default:
@@ -78,6 +78,7 @@ func addInput() {
 func removeInput() {
 	var (
 		id      string
+		confirm string
 		scanner = bufio.NewScanner(os.Stdin)
 	)
 
@@ -90,8 +91,22 @@ func removeInput() {
 		logger.Error.Println("Invalid input.")
 	}
 
-	// double check with user using ViewSingleRow here
-	Remove(db, idToINT)
+	ViewSingleRow(db, idToINT)
+
+	fmt.Print("Remove this entry? (y/n): ")
+	scanner.Scan()
+	confirm = scanner.Text()
+
+	switch confirm {
+	case "y", "Y":
+		Remove(db, idToINT)
+	case "n", "N":
+		return
+	default:
+		logger.Info.Println("Invalid input received:", confirm)
+		fmt.Println("Invalid input. Exiting.")
+		return
+	}
 }
 
 func viewInput() {

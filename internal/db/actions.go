@@ -14,7 +14,7 @@ var (
 	note     string
 	keywords string
 	bGroup   string
-	archived int
+	archived bool
 	modified time.Time
 )
 
@@ -25,7 +25,7 @@ type Bookmark struct {
 	Note     string
 	Keywords string
 	BGroup   string
-	Archived int
+	Archived bool
 	Modified time.Time
 }
 
@@ -73,11 +73,10 @@ func ViewAll(database *sql.DB, o string) []Bookmark {
 	for rows.Next() {
 		rows.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &modified)
 		if o != "s" {
-			fmt.Printf("%d : %s, %s, %s, %s, %s, %d, %v\n", id, url, title, note, keywords, bGroup, archived, modified)
+			fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %v\n", id, url, title, note, keywords, bGroup, archived, modified)
 		}
 		result = append(result, Bookmark{id, url, title, note, keywords, bGroup, archived, modified})
 	}
-	// logger.Info.Println(result)
 	return result
 }
 
@@ -99,6 +98,6 @@ func ViewSingleRow(database *sql.DB, id int) {
 
 	for execRes.Next() {
 		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &modified)
-		fmt.Printf("%d : %s, %s, %s, %s, %s, %d, %v\n", id, url, title, note, keywords, bGroup, archived, modified)
+		fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %v\n", id, url, title, note, keywords, bGroup, archived, modified)
 	}
 }
