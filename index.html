@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assets/styles.css">
-    <script src="js/main.js" type="text/javascript" defer></script>
+    <link rel="stylesheet" href="./static/assets/styles.css">
+    <script src="./static/js/main.js" type="text/javascript" defer></script>
     <title>Dalennod</title>
 </head>
 
@@ -13,21 +13,21 @@
     <!-- Dalennod -->
     <nav>
         <input type="text" id="input-search" placeholder="Search keywords">
-        <button id="button-add">Add</button>
+        <a href="static/add.html"><button id="button-add-html">Add</button></a>
     </nav>
 
     <main>
         <div class="grid-view-list">
             {{ range. }}
-            <p class="grid-child" id="{{.ID}}">
-                {{.ID}}: <a href="{{.URL}}" target="_blank">{{.Title}}</a>
-                <br> Note: {{.Note}}
-                <br> Keywords: {{.Keywords}}
-                <br> Group: {{.BGroup}}
-                <br> Archived: {{.Archived}}
-                <br> Last modified: {{.Modified}}
-                <br> <button id="button-delete" onclick="deleteEntry(this);">Delete</button>
-            </p>
+            <div class="grid-child" id="{{.ID}}">
+                <p>{{.ID}}: <a href="{{.URL}}" target="_blank">{{.Title}}</a></p>
+                <p>Note: {{.Note}}</p>
+                <p>Keywords: {{.Keywords}}</p>
+                <p>Group: {{.BGroup}}</p>
+                <p>Archived: {{.Archived}}</p>
+                <p>Last modified: {{.Modified}}</p>
+                <p><button id="button-delete" onclick="deleteEntry(this);">Delete</button></p>
+            </div>
             {{ end }}
         </div>
     </main>
