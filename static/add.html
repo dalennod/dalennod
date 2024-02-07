@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="js/main.js" type="text/javascript" defer></script>
+    <title>Dalennod - Add</title>
+</head>
+
+<body>
+    <nav>
+        <a href="../"><button id="button-back">&lt;// Back</button></a>
+    </nav>
+
+    <main>
+        <div class="centered">
+            <p>URL<span style="color: #700000;">*</span>: <input type="text" id="input-url" placeholder="URL to save" required></p>
+            <p>Title: <input type="text" id="input-title" placeholder="Title for the bookmark"></p>
+            <p>Reason: <input type="text" id="input-reason" placeholder="Log notes for bookmark"></p>
+            <p>Keywords: <input type="text" id="input-keywords" placeholder="Keywords, to, search, bookmark"></p>
+            <p>Group: <input type="text" id="input-group" placeholder="Group to store bookmark into"></p>
+            <p>
+                Archive?:
+                <input type="radio" name="radio-archive" id="radio-yes" value="1">
+                <label for="radio-yes">Yes</label>
+                <input type="radio" name="radio-archive" id="radio-no" value="0" checked>
+                <label for="radio-no">No</label>
+            </p>
+            <p style="font-size: 12px; text-align: right; color: #700000;">
+                * required
+            </p>
+            <p style="text-align: center;">
+                <button id="button-add-req" onclick="addEntry();">
+                    Add
+                </button>
+            </p>
+        </div>
+    </main>
+</body>
+
+</html>

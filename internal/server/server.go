@@ -1,9 +1,11 @@
 package server
 
 import (
+	"dalennod/internal/archive"
 	"dalennod/internal/db"
 	"dalennod/internal/logger"
 	"database/sql"
+	"encoding/json"
 	"html/template"
 	"net/http"
 	"regexp"
@@ -16,20 +18,28 @@ var (
 	data *sql.DB
 	tmpl *template.Template
 
-	deleteID = regexp.MustCompile("/delete/([0-9]+)$")
+	deleteID = regexp.MustCompile("^/delete/([0-9]+)$")
 )
+
+type InsertEntry struct {
+	URL      string `json:"url"`
+	Title    string `json:"title"`
+	Reason   string `json:"reason"`
+	Keywords string `json:"keywords"`
+	Group    string `json:"group"`
+	Archive  int    `json:"archive"`
+}
 
 func Start(database *sql.DB) {
 	data = database
 	var mux *http.ServeMux = http.NewServeMux()
 
-	var assetsFileServer http.Handler = http.FileServer(http.Dir("assets"))
-	mux.Handle("/assets/", http.StripPrefix("/assets/", assetsFileServer))
-	var jsFileServer http.Handler = http.FileServer(http.Dir("js"))
-	mux.Handle("/js/", http.StripPrefix("/js/", jsFileServer))
+	var staticFileServer http.Handler = http.FileServer(http.Dir("static"))
+	mux.Handle("/static/", http.StripPrefix("/static/", staticFileServer))
 
 	mux.HandleFunc("/", root)
 	mux.HandleFunc("/delete/", deleteHandler)
+	mux.HandleFunc("/add/", addHandler)
 
 	err := http.ListenAndServe(":"+PORT, mux)
 	if err != nil {
@@ -62,6 +72,30 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		db.Remove(data, matchInt)
+		w.WriteHeader(http.StatusOK)
+	} else {
+		internalServerErrorHandler(w, r)
+	}
+}
+
+func addHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		w.Write([]byte("hi :3"))
+
+		var insData InsertEntry
+		err := json.NewDecoder(r.Body).Decode(&insData)
+		if err != nil {
+			logger.Error.Println(err)
+		}
+
+		// fmt.Println(insData)
+		if insData.Archive == 0 {
+			db.Add(data, insData.URL, insData.Title, insData.Reason, insData.Keywords, insData.Group, insData.Archive)
+		} else {
+			db.Add(data, insData.URL, insData.Title, insData.Reason, insData.Keywords, insData.Group, insData.Archive)
+			go archive.SendSnapshot(insData.URL)
+		}
+		w.WriteHeader(http.StatusOK)
 	} else {
 		internalServerErrorHandler(w, r)
 	}
