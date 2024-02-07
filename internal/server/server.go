@@ -60,7 +60,6 @@ func root(w http.ResponseWriter, r *http.Request) {
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		// http.ServeFile(w, r, "delete.html")
 		var match []string = deleteID.FindStringSubmatch(r.URL.Path)
 		if len(match) < 2 {
 			internalServerErrorHandler(w, r)
@@ -80,22 +79,19 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func addHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		w.Write([]byte("hi :3"))
-
 		var insData InsertEntry
 		err := json.NewDecoder(r.Body).Decode(&insData)
 		if err != nil {
 			logger.Error.Println(err)
 		}
 
-		// fmt.Println(insData)
 		if insData.Archive == 0 {
 			db.Add(data, insData.URL, insData.Title, insData.Reason, insData.Keywords, insData.Group, insData.Archive)
 		} else {
 			db.Add(data, insData.URL, insData.Title, insData.Reason, insData.Keywords, insData.Group, insData.Archive)
 			go archive.SendSnapshot(insData.URL)
 		}
-		w.WriteHeader(http.StatusOK)
+		w.WriteHeader(http.StatusCreated)
 	} else {
 		internalServerErrorHandler(w, r)
 	}
