@@ -4,6 +4,7 @@ import (
 	"dalennod/internal/archive"
 	"dalennod/internal/db"
 	"dalennod/internal/logger"
+	"dalennod/internal/setup"
 	"database/sql"
 	"encoding/json"
 	"html/template"
@@ -20,15 +21,6 @@ var (
 
 	deleteID = regexp.MustCompile("^/delete/([0-9]+)$")
 )
-
-type InsertEntry struct {
-	URL      string `json:"url"`
-	Title    string `json:"title"`
-	Reason   string `json:"reason"`
-	Keywords string `json:"keywords"`
-	Group    string `json:"group"`
-	Archive  int    `json:"archive"`
-}
 
 func Start(database *sql.DB) {
 	data = database
@@ -51,7 +43,7 @@ func Start(database *sql.DB) {
 func root(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		tmpl = template.Must(template.ParseFiles("index.html"))
-		var bookmarks []db.Bookmark = db.ViewAll(data, "s")
+		var bookmarks []setup.Bookmark = db.ViewAll(data, true)
 		tmpl.Execute(w, bookmarks)
 	} else {
 		internalServerErrorHandler(w, r)
@@ -79,17 +71,26 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 func addHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		var insData InsertEntry
+		var (
+			insData       setup.Bookmark
+			archiveResult bool   = false
+			snapshotURL   string = ""
+		)
 		err := json.NewDecoder(r.Body).Decode(&insData)
 		if err != nil {
 			logger.Error.Println(err)
 		}
 
-		if insData.Archive == 0 {
-			db.Add(data, insData.URL, insData.Title, insData.Reason, insData.Keywords, insData.Group, insData.Archive)
+		if !insData.Archived {
+			db.Add(data, insData.URL, insData.Title, insData.Note, insData.Keywords, insData.BGroup, insData.Archived, snapshotURL)
 		} else {
-			db.Add(data, insData.URL, insData.Title, insData.Reason, insData.Keywords, insData.Group, insData.Archive)
-			go archive.SendSnapshot(insData.URL)
+			archiveResult, snapshotURL = archive.SendSnapshot(insData.URL)
+			if archiveResult {
+				db.Add(data, insData.URL, insData.Title, insData.Note, insData.Keywords, insData.BGroup, insData.Archived, snapshotURL)
+			} else {
+				logger.Warn.Println("Snapshot failed.")
+				db.Add(data, insData.URL, insData.Title, insData.Note, insData.Keywords, insData.BGroup, false, snapshotURL)
+			}
 		}
 		w.WriteHeader(http.StatusCreated)
 	} else {

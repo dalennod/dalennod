@@ -6,18 +6,25 @@ import (
 	"net/http"
 )
 
-func SendSnapshot(url string) {
+func SendSnapshot(url string) (bool, string) {
 	var check bool = checkURL(url)
+	var snapshotURL string
+
 	if check {
 		res, err := http.Get(fmt.Sprintf("https://web.archive.org/save/%s", url))
 		if err != nil {
 			logger.Warn.Println("Failed to archive due to error: ", err)
+			return false, "Failed to archive due to error."
 		}
 		defer res.Body.Close()
 
-		logger.Info.Printf("Archived URL '%s' to Wayback Machine. [%s]\n", url, res.Request.URL.String())
+		snapshotURL = res.Request.URL.String()
+		logger.Info.Printf("Archived URL '%s' to Wayback Machine. [%s]\n", url, snapshotURL)
+
+		return check, snapshotURL
 	} else {
-		logger.Warn.Printf("URL [%s] did not respond. Not sending to be archived.", url)
+		logger.Warn.Printf("URL [%s] did not respond. Not sending to be archived.\n", url)
+		return check, "Failed to archive due to website not responding."
 	}
 }
 
