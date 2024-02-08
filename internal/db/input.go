@@ -88,15 +88,15 @@ func addInput(url, title, note, keywords, group, archived string, update bool, i
 		case "y", "Y":
 			archiveResult, snapshotURL = archive.SendSnapshot(url)
 			if archiveResult {
-				Update(db, url, title, note, keywords, group, id, true, snapshotURL)
+				Update(db, url, title, note, keywords, group, id, true, false, snapshotURL)
 			} else {
 				logger.Warn.Println("Snapshot failed.")
-				Update(db, url, title, note, keywords, group, id, false, snapshotURL)
+				Update(db, url, title, note, keywords, group, id, false, false, snapshotURL)
 			}
 		case "n", "N":
-			Update(db, url, title, note, keywords, group, id, false, snapshotURL)
+			Update(db, url, title, note, keywords, group, id, false, false, snapshotURL)
 		default:
-			Update(db, url, title, note, keywords, group, id, false, snapshotURL)
+			Update(db, url, title, note, keywords, group, id, false, false, snapshotURL)
 			logger.Warn.Println("Invalid input for archive request. URL has not been archived.")
 		}
 	}
@@ -117,7 +117,7 @@ func updateInput() {
 		logger.Error.Println("invalid input")
 	}
 
-	ViewSingleRow(db, idToINT)
+	ViewSingleRow(db, idToINT, false)
 
 	fmt.Print("Update this entry? (y/N): ")
 	scanner.Scan()
@@ -151,7 +151,7 @@ func removeInput() {
 		logger.Error.Println("Invalid input.")
 	}
 
-	ViewSingleRow(db, idToINT)
+	ViewSingleRow(db, idToINT, false)
 
 	fmt.Print("Remove this entry? (y/n): ")
 	scanner.Scan()
@@ -187,6 +187,6 @@ func viewInput() {
 		if err != nil {
 			logger.Error.Println("Invalid input.")
 		}
-		ViewSingleRow(db, idToINT)
+		ViewSingleRow(db, idToINT, false)
 	}
 }

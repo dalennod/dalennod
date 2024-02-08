@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./static/assets/styles.css">
     <script src="./static/js/main.js" type="text/javascript" defer></script>
+    <script type="text/javascript">
+        localStorage.removeItem("old-data");
+    </script>
     <title>Dalennod</title>
 </head>
 
@@ -30,7 +33,10 @@
                 <p>Archived: {{.Archived}}</p>
                 {{end}}
                 <p>Last modified: {{.Modified}}</p>
-                <p><button id="button-delete" onclick="deleteEntry(this);">Delete</button></p>
+                <div>
+                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button>
+                    <button id="button-update" onclick="window.location.href='static/update.html'; getOldData(this);">Update</button>
+                </div>
             </div>
             {{ end }}
         </div>
