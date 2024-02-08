@@ -24,7 +24,11 @@
                 <p>Note: {{.Note}}</p>
                 <p>Keywords: {{.Keywords}}</p>
                 <p>Group: {{.BGroup}}</p>
+                {{if .Archived}}
+                <p>Archived: {{.Archived}} <a href="{{.SnapshotURL}}" target="_blank">[here]</a></p>
+                {{else if not .Archived}}
                 <p>Archived: {{.Archived}}</p>
+                {{end}}
                 <p>Last modified: {{.Modified}}</p>
                 <p><button id="button-delete" onclick="deleteEntry(this);">Delete</button></p>
             </div>

@@ -20,12 +20,14 @@ const addEntry = async () => {
     const dataJSON = {
         url: document.querySelector("#input-url").value,
         title: document.querySelector("#input-title").value,
-        reason: document.querySelector("#input-reason").value,
+        note: document.querySelector("#input-note").value,
         keywords: document.querySelector("#input-keywords").value,
-        group: document.querySelector("#input-group").value,
-        archive: (document.querySelector("#radio-no").checked) ? 0 : 1,
+        bGroup: document.querySelector("#input-bGroup").value,
+        archive: (document.querySelector("#radio-no").checked) ? false : true,
     };
 
+    // console.log(JSON.stringify(dataJSON));
+    
     const fetchURL = ENDPOINT + "add/";
     const res = await fetch(fetchURL, {
         method: "POST",

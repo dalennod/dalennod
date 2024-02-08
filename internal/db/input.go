@@ -17,12 +17,14 @@ func UserInput(database *sql.DB) {
 	db = database
 
 	var input string
-	fmt.Print("Add, remove or view entries? : ")
+	fmt.Print("Add, update, remove or view entries? : ")
 	fmt.Scanln(&input)
 
 	switch strings.ToLower(input) {
 	case "add", "a":
-		addInput()
+		addInput("", "", "", "", "", "", false, 0)
+	case "update", "u":
+		updateInput()
 	case "remove", "r":
 		removeInput()
 	case "view", "v":
@@ -32,11 +34,14 @@ func UserInput(database *sql.DB) {
 	}
 }
 
-func addInput() {
+func addInput(url, title, note, keywords, group, archived string, update bool, id int) {
 	var (
-		url, title, note, keywords, group, archived string
-		scanner                                     = bufio.NewScanner(os.Stdin)
+		archiveResult bool   = false
+		snapshotURL   string = ""
+		scanner              = bufio.NewScanner(os.Stdin)
 	)
+
+	logger.Info.Println(url, title, note, keywords, group, archived)
 
 	fmt.Print("URL to save: ")
 	scanner.Scan()
@@ -62,24 +67,79 @@ func addInput() {
 	scanner.Scan()
 	archived = scanner.Text()
 
-	switch archived {
-	case "y", "Y":
-		Add(db, url, title, note, keywords, group, 1)
-		archive.SendSnapshot(url)
-	case "n", "N":
-		Add(db, url, title, note, keywords, group, 0)
-	default:
-		Add(db, url, title, note, keywords, group, 0)
-		logger.Warn.Println("Invalid input for archive request. URL has not been archived.")
+	if !update {
+		switch archived {
+		case "y", "Y":
+			archiveResult, snapshotURL = archive.SendSnapshot(url)
+			if archiveResult {
+				Add(db, url, title, note, keywords, group, true, snapshotURL)
+			} else {
+				logger.Warn.Println("Snapshot failed.")
+				Add(db, url, title, note, keywords, group, false, snapshotURL)
+			}
+		case "n", "N":
+			Add(db, url, title, note, keywords, group, false, snapshotURL)
+		default:
+			Add(db, url, title, note, keywords, group, false, snapshotURL)
+			logger.Warn.Println("Invalid input for archive request. URL has not been archived.")
+		}
+	} else {
+		switch archived {
+		case "y", "Y":
+			archiveResult, snapshotURL = archive.SendSnapshot(url)
+			if archiveResult {
+				Update(db, url, title, note, keywords, group, id, true, snapshotURL)
+			} else {
+				logger.Warn.Println("Snapshot failed.")
+				Update(db, url, title, note, keywords, group, id, false, snapshotURL)
+			}
+		case "n", "N":
+			Update(db, url, title, note, keywords, group, id, false, snapshotURL)
+		default:
+			Update(db, url, title, note, keywords, group, id, false, snapshotURL)
+			logger.Warn.Println("Invalid input for archive request. URL has not been archived.")
+		}
+	}
+}
+
+func updateInput() {
+	var (
+		id, url, title, note, keywords, group, archived, confirm string
+		scanner                                                  = bufio.NewScanner(os.Stdin)
+	)
+
+	fmt.Print("ID of bookmark to update: ")
+	scanner.Scan()
+	id = scanner.Text()
+
+	idToINT, err := strconv.Atoi(id)
+	if err != nil {
+		logger.Error.Println("invalid input")
 	}
 
+	ViewSingleRow(db, idToINT)
+
+	fmt.Print("Update this entry? (y/N): ")
+	scanner.Scan()
+	confirm = scanner.Text()
+
+	switch confirm {
+	case "y", "Y":
+		fmt.Println("Leave empty to retain old information.")
+		addInput(url, title, note, keywords, group, archived, true, idToINT)
+	case "n", "N":
+		return
+	default:
+		logger.Info.Println("Invalid input received:", confirm)
+		fmt.Println("Invalid input. Exiting.")
+		return
+	}
 }
 
 func removeInput() {
 	var (
-		id      string
-		confirm string
-		scanner = bufio.NewScanner(os.Stdin)
+		id, confirm string
+		scanner     = bufio.NewScanner(os.Stdin)
 	)
 
 	fmt.Print("ID to remove: ")
@@ -121,7 +181,7 @@ func viewInput() {
 
 	switch strings.ToLower(input) {
 	case "all", "a":
-		_ = ViewAll(db, "c")
+		ViewAll(db, false)
 	default:
 		idToINT, err := strconv.Atoi(input)
 		if err != nil {
