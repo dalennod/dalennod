@@ -33,8 +33,12 @@ func Add(database *sql.DB, url, title, note, keywords, bGroup string, archive bo
 	logger.Info.Println(execResult.RowsAffected())
 }
 
-func Update(database *sql.DB, url, title, note, keywords, bGroup string, id int, archive bool, snapshotURL string) {
-	url, title, note, keywords, bGroup = updateCheck(database, url, title, note, keywords, bGroup, id)
+func Update(database *sql.DB, url, title, note, keywords, bGroup string, id int, archive, s bool, snapshotURL string) {
+	if !s {
+		url, title, note, keywords, bGroup = updateCheck(database, url, title, note, keywords, bGroup, id)
+	}
+
+	logger.Info.Printf("url %s, title %s, note %s, keywords %s, bGroup %s, id %d, archive %t, s %t, snapshotURL %s\n", url, title, note, keywords, bGroup, id, archive, s, snapshotURL)
 
 	stmt, err := database.Prepare("UPDATE bookmarks SET url=?, title=?, note=?, keywords=?, bGroup=?, archived=?, snapshotURL=? WHERE id=?;")
 	if err != nil {
@@ -53,7 +57,7 @@ func updateCheck(database *sql.DB, url, title, note, keywords, bGroup string, id
 	var (
 		oldURL, oldTitle, oldNote, oldKeywords, oldBGroup string
 	)
-	oldURL, oldTitle, oldNote, oldKeywords, oldBGroup = ViewSingleRow(database, id)
+	oldURL, oldTitle, oldNote, oldKeywords, oldBGroup, _ = ViewSingleRow(database, id, true)
 
 	if url == "" {
 		url = oldURL
@@ -104,15 +108,16 @@ func ViewAll(database *sql.DB, s bool) []setup.Bookmark {
 
 	for rows.Next() {
 		rows.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &modified)
-		if !s {
+		if s {
+			result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified})
+		} else {
 			fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %s, %v\n", id, url, title, note, keywords, bGroup, archived, snapshotURL, modified)
 		}
-		result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified})
 	}
 	return result
 }
 
-func ViewSingleRow(database *sql.DB, id int) (string, string, string, string, string) {
+func ViewSingleRow(database *sql.DB, id int, s bool) (string, string, string, string, string, bool) {
 	// rows, err := database.Query(fmt.Sprintf("SELECT * FROM bookmarks WHERE id=%d;", id))
 	// if err != nil {
 	// 	logger.Error.Fatalln(err)
@@ -129,8 +134,10 @@ func ViewSingleRow(database *sql.DB, id int) (string, string, string, string, st
 	}
 
 	for execRes.Next() {
-		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &modified)
-		fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %v\n", id, url, title, note, keywords, bGroup, archived, modified)
+		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &modified)
+		if !s {
+			fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %s, %v\n", id, url, title, note, keywords, bGroup, archived, snapshotURL, modified)
+		}
 	}
-	return url, title, note, keywords, bGroup
+	return url, title, note, keywords, bGroup, archived
 }
