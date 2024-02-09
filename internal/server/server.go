@@ -24,7 +24,7 @@ func Start(database *sql.DB) {
 	data = database
 	var mux *http.ServeMux = http.NewServeMux()
 
-	var staticFileServer http.Handler = http.FileServer(http.Dir("static"))
+	var staticFileServer http.Handler = http.FileServer(http.Dir("./static"))
 	mux.Handle("/static/", http.StripPrefix("/static/", staticFileServer))
 
 	mux.HandleFunc("/", root)
@@ -32,6 +32,8 @@ func Start(database *sql.DB) {
 	mux.HandleFunc("/add/", addHandler)
 	mux.HandleFunc("/getRow/", getRowHandler)
 	mux.HandleFunc("/update/", updateHandler)
+	// mux.HandleFunc("/search/", searchHandler)
+	mux.HandleFunc("/static/search.html", searchHandler)
 
 	err := http.ListenAndServe(":"+PORT, mux)
 	if err != nil {
@@ -170,6 +172,27 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		w.WriteHeader(http.StatusCreated)
+	} else {
+		internalServerErrorHandler(w, r)
+	}
+}
+
+func searchHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		r.ParseForm()
+
+		var bookmarks []setup.Bookmark
+		for _, vs := range r.Form {
+			for _, v := range vs {
+				bookmarks = db.ViewAllWhere(data, v)
+				// fmt.Println(bookmarks)
+				// fmt.Println(k, v)
+			}
+		}
+
+		// // tmpl = template.Must(template.ParseFiles("./search/index.html"))
+		tmpl = template.Must(template.ParseFiles("./static/search.html"))
+		tmpl.Execute(w, bookmarks)
 	} else {
 		internalServerErrorHandler(w, r)
 	}

@@ -29,6 +29,8 @@ func UserInput(database *sql.DB) {
 		removeInput()
 	case "view", "v":
 		viewInput()
+	case "q":
+		os.Exit(0)
 	default:
 		logger.Warn.Println("invalid input")
 	}

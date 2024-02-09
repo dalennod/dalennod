@@ -117,13 +117,38 @@ func ViewAll(database *sql.DB, s bool) []setup.Bookmark {
 	return result
 }
 
+func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
+	var result []setup.Bookmark
+	if keyword == "" {
+		return result
+	}
+	keyword = "%" + keyword + "%"
+
+	stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) or bGroup LIKE (?) or note LIKE (?) or title LIKE (?);")
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+
+	execRes, err := stmt.Query(keyword, keyword, keyword, keyword)
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+
+	for execRes.Next() {
+		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &modified)
+		result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified})
+	}
+
+	return result
+}
+
 func ViewSingleRow(database *sql.DB, id int, s bool) (string, string, string, string, string, bool) {
 	// rows, err := database.Query(fmt.Sprintf("SELECT * FROM bookmarks WHERE id=%d;", id))
 	// if err != nil {
 	// 	logger.Error.Fatalln(err)
 	// }
 
-	stmt, err := database.Prepare("SELECT * FROM bookmarks where id=(?);")
+	stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE id=(?);")
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}

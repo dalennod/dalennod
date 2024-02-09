@@ -9,7 +9,7 @@
     <script type="text/javascript">
         const updateInputBox = () => {
             if (typeof (Storage) !== "undefined") {
-                const oldData = JSON.parse(localStorage.getItem("old-data"));
+                const oldData = JSON.parse(localStorage.getItem("oldData"));
                 document.querySelector("#data-id").innerText = oldData.id;
                 document.querySelector("#old-url").value = oldData.url;
                 document.querySelector("#old-title").value = oldData.title;
