@@ -23,7 +23,7 @@ const getOldData = async (ele) => {
 
     const oldData = await res.json();
     if (typeof (Storage) !== "undefined") {
-        localStorage.setItem('old-data', JSON.stringify(oldData));
+        localStorage.setItem("oldData", JSON.stringify(oldData));
     };
 };
 
@@ -87,6 +87,10 @@ const addEntry = async () => {
     if (res.ok) {
         resizeInput();
     };
+};
+
+const setValue = (term) => {
+    document.querySelector("#hidden-url-param").value = term;
 };
 
 const resizeInput = () => {

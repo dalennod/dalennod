@@ -4,23 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./static/assets/styles.css">
-    <script src="./static/js/main.js" type="text/javascript" defer></script>
-    <script type="text/javascript">
-        localStorage.removeItem("oldData");
-    </script>
-    <title>Dalennod</title>
+    <link rel="stylesheet" href="assets/styles.css">
+    <script src="js/main.js" type="text/javascript" defer></script>
+    <title>Dalennod - Search</title>
 </head>
 
 <body>
     <!-- Dalennod -->
     <nav>
-        <input type="text" id="input-search" placeholder="Search keywords">
-        <form action="./static/search.html" method="post">
-            <input type="hidden" name="searchTerm" id="hidden-url-param" value="">
-            <button type="submit" id="button-search-html" onclick="setValue(document.querySelector('#input-search').value);">Search</button>
-        </form> _
-        <a href="static/add.html"><button id="button-add-html">Add</button></a>
+        <a href="../"><button id="button-back">&lt;// Back</button></a>
+        <!-- <input type="text" id="input-search" placeholder="Search keywords"> -->
     </nav>
 
     <main>
@@ -39,7 +32,8 @@
                 <p>Last modified: {{.Modified}}</p>
                 <div>
                     <button id="button-delete" onclick="deleteEntry(this);">Delete</button>
-                    <button id="button-update" onclick="window.location.href='static/update.html'; getOldData(this);">Update</button>
+                    <button id="button-update"
+                        onclick="window.location.href='update.html'; getOldData(this);">Update</button>
                 </div>
             </div>
             {{ end }}
