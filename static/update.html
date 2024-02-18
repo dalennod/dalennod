@@ -16,13 +16,7 @@
                 document.querySelector("#old-note").value = oldData.note;
                 document.querySelector("#old-keywords").value = oldData.keywords;
                 document.querySelector("#old-bGroup").value = oldData.bGroup;
-                if (oldData.archived) {
-                    document.querySelector("#old-radio-yes").checked = true;
-                    document.querySelector("#old-radio-no").checked = false;
-                } else {
-                    document.querySelector("#old-radio-no").checked = true;
-                    document.querySelector("#old-radio-yes").checked = false;
-                };
+                (oldData.archive) ? document.querySelector("#old-radio-yes").checked = true : document.querySelector("#old-radio-no").checked = true;
             };
         };
         window.onload = updateInputBox;

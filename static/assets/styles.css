@@ -7,13 +7,22 @@ body * {
     box-sizing: border-box;
 }
 
-button,
-input,
+input {
+    background: none;
+    border-width: 0px;
+    text-decoration: none;
+}
+
 input:focus {
+    outline: none;
+}
+
+button {
     background: none;
     border-width: 0px;
     text-decoration: none;
     outline: none;
+    cursor: pointer;
 }
 
 nav {
@@ -27,7 +36,6 @@ nav {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    /* border: solid 1px black; */
 }
 
 #input-search {
@@ -38,7 +46,6 @@ nav {
 
 main {
     margin-top: 66px;
-    /* border: solid 1px black; */
 }
 
 .grid-view-list {
@@ -60,23 +67,15 @@ main {
 
 .grid-child a:hover {
     text-decoration: underline;
-    color: #004dab;
+    color: #2b4880;
 }
 
 .centered {
-    /* display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    min-height: 50vh; */
-
     position: absolute;
     top: 50%;
     left: 50%;
     margin-right: -50%;
     transform: translate(-50%, -50%);
-    /* border: solid 1px black; */
 }
 
 .centered input[type=text] {

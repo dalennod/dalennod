@@ -4,7 +4,6 @@ import (
 	"dalennod/internal/logger"
 	"database/sql"
 	"fmt"
-	"time"
 )
 
 const (
@@ -12,15 +11,15 @@ const (
 )
 
 type Bookmark struct {
-	ID          int       `json:"id"`
-	URL         string    `json:"url"`
-	Title       string    `json:"title"`
-	Note        string    `json:"note"`
-	Keywords    string    `json:"keywords"`
-	BGroup      string    `json:"bGroup"`
-	Archived    bool      `json:"archive"`
-	SnapshotURL string    `json:"snapshotURL"`
-	Modified    time.Time `json:"modified"`
+	ID          int    `json:"id"`
+	URL         string `json:"url"`
+	Title       string `json:"title"`
+	Note        string `json:"note"`
+	Keywords    string `json:"keywords"`
+	BGroup      string `json:"bGroup"`
+	Archived    bool   `json:"archive"`
+	SnapshotURL string `json:"snapshotURL"`
+	Modified    string `json:"modified"`
 }
 
 func CreateDB(dbSavePath string) *sql.DB {

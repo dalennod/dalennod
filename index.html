@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./static/assets/styles.css">
     <script src="./static/js/main.js" type="text/javascript" defer></script>
-    <script type="text/javascript">
-        localStorage.removeItem("oldData");
-    </script>
+    <script type="text/javascript"> localStorage.clear(); </script>
     <title>Dalennod</title>
 </head>
 
@@ -20,7 +18,7 @@
             <input type="hidden" name="searchTerm" id="hidden-url-param" value="">
             <button type="submit" id="button-search-html" onclick="setValue(document.querySelector('#input-search').value);">Search</button>
         </form> _
-        <a href="static/add.html"><button id="button-add-html">Add</button></a>
+        <a href="static/add.html"><button id="button-add-html">Create</button></a>
     </nav>
 
     <main>
@@ -38,7 +36,7 @@
                 {{end}}
                 <p>Last modified: {{.Modified}}</p>
                 <div>
-                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button>
+                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button> <span id="delete-checkmark" hidden>&check;</span>
                     <button id="button-update" onclick="window.location.href='static/update.html'; getOldData(this);">Update</button>
                 </div>
             </div>
