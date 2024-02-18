@@ -9,6 +9,11 @@ const deleteEntry = async (ele) => {
     });
 
     console.log(res.status);
+
+    document.querySelector("#delete-checkmark").removeAttribute("hidden");
+    setTimeout(() => {
+        document.querySelector("#delete-checkmark").setAttribute("hidden", "");
+    }, 2000);
 };
 
 const getOldData = async (ele) => {
@@ -36,8 +41,6 @@ const updateEntry = async () => {
         bGroup: (document.querySelector("#input-bGroup").value === "") ? document.querySelector("#old-bGroup").value : document.querySelector("#input-bGroup").value,
         archive: (document.querySelector("#radio-no").checked) ? false : true,
     };
-
-    // console.log(JSON.stringify(newDataJSON));
 
     const dataID = document.querySelector("#data-id").innerText;
     const fetchURL = ENDPOINT + "update/" + dataID;
@@ -72,7 +75,9 @@ const addEntry = async () => {
         archive: (document.querySelector("#radio-no").checked) ? false : true,
     };
 
-    // console.log(JSON.stringify(dataJSON));
+    if (dataJSON.archive) {
+        document.querySelector("#archive-warn").removeAttribute("hidden");
+    };
 
     const fetchURL = ENDPOINT + "add/";
     const res = await fetch(fetchURL, {
@@ -87,11 +92,30 @@ const addEntry = async () => {
     if (res.ok) {
         resizeInput();
     };
+
+    document.querySelector("#checkmark").removeAttribute("hidden");
+    setTimeout(() => {
+        document.querySelector("#checkmark").setAttribute("hidden", "");
+    }, 2000);
 };
 
 const setValue = (term) => {
     document.querySelector("#hidden-url-param").value = term;
 };
+
+const inputEventKey = () => {
+    const inputSearch = document.querySelector("#input-search");
+    if (inputSearch === null) {
+        return;
+    };
+    inputSearch.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            document.querySelector("#button-search-html").click();
+        };
+    });
+};
+inputEventKey();
 
 const resizeInput = () => {
     const input = document.querySelectorAll("input");
@@ -100,5 +124,4 @@ const resizeInput = () => {
         input[i].value = "";
     };
 };
-
 resizeInput();

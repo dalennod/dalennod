@@ -101,19 +101,36 @@ func RemoveAll(database *sql.DB) {
 func ViewAll(database *sql.DB, s bool) []setup.Bookmark {
 	var result []setup.Bookmark
 
-	rows, err := database.Query("SELECT * FROM bookmarks;")
+	rows, err := database.Query("SELECT * FROM bookmarks ORDER BY id DESC;")
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
 
+	// Table format
+	// var w *tabwriter.Writer = tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
+	// fmt.Fprintln(w, "# \t URL \t Title \t Note \t Keywords \t Group \t Archived \t Archive URL \t Modified")
 	for rows.Next() {
 		rows.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &modified)
 		if s {
-			result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified})
+			result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
 		} else {
-			fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %s, %v\n", id, url, title, note, keywords, bGroup, archived, snapshotURL, modified)
+			// original
+			// fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %s, %v\n", id, url, title, note, keywords, bGroup, archived, snapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
+
+			// Tabbed, new line format
+			fmt.Printf("\t#%d\nTitle:\t\t%s\nURL:\t\t%s\nNote:\t\t%s\nKeywords:\t%s\nGroup:\t\t%s\nArchived?:\t%t\nArchive URL:\t%s\nModified:\t%v\n\n", id, title, url, note, keywords, bGroup, archived, snapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
+
+			// Table format
+			// var output string = fmt.Sprintf("%d \t %s \t %s \t %s \t %s \t %s \t %t \t %s \t %v\n", id, url, title, note, keywords, bGroup, archived, snapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
+			// fmt.Fprintln(w, output)
+
+			// JSON format
+			// result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
 		}
 	}
+	// JSON format
+	// st, _ := json.MarshalIndent(result, "", "\t")
+	// fmt.Println(string(st))
 	return result
 }
 
@@ -124,7 +141,7 @@ func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
 	}
 	keyword = "%" + keyword + "%"
 
-	stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) or bGroup LIKE (?) or note LIKE (?) or title LIKE (?);")
+	stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) or bGroup LIKE (?) or note LIKE (?) or title LIKE (?) ORDER BY id DESC;")
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
@@ -136,7 +153,7 @@ func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
 
 	for execRes.Next() {
 		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &modified)
-		result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified})
+		result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
 	}
 
 	return result
@@ -161,7 +178,7 @@ func ViewSingleRow(database *sql.DB, id int, s bool) (string, string, string, st
 	for execRes.Next() {
 		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &modified)
 		if !s {
-			fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %s, %v\n", id, url, title, note, keywords, bGroup, archived, snapshotURL, modified)
+			fmt.Printf("\t#%d\nTitle:\t\t%s\nURL:\t\t%s\nNote:\t\t%s\nKeywords:\t%s\nGroup:\t\t%s\nArchived?:\t%t\nArchive URL:\t%s\nModified:\t%v\n", id, title, url, note, keywords, bGroup, archived, snapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
 		}
 	}
 	return url, title, note, keywords, bGroup, archived

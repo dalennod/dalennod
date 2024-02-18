@@ -13,7 +13,6 @@
     <!-- Dalennod -->
     <nav>
         <a href="../"><button id="button-back">&lt;// Back</button></a>
-        <!-- <input type="text" id="input-search" placeholder="Search keywords"> -->
     </nav>
 
     <main>
@@ -31,9 +30,8 @@
                 {{end}}
                 <p>Last modified: {{.Modified}}</p>
                 <div>
-                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button>
-                    <button id="button-update"
-                        onclick="window.location.href='update.html'; getOldData(this);">Update</button>
+                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button> <span id="delete-checkmark" hidden>&check;</span>
+                    <button id="button-update" onclick="window.location.href='update.html'; getOldData(this);">Update</button>
                 </div>
             </div>
             {{ end }}

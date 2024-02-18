@@ -13,7 +13,7 @@ import (
 	"strconv"
 )
 
-const PORT string = "41415"
+const PORT string = ":41415"
 
 var (
 	data *sql.DB
@@ -32,14 +32,13 @@ func Start(database *sql.DB) {
 	mux.HandleFunc("/add/", addHandler)
 	mux.HandleFunc("/getRow/", getRowHandler)
 	mux.HandleFunc("/update/", updateHandler)
-	// mux.HandleFunc("/search/", searchHandler)
 	mux.HandleFunc("/static/search.html", searchHandler)
 
-	err := http.ListenAndServe(":"+PORT, mux)
+	err := http.ListenAndServe(PORT, mux)
 	if err != nil {
 		logger.Error.Println(err)
 	}
-	logger.Info.Println("Started on http://localhost:" + PORT)
+	logger.Info.Println("Started on http://localhost" + PORT)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
@@ -185,12 +184,14 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		for _, vs := range r.Form {
 			for _, v := range vs {
 				bookmarks = db.ViewAllWhere(data, v)
-				// fmt.Println(bookmarks)
-				// fmt.Println(k, v)
 			}
 		}
 
-		// // tmpl = template.Must(template.ParseFiles("./search/index.html"))
+		if len(bookmarks) == 0 {
+			notFoundHandler(w, r)
+			return
+		}
+
 		tmpl = template.Must(template.ParseFiles("./static/search.html"))
 		tmpl.Execute(w, bookmarks)
 	} else {
@@ -203,7 +204,7 @@ func internalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("500 Internal Server Error"))
 }
 
-// func notFoundHandler(w http.ResponseWriter, r *http.Request) {
-// 	w.WriteHeader(http.StatusNotFound)
-// 	w.Write([]byte("404 Not Found"))
-// }
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte("404 Not Found"))
+}
