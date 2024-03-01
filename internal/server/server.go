@@ -33,6 +33,7 @@ func Start(database *sql.DB) {
 	mux.HandleFunc("/getRow/", getRowHandler)
 	mux.HandleFunc("/update/", updateHandler)
 	mux.HandleFunc("/static/search.html", searchHandler)
+	mux.HandleFunc("/backupAuth/", backupAuthHandler)
 
 	err := http.ListenAndServe(PORT, mux)
 	if err != nil {
@@ -199,12 +200,21 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func backupAuthHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		var urlParse string = r.URL.Query().Get("code")
+		w.Write([]byte(urlParse))
+	}
+}
+
 func internalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte("500 Internal Server Error"))
+	logger.Warn.Printf("status 500 at '%s%s'\n", r.Host, r.URL)
 }
 
 func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	w.Write([]byte("404 Not Found"))
+	logger.Warn.Printf("status 404 at '%s%s'\n", r.Host, r.URL)
 }

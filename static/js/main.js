@@ -93,6 +93,7 @@ const addEntry = async () => {
         resizeInput();
     };
 
+    document.querySelector("#archive-warn").setAttribute("hidden", "");
     document.querySelector("#checkmark").removeAttribute("hidden");
     setTimeout(() => {
         document.querySelector("#checkmark").setAttribute("hidden", "");
