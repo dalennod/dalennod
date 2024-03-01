@@ -1,38 +1,45 @@
-package db
+package user_input
 
 import (
 	"bufio"
 	"dalennod/internal/archive"
+	"dalennod/internal/backup"
+	"dalennod/internal/db"
 	"dalennod/internal/logger"
+	"dalennod/internal/server"
+	"dalennod/internal/setup"
 	"database/sql"
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 )
 
-var db *sql.DB
+var database *sql.DB
 
-func UserInput(database *sql.DB) {
-	db = database
+func UserInput(data *sql.DB) {
+	database = data
 
-	var input string
-	fmt.Print("Add, update, remove or view entries? : ")
-	fmt.Scanln(&input)
+	var flagVals setup.FlagValues = setup.ParseFlags()
 
-	switch strings.ToLower(input) {
-	case "add", "a":
+	switch true {
+	case flagVals.ViewAll:
+		db.ViewAll(database, false)
+	case flagVals.StartServer:
+		server.Start(database)
+	case flagVals.AddEntry:
 		addInput("", "", "", "", "", "", false, 0)
-	case "update", "u":
-		updateInput()
-	case "remove", "r":
-		removeInput()
-	case "view", "v":
-		viewInput()
-	case "q":
-		os.Exit(0)
-	default:
-		logger.Warn.Println("invalid input")
+	case flagVals.Backup && flagVals.JSONOut:
+		backup.JSONOut(database)
+	case flagVals.Backup:
+		backup.GDrive()
+	}
+
+	if flagVals.RemoveID != "" {
+		removeInput(flagVals.RemoveID)
+	} else if flagVals.UpdateID != "" {
+		updateInput(flagVals.UpdateID)
+	} else if flagVals.ViewID != "" {
+		viewInput(flagVals.ViewID)
 	}
 }
 
@@ -74,15 +81,15 @@ func addInput(url, title, note, keywords, group, archived string, update bool, i
 		case "y", "Y":
 			archiveResult, snapshotURL = archive.SendSnapshot(url)
 			if archiveResult {
-				Add(db, url, title, note, keywords, group, true, snapshotURL)
+				db.Add(database, url, title, note, keywords, group, true, snapshotURL)
 			} else {
 				logger.Warn.Println("Snapshot failed.")
-				Add(db, url, title, note, keywords, group, false, snapshotURL)
+				db.Add(database, url, title, note, keywords, group, false, snapshotURL)
 			}
 		case "n", "N":
-			Add(db, url, title, note, keywords, group, false, snapshotURL)
+			db.Add(database, url, title, note, keywords, group, false, snapshotURL)
 		default:
-			Add(db, url, title, note, keywords, group, false, snapshotURL)
+			db.Add(database, url, title, note, keywords, group, false, snapshotURL)
 			logger.Warn.Println("Invalid input for archive request. URL has not been archived.")
 		}
 	} else {
@@ -90,36 +97,38 @@ func addInput(url, title, note, keywords, group, archived string, update bool, i
 		case "y", "Y":
 			archiveResult, snapshotURL = archive.SendSnapshot(url)
 			if archiveResult {
-				Update(db, url, title, note, keywords, group, id, true, false, snapshotURL)
+				db.Update(database, url, title, note, keywords, group, id, true, false, snapshotURL)
 			} else {
 				logger.Warn.Println("Snapshot failed.")
-				Update(db, url, title, note, keywords, group, id, false, false, snapshotURL)
+				db.Update(database, url, title, note, keywords, group, id, false, false, snapshotURL)
 			}
 		case "n", "N":
-			Update(db, url, title, note, keywords, group, id, false, false, snapshotURL)
+			db.Update(database, url, title, note, keywords, group, id, false, false, snapshotURL)
 		default:
-			Update(db, url, title, note, keywords, group, id, false, false, snapshotURL)
+			db.Update(database, url, title, note, keywords, group, id, false, false, snapshotURL)
 			logger.Warn.Println("Invalid input for archive request. URL has not been archived.")
 		}
 	}
 }
 
-func updateInput() {
+func updateInput(updateID string) {
 	var (
 		id, url, title, note, keywords, group, archived, confirm string
 		scanner                                                  = bufio.NewScanner(os.Stdin)
 	)
 
-	fmt.Print("ID of bookmark to update: ")
-	scanner.Scan()
-	id = scanner.Text()
+	// fmt.Print("ID of bookmark to update: ")
+	// scanner.Scan()
+	// id = scanner.Text()
+
+	id = updateID
 
 	idToINT, err := strconv.Atoi(id)
 	if err != nil {
 		logger.Error.Println("invalid input")
 	}
 
-	ViewSingleRow(db, idToINT, false)
+	db.ViewSingleRow(database, idToINT, false)
 
 	fmt.Print("Update this entry? (y/N): ")
 	scanner.Scan()
@@ -138,22 +147,24 @@ func updateInput() {
 	}
 }
 
-func removeInput() {
+func removeInput(removeID string) {
 	var (
 		id, confirm string
 		scanner     = bufio.NewScanner(os.Stdin)
 	)
 
-	fmt.Print("ID to remove: ")
-	scanner.Scan()
-	id = scanner.Text()
+	// fmt.Print("ID to remove: ")
+	// scanner.Scan()
+	// id = scanner.Text()
+
+	id = removeID
 
 	idToINT, err := strconv.Atoi(id)
 	if err != nil {
 		logger.Error.Println("Invalid input.")
 	}
 
-	ViewSingleRow(db, idToINT, false)
+	db.ViewSingleRow(database, idToINT, false)
 
 	fmt.Print("Remove this entry? (y/n): ")
 	scanner.Scan()
@@ -161,7 +172,7 @@ func removeInput() {
 
 	switch confirm {
 	case "y", "Y":
-		Remove(db, idToINT)
+		db.Remove(database, idToINT)
 	case "n", "N":
 		return
 	default:
@@ -171,24 +182,10 @@ func removeInput() {
 	}
 }
 
-func viewInput() {
-	var (
-		input   string
-		scanner = bufio.NewScanner(os.Stdin)
-	)
-
-	fmt.Print("Enter specific ID or All: ")
-	scanner.Scan()
-	input = scanner.Text()
-
-	switch strings.ToLower(input) {
-	case "all", "a":
-		ViewAll(db, false)
-	default:
-		idToINT, err := strconv.Atoi(input)
-		if err != nil {
-			logger.Error.Println("Invalid input.")
-		}
-		ViewSingleRow(db, idToINT, false)
+func viewInput(viewID string) {
+	idToINT, err := strconv.Atoi(viewID)
+	if err != nil {
+		logger.Error.Println("Invalid input.")
 	}
+	db.ViewSingleRow(database, idToINT, false)
 }
