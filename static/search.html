@@ -30,7 +30,7 @@
                 {{end}}
                 <p>Last modified: {{.Modified}}</p>
                 <div>
-                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button> <span id="delete-checkmark" hidden>&check;</span>
+                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button> <span id="delete-checkmark-{{.ID}}" hidden>&check;</span>
                     <button id="button-update" onclick="window.location.href='update.html'; getOldData(this);">Update</button>
                 </div>
             </div>

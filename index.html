@@ -13,11 +13,11 @@
 <body>
     <!-- Dalennod -->
     <nav>
-        <input type="text" id="input-search" placeholder="Search keywords">
+        <input type="text" id="input-search" placeholder="Search a keyword">
         <form action="./static/search.html" method="post">
             <input type="hidden" name="searchTerm" id="hidden-url-param" value="">
             <button type="submit" id="button-search-html" onclick="setValue(document.querySelector('#input-search').value);">Search</button>
-        </form> _
+        </form> &nbsp;&nbsp;
         <a href="static/add.html"><button id="button-add-html">Create</button></a>
     </nav>
 
@@ -36,7 +36,7 @@
                 {{end}}
                 <p>Last modified: {{.Modified}}</p>
                 <div>
-                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button> <span id="delete-checkmark" hidden>&check;</span>
+                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button> <span id="delete-checkmark-{{.ID}}" hidden>&check;</span>
                     <button id="button-update" onclick="window.location.href='static/update.html'; getOldData(this);">Update</button>
                 </div>
             </div>

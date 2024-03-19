@@ -10,9 +10,9 @@ const deleteEntry = async (ele) => {
 
     console.log(res.status);
 
-    document.querySelector("#delete-checkmark").removeAttribute("hidden");
+    document.querySelector("#delete-checkmark-" + dataID).removeAttribute("hidden")
     setTimeout(() => {
-        document.querySelector("#delete-checkmark").setAttribute("hidden", "");
+        document.querySelector("#delete-checkmark-" + dataID).setAttribute("hidden", "");
     }, 2000);
 };
 

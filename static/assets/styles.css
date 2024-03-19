@@ -18,10 +18,7 @@ input:focus {
 }
 
 button {
-    background: none;
-    border-width: 0px;
-    text-decoration: none;
-    outline: none;
+    border-radius: 8pt;
     cursor: pointer;
 }
 
@@ -58,6 +55,7 @@ main {
     background-color: #f1f1f1;
     line-height: 1.2;
     padding: 10px;
+    border-radius: 4pt;
 }
 
 .grid-child a {
@@ -98,9 +96,9 @@ main {
     width: 25vw;
 }
 
-#button-add-req,
+/* #button-add-req,
 #button-delete,
 #button-update {
     background: none;
     border-width: 2px;
-}
+} */
