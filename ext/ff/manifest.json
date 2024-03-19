@@ -1,0 +1,23 @@
+{
+    "manifest_version": 2,
+    "name": "test",
+    "version": "0.1.0",
+    "description": "",
+    "homepage_url": "",
+    "icons": {
+        "48": "icons/bookmark-it.png",
+        "96": "icons/bookmark-it@2x.png"
+    },
+    "permissions": [
+        "tabs"
+    ],
+    "browser_action": {
+        "default_icon": "icons/star-empty-38.png",
+        "default_title": ".."
+    },
+    "background": {
+        "scripts": [
+            "app.js"
+        ]
+    }
+}
