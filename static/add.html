@@ -13,7 +13,7 @@
             border-radius: 0pt;
         }
         input {
-            border-bottom: dotted 1px black;
+            border-bottom: dotted 1px #eaeaea;
             /* border-style: outset;
             border-width: 1px;
             border-color: black;
@@ -30,7 +30,7 @@
 
     <main>
         <div class="centered">
-            <p>URL<span style="color: #700000;">*</span>: <input type="text" id="input-url" placeholder="URL to save" required></p>
+            <p>URL<span style="color: #f53838;">*</span>: <input type="text" id="input-url" placeholder="URL to save" required></p>
             <p>Title: <input type="text" id="input-title" placeholder="Title for the bookmark"></p>
             <p>Notes: <input type="text" id="input-note" placeholder="Log notes for bookmark"></p>
             <p>Keywords: <input type="text" id="input-keywords" placeholder="Keywords, to, search, bookmark"></p>
@@ -42,14 +42,14 @@
                 <input type="radio" name="radio-archive" id="radio-no" value="0" checked>
                 <label for="radio-no">No</label>
             </p>
-            <p style="font-size: 12px; text-align: right; color: #700000;">
+            <p style="font-size: 14px; text-align: right; color: #f53838;">
                 * required
             </p>
             <p style="text-align: center;">
                 <button id="button-add-req" onclick="addEntry();">
-                    Add
+                    Create
                 </button> <span id="checkmark" hidden>&check;</span> 
-                <span style="font-size: 12px; color: #700000;" id="archive-warn" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
+                <span style="font-size: 14px; color: #f53838;" id="archive-warn" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
             </p>
         </div>
     </main>

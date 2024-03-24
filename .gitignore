@@ -1,5 +1,6 @@
 logs
 dalennod*
+!*.png
 nohup.out
 tmp
 *.sh
