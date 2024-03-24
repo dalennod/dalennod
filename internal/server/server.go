@@ -75,6 +75,8 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func addHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == "POST" {
 		var (
 			insData       setup.Bookmark
@@ -98,6 +100,8 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		w.WriteHeader(http.StatusCreated)
+	} else if r.Method == "GET" {
+		w.Write([]byte("Alive."))
 	} else {
 		internalServerErrorHandler(w, r)
 	}
