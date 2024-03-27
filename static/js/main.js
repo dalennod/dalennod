@@ -118,6 +118,18 @@ const inputEventKey = () => {
 };
 inputEventKey();
 
+// const tapCheck = () => {
+//     const gridChild = document.querySelector(".grid-child");
+//     if (gridChild === null) {
+//         return;
+//     }
+//     let count = 0;
+//     gridChild.addEventListener("click", (e) => {
+//         count === 6 ? console.log("7") : count++;
+//     })
+// }
+// tapCheck();
+
 const resizeInput = () => {
     const input = document.querySelectorAll("input");
     for (i = 0; i < input.length; i++) {
