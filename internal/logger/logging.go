@@ -1,6 +1,7 @@
 package logger
 
 import (
+	"dalennod/internal/setup"
 	"fmt"
 	"io"
 	"log"
@@ -14,13 +15,12 @@ var (
 	Error *log.Logger
 
 	logFileName string = time.Now().Format("2006-01-02_15.04.05")
-	logPath            = "./logs"
 )
 
 func Enable() {
-	err := os.MkdirAll(logPath, 0755)
+	logPath, err := setup.CacheDir()
 	if err != nil {
-		log.Fatalf("Error creating logs directory: %v\n", err)
+		log.Fatalln(err)
 	}
 
 	logFile, err := os.Create(fmt.Sprintf("%s/%s.log", logPath, logFileName))

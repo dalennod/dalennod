@@ -1,62 +1,79 @@
 package setup
 
 import (
-	"dalennod/internal/logger"
+	"log"
 
 	"os"
 	"runtime"
 )
 
 const (
-	NAME = "dalennod/"
-
-	UNIX_PATH = "/.local/share/" + NAME
-	WIN_PATH  = "/AppData/Roaming/" + NAME
+	NAME string = "/dalennod/"
+	LOGS string = "logs/"
+	DB   string = "db/"
 )
 
 func GetOS() string {
-	logger.Enable()
-
-	var os string = runtime.GOOS
-	var path string
-
-	homeDir, err := getHomeDir()
+	cfgDir, err := ConfigDir()
 	if err != nil {
-		logger.Error.Fatalln("Could not locate home directory", err)
+		log.Fatalln(err)
 	}
 
-	switch os {
+	cacheDir, err := CacheDir()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	dbDir, err := DatabaseDir()
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	var goos string = runtime.GOOS
+
+	switch goos {
 	case "linux", "darwin":
-		path = unixSetup(homeDir)
+		createDir(cfgDir, dbDir, cacheDir)
 	case "windows":
-		path = winSetup(homeDir)
+		createDir(cfgDir, dbDir, cacheDir)
 	default:
-		logger.Error.Fatalln("Failed to recognize OS:", os)
+		log.Fatalln("unrecognized OS:", err)
 	}
 
-	return path
+	CfgSetup()
+
+	return dbDir
 }
 
-func getHomeDir() (string, error) {
-	return os.UserHomeDir()
-}
-
-func winSetup(homeDir string) string {
-	var path string = homeDir + WIN_PATH
-	createDir(path)
-	return path
-}
-
-func unixSetup(homeDir string) string {
-	var path string = homeDir + UNIX_PATH
-	createDir(path)
-	return path
-}
-
-func createDir(path string) {
-	err := os.MkdirAll(path, 0755)
+func ConfigDir() (string, error) {
+	cfgDir, err := os.UserConfigDir()
 	if err != nil {
-		logger.Error.Fatalf("Error creating database directory: %v\n", err)
+		return "", err
 	}
-	logger.Info.Printf("Database directory created at %s\n", path)
+	return cfgDir + NAME, nil
+}
+
+func CacheDir() (string, error) {
+	cacheDir, err := os.UserCacheDir()
+	if err != nil {
+		return "", err
+	}
+	return cacheDir + NAME + LOGS, nil
+}
+
+func DatabaseDir() (string, error) {
+	dbDir, err := ConfigDir()
+	if err != nil {
+		return "", err
+	}
+	return dbDir + DB, nil
+}
+
+func createDir(args ...string) {
+	for _, path := range args {
+		err := os.MkdirAll(path, 0755)
+		if err != nil {
+			log.Fatalln(err)
+		}
+	}
 }

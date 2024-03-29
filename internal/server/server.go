@@ -34,6 +34,7 @@ func Start(database *sql.DB) {
 	mux.HandleFunc("/update/", updateHandler)
 	mux.HandleFunc("/static/search.html", searchHandler)
 	mux.HandleFunc("/backupAuth/", backupAuthHandler)
+	mux.HandleFunc("/dm/", dmHandler)
 
 	err := http.ListenAndServe(PORT, mux)
 	if err != nil {
@@ -208,6 +209,35 @@ func backupAuthHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		var urlParse string = r.URL.Query().Get("code")
 		w.Write([]byte(urlParse))
+	} else {
+		internalServerErrorHandler(w, r)
+	}
+}
+
+func dmHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		w.Header().Set("Content-Type", "application/json")
+		dmStatus, err := setup.ReadCfg()
+		if err != nil {
+			logger.Error.Fatalln(err)
+		}
+		json.NewEncoder(w).Encode(dmStatus.DarkMode)
+	} else if r.Method == "POST" {
+		var cfg setup.CFG
+		err := json.NewDecoder(r.Body).Decode(&cfg)
+		if err != nil {
+			logger.Error.Println(err)
+		}
+
+		oldData, err := setup.ReadCfg()
+		if err != nil {
+			logger.Error.Fatalln(err)
+		}
+		setup.WriteCfg(oldData.FirstRun, cfg.DarkMode, oldData.AlwaysOverwrite)
+
+		w.WriteHeader(http.StatusCreated)
+	} else {
+		internalServerErrorHandler(w, r)
 	}
 }
 

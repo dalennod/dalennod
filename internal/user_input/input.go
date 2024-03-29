@@ -17,6 +17,8 @@ import (
 var database *sql.DB
 
 func UserInput(data *sql.DB) {
+	enableLogs()
+
 	database = data
 
 	var flagVals setup.FlagValues = setup.ParseFlags()
@@ -188,4 +190,12 @@ func viewInput(viewID string) {
 		logger.Error.Println("Invalid input.")
 	}
 	db.ViewSingleRow(database, idToINT, false)
+}
+
+func enableLogs() {
+	logger.Enable()
+	cfgDir, _ := setup.ConfigDir()
+	logDir, _ := setup.CacheDir()
+	logger.Info.Printf("Database and config directory: %s\n", cfgDir)
+	logger.Info.Printf("Error logs directory: %s\n", logDir)
 }
