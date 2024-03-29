@@ -27,14 +27,6 @@ func CreateDB(dbSavePath string) *sql.DB {
 		log.Fatalln(err)
 	}
 
-	cfg, err := ReadCfg()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if !cfg.FirstRun {
-		return db
-	}
-
 	stmt, err := db.Prepare(`
 		CREATE TABLE IF NOT EXISTS bookmarks (
 			id 			INTEGER 	PRIMARY KEY 	NOT NULL,

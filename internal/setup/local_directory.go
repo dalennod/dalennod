@@ -40,7 +40,7 @@ func GetOS() string {
 		log.Fatalln("unrecognized OS:", err)
 	}
 
-	CfgSetup()
+	CfgSetup(cfgDir)
 
 	return dbDir
 }
