@@ -1,13 +1,9 @@
 package setup
 
 import (
-	"dalennod/internal/logger"
 	"database/sql"
 	"fmt"
-)
-
-const (
-	DB_FILENAME = "default_user.db"
+	"log"
 )
 
 type Bookmark struct {
@@ -19,13 +15,24 @@ type Bookmark struct {
 	BGroup      string `json:"bGroup"`
 	Archived    bool   `json:"archive"`
 	SnapshotURL string `json:"snapshotURL"`
+	ThumbURL    string `json:"thumbURL"`
 	Modified    string `json:"modified"`
 }
+
+const DB_FILENAME string = "default_user.db"
 
 func CreateDB(dbSavePath string) *sql.DB {
 	db, err := sql.Open("sqlite3", fmt.Sprint(dbSavePath+DB_FILENAME))
 	if err != nil {
-		logger.Error.Fatalln(err)
+		log.Fatalln(err)
+	}
+
+	cfg, err := ReadCfg()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if !cfg.FirstRun {
+		return db
 	}
 
 	stmt, err := db.Prepare(`
@@ -38,18 +45,18 @@ func CreateDB(dbSavePath string) *sql.DB {
 			bGroup		TEXT,
 			archived	BOOLEAN		NOT NULL,
 			snapshotURL	TEXT,
+			thumbURL	TEXT,
 			modified	DATETIME 	DEFAULT 		CURRENT_TIMESTAMP	NOT NULL
 		);
 	`)
 	if err != nil {
-		logger.Error.Fatalln(err)
+		log.Fatalln(err)
 	}
 
-	execResult, err := stmt.Exec()
+	_, err = stmt.Exec()
 	if err != nil {
-		logger.Error.Fatalln(err)
+		log.Fatalln(err)
 	}
-	logger.Info.Println(execResult.RowsAffected())
 
 	return db
 }
