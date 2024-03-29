@@ -14,11 +14,9 @@ type CFG struct {
 
 const CFG_FILE string = "config.json"
 
-func CfgSetup() {
+func CfgSetup(cfgDir string) {
 	_, err := ReadCfg()
-	if err != nil {
-		log.Fatalln(err)
-	} else {
+	if err == nil {
 		return
 	}
 
@@ -28,11 +26,6 @@ func CfgSetup() {
 		AlwaysOverwrite: true,
 	}
 	cfgJson, err := json.MarshalIndent(config, "", "\t")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	cfgDir, err := ConfigDir()
 	if err != nil {
 		log.Fatalln(err)
 	}
