@@ -16,8 +16,8 @@ type FlagValues struct {
 var flagValues FlagValues
 
 func cliFlags() {
-	flag.StringVar(&flagValues.RemoveID, "r", "", "Delete specific bookmark using its ID.")
-	flag.StringVar(&flagValues.RemoveID, "remove", "", "Delete specific bookmark using its ID.")
+	flag.StringVar(&flagValues.RemoveID, "r", "", "Remove specific bookmark using its ID.")
+	flag.StringVar(&flagValues.RemoveID, "remove", "", "Remove specific bookmark using its ID.")
 
 	flag.StringVar(&flagValues.UpdateID, "u", "", "Update specific bookmark using its ID.")
 	flag.StringVar(&flagValues.UpdateID, "update", "", "Update specific bookmark using its ID.")
