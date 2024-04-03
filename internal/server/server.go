@@ -6,8 +6,11 @@ import (
 	"dalennod/internal/logger"
 	"dalennod/internal/setup"
 	"database/sql"
+	"embed"
 	"encoding/json"
+	"fmt"
 	"html/template"
+	"io/fs"
 	"net/http"
 	"regexp"
 	"strconv"
@@ -18,14 +21,18 @@ const PORT string = ":41415"
 var (
 	data *sql.DB
 	tmpl *template.Template
+
+	IndexHtml embed.FS
+	Webui     embed.FS
 )
 
 func Start(database *sql.DB) {
 	data = database
 	var mux *http.ServeMux = http.NewServeMux()
 
-	var staticFileServer http.Handler = http.FileServer(http.Dir("./static"))
-	mux.Handle("/static/", http.StripPrefix("/static/", staticFileServer))
+	fsopen := fs.FS(Webui)
+	webuiStatic, _ := fs.Sub(fsopen, "static")
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webuiStatic))))
 
 	mux.HandleFunc("/", root)
 	mux.HandleFunc("/delete/", deleteHandler)
@@ -40,12 +47,13 @@ func Start(database *sql.DB) {
 	if err != nil {
 		logger.Error.Println(err)
 	}
-	logger.Info.Println("Started on http://localhost" + PORT)
+	logger.Info.Printf("Web-server started on http://localhost%s", PORT)
+	fmt.Printf("Web-server started on http://localhost%s", PORT)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		tmpl = template.Must(template.ParseFiles("index.html"))
+		tmpl = template.Must(template.ParseFS(IndexHtml, "index.html"))
 		var bookmarks []setup.Bookmark = db.ViewAll(data, true)
 		tmpl.Execute(w, bookmarks)
 	} else {
@@ -198,7 +206,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tmpl = template.Must(template.ParseFiles("./static/search.html"))
+		tmpl = template.Must(template.ParseFS(Webui, "static/search.html"))
 		tmpl.Execute(w, bookmarks)
 	} else {
 		internalServerErrorHandler(w, r)
