@@ -176,10 +176,16 @@ func ViewSingleRow(database *sql.DB, id int, s bool) (string, string, string, st
 	}
 
 	for execRes.Next() {
-		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &modified)
-		if !s {
-			fmt.Printf("\t#%d\nTitle:\t\t%s\nURL:\t\t%s\nNote:\t\t%s\nKeywords:\t%s\nGroup:\t\t%s\nArchived?:\t%t\nArchive URL:\t%s\nModified:\t%v\n", id, title, url, note, keywords, bGroup, archived, snapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
-		}
+		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &thumbURL, &modified)
 	}
+
+	if url == "" {
+		return url, title, note, keywords, bGroup, archived
+	}
+
+	if !s {
+		fmt.Printf("\t#%d\nTitle:\t\t%s\nURL:\t\t%s\nNote:\t\t%s\nKeywords:\t%s\nGroup:\t\t%s\nArchived?:\t%t\nArchive URL:\t%s\nModified:\t%v\n", id, title, url, note, keywords, bGroup, archived, snapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
+	}
+
 	return url, title, note, keywords, bGroup, archived
 }
