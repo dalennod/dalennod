@@ -137,7 +137,12 @@ func updateInput(updateID string) {
 		logger.Error.Println("invalid input")
 	}
 
-	db.ViewSingleRow(database, idToINT, false)
+	url, title, note, keywords, group, _ = db.ViewSingleRow(database, idToINT, false)
+	if url == "" {
+		fmt.Println("id does not exist")
+		logger.Info.Println("id does not exist")
+		return
+	}
 
 	fmt.Print("Update this entry? (y/N): ")
 	scanner.Scan()
@@ -173,7 +178,12 @@ func removeInput(removeID string) {
 		logger.Error.Println("Invalid input.")
 	}
 
-	db.ViewSingleRow(database, idToINT, false)
+	url, _, _, _, _, _ := db.ViewSingleRow(database, idToINT, false)
+	if url == "" {
+		fmt.Println("id does not exist")
+		logger.Info.Println("id does not exist")
+		return
+	}
 
 	fmt.Print("Remove this entry? (y/n): ")
 	scanner.Scan()

@@ -13,6 +13,7 @@ const addEntry = async () => {
 
     if (dataJSON.archive) {
         document.querySelector("#archive-warn").removeAttribute("hidden");
+        document.querySelector("#button-add-req").disabled = true;
     };
 
     const fetchURL = ENDPOINT + "add/";
@@ -27,10 +28,12 @@ const addEntry = async () => {
     };
 
     document.querySelector("#archive-warn").setAttribute("hidden", "");
+    document.querySelector("#button-add-req").disabled = false;
     document.querySelector("#checkmark").removeAttribute("hidden");
     setTimeout(() => {
         document.querySelector("#checkmark").setAttribute("hidden", "");
     }, 2000);
+    document.querySelector("#created-div").style.display = "block";
 };
 
 const checkConnection = async () => {
