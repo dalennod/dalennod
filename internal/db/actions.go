@@ -3,6 +3,7 @@ package db
 import (
 	"dalennod/internal/logger"
 	"dalennod/internal/setup"
+	"dalennod/internal/thumb_url"
 	"database/sql"
 	"fmt"
 	"time"
@@ -17,16 +18,21 @@ var (
 	bGroup      string
 	archived    bool
 	snapshotURL string
+	thumbURL    string
 	modified    time.Time
 )
 
-func Add(database *sql.DB, url, title, note, keywords, bGroup string, archive bool, snapshotURL string) {
-	stmt, err := database.Prepare("INSERT INTO bookmarks (url, title, note, keywords, bGroup, archived, snapshotURL) VALUES (?, ?, ?, ?, ?, ?, ?);")
+func Add(database *sql.DB, url, title, note, keywords, bGroup string, archive bool, snapshotURL, thumbURL string) {
+	if thumbURL == "s" {
+		thumbURL, _ = thumb_url.GetPageThumb(url)
+	}
+
+	stmt, err := database.Prepare("INSERT INTO bookmarks (url, title, note, keywords, bGroup, archived, snapshotURL, thumbURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?);")
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
 
-	_, err = stmt.Exec(url, title, note, keywords, bGroup, archive, snapshotURL)
+	_, err = stmt.Exec(url, title, note, keywords, bGroup, archive, snapshotURL, thumbURL)
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
@@ -104,9 +110,9 @@ func ViewAll(database *sql.DB, s bool) []setup.Bookmark {
 	// var w *tabwriter.Writer = tabwriter.NewWriter(os.Stdout, 1, 1, 1, ' ', 0)
 	// fmt.Fprintln(w, "# \t URL \t Title \t Note \t Keywords \t Group \t Archived \t Archive URL \t Modified")
 	for rows.Next() {
-		rows.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &modified)
+		rows.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &thumbURL, &modified)
 		if s {
-			result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+			result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, ThumbURL: thumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
 		} else {
 			// original
 			// fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %s, %v\n", id, url, title, note, keywords, bGroup, archived, snapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
@@ -146,8 +152,8 @@ func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
 	}
 
 	for execRes.Next() {
-		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &modified)
-		result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+		execRes.Scan(&id, &url, &title, &note, &keywords, &bGroup, &archived, &snapshotURL, &thumbURL, &modified)
+		result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, ThumbURL: thumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
 	}
 
 	return result

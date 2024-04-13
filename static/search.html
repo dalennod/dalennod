@@ -19,19 +19,46 @@
         <div class="grid-view-list">
             {{ range. }}
             <div class="grid-child" id="{{.ID}}">
-                <p>{{.ID}}: <a href="{{.URL}}" target="_blank">{{.Title}}</a></p>
-                <p>Note: {{.Note}}</p>
-                <p>Keywords: {{.Keywords}}</p>
-                <p>Group: {{.BGroup}}</p>
-                {{if .Archived}}
-                <p>Archived: {{.Archived}} <a href="{{.SnapshotURL}}" target="_blank">[here]</a></p>
-                {{else if not .Archived}}
-                <p>Archived: {{.Archived}}</p>
+                <div id="id-creation">
+                    <p><a href="{{.URL}}" target="_blank">{{.ID}}.</a></p>
+                    <span style="font-size: 12px;">{{.Modified}}</span>
+                </div>
+
+                {{if .ThumbURL}}
+                <div id="image">
+                    <a href="{{.URL}}" target="_blank">
+                        <img src="{{.ThumbURL}}" alt="[thumbnail not found]">
+                    </a>
+                </div>
                 {{end}}
-                <p>Last modified: {{.Modified}}</p>
-                <div>
-                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button> <span id="delete-checkmark-{{.ID}}" hidden>&check;</span>
-                    <button id="button-update" onclick="window.location.href='update.html'; getOldData(this);">Update</button>
+
+                {{if .Title}}
+                <p><a href="{{.URL}}" target="_blank">{{.Title}}</a></p>
+                {{else if not .Title}}
+                <p><a href="{{.URL}}" target="_blank">{{.URL}}</a></p>
+                {{end}}
+
+                {{if .Note}}
+                <p>Notes: {{.Note}}</p>
+                {{end}}
+
+                {{if .Archived}}
+                <p>Archived: <a href="{{.SnapshotURL}}" target="_blank">[click here]</a></p>
+                {{end}}
+
+                {{if .Keywords}}
+                <p> <span id="keywords">{{.Keywords}}</span> </p>
+                {{end}}
+
+                {{if .BGroup}}
+                <p><span id="group">{{.BGroup}}</span></p>
+                {{end}}
+
+                <div id="buttons">
+                    <button id="button-delete" onclick="deleteEntry(this);">Delete</button> <span
+                        id="delete-checkmark-{{.ID}}" hidden>&check;</span>
+                    <button id="button-update"
+                        onclick="window.location.href='update.html'; getOldData(this);">Update</button>
                 </div>
             </div>
             {{ end }}
