@@ -8,20 +8,24 @@ import (
 	"dalennod/internal/logger"
 	"dalennod/internal/server"
 	"dalennod/internal/setup"
+	"dalennod/internal/thumb_url"
 	"database/sql"
 	"fmt"
 	"os"
 	"strconv"
 )
 
-var database *sql.DB
+var (
+	database *sql.DB
+	flagVals setup.FlagValues
+)
 
 func UserInput(data *sql.DB) {
 	enableLogs()
 
 	database = data
 
-	var flagVals setup.FlagValues = setup.ParseFlags()
+	flagVals = setup.ParseFlags()
 
 	switch true {
 	case flagVals.ViewAll:
@@ -52,11 +56,14 @@ func addInput(url, title, note, keywords, group, archived string, update bool, i
 		scanner              = bufio.NewScanner(os.Stdin)
 	)
 
-	logger.Info.Println(url, title, note, keywords, group, archived)
-
 	fmt.Print("URL to save: ")
 	scanner.Scan()
 	url = scanner.Text()
+
+	thumbURL, err := thumb_url.GetPageThumb(url)
+	if err != nil {
+		thumbURL = url
+	}
 
 	fmt.Print("Title for the bookmark: ")
 	scanner.Scan()
@@ -83,15 +90,15 @@ func addInput(url, title, note, keywords, group, archived string, update bool, i
 		case "y", "Y":
 			archiveResult, snapshotURL = archive.SendSnapshot(url)
 			if archiveResult {
-				db.Add(database, url, title, note, keywords, group, true, snapshotURL)
+				db.Add(database, url, title, note, keywords, group, true, snapshotURL, thumbURL)
 			} else {
 				logger.Warn.Println("Snapshot failed.")
-				db.Add(database, url, title, note, keywords, group, false, snapshotURL)
+				db.Add(database, url, title, note, keywords, group, false, snapshotURL, thumbURL)
 			}
 		case "n", "N":
-			db.Add(database, url, title, note, keywords, group, false, snapshotURL)
+			db.Add(database, url, title, note, keywords, group, false, snapshotURL, thumbURL)
 		default:
-			db.Add(database, url, title, note, keywords, group, false, snapshotURL)
+			db.Add(database, url, title, note, keywords, group, false, snapshotURL, thumbURL)
 			logger.Warn.Println("Invalid input for archive request. URL has not been archived.")
 		}
 	} else {

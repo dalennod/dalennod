@@ -3,6 +3,7 @@ module dalennod
 go 1.21.1
 
 require (
+	github.com/dyatlov/go-opengraph/opengraph v0.0.0-20220524092352-606d7b1e5f8a
 	github.com/mattn/go-sqlite3 v1.14.17
 	golang.org/x/oauth2 v0.17.0
 	google.golang.org/api v0.167.0

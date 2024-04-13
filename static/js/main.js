@@ -101,6 +101,7 @@ const addEntry = async () => {
 };
 
 const setValue = (term) => {
+    console.log(document.querySelector("#hidden-url-param").value);
     document.querySelector("#hidden-url-param").value = term;
 };
 

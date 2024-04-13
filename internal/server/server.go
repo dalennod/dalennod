@@ -43,12 +43,13 @@ func Start(database *sql.DB) {
 	mux.HandleFunc("/backupAuth/", backupAuthHandler)
 	mux.HandleFunc("/dm/", dmHandler)
 
+	logger.Info.Printf("Web-server starting on http://localhost%s\n", PORT)
+	fmt.Printf("Web-server starting on http://localhost%s\n", PORT)
 	err := http.ListenAndServe(PORT, mux)
 	if err != nil {
-		logger.Error.Println(err)
+		fmt.Printf("Stopping (error: %v)\n", err)
+		logger.Error.Printf("Stopping (error: %v)\n", err)
 	}
-	logger.Info.Printf("Web-server started on http://localhost%s", PORT)
-	fmt.Printf("Web-server started on http://localhost%s", PORT)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
@@ -98,14 +99,14 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if !insData.Archived {
-			db.Add(data, insData.URL, insData.Title, insData.Note, insData.Keywords, insData.BGroup, insData.Archived, snapshotURL)
+			db.Add(data, insData.URL, insData.Title, insData.Note, insData.Keywords, insData.BGroup, insData.Archived, snapshotURL, "s")
 		} else {
 			archiveResult, snapshotURL = archive.SendSnapshot(insData.URL)
 			if archiveResult {
-				db.Add(data, insData.URL, insData.Title, insData.Note, insData.Keywords, insData.BGroup, insData.Archived, snapshotURL)
+				db.Add(data, insData.URL, insData.Title, insData.Note, insData.Keywords, insData.BGroup, insData.Archived, snapshotURL, "s")
 			} else {
 				logger.Warn.Println("Snapshot failed.", snapshotURL)
-				db.Add(data, insData.URL, insData.Title, insData.Note, insData.Keywords, insData.BGroup, false, snapshotURL)
+				db.Add(data, insData.URL, insData.Title, insData.Note, insData.Keywords, insData.BGroup, false, snapshotURL, "s")
 			}
 		}
 		w.WriteHeader(http.StatusCreated)
