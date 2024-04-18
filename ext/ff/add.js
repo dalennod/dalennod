@@ -34,6 +34,9 @@ const addEntry = async () => {
         document.querySelector("#checkmark").setAttribute("hidden", "");
     }, 2000);
     document.querySelector("#created-div").style.display = "block";
+    setTimeout(() => {
+        document.querySelector("#created-div").style.display = "none";
+    }, 2000);
 };
 
 const checkConnection = async () => {
