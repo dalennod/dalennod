@@ -116,8 +116,16 @@ main {
 .grid-child #group,
 .grid-child #keywords {
     font-size: 13px;
-    border-bottom: dotted 1px #aaa;
     padding: 2pt;
+}
+
+.grid-child #group {
+    border: dotted 2px #aaa;
+    border-radius: 5pt;
+}
+
+.grid-child #keywords {
+    border-bottom: dotted 1px #aaa;
 }
 
 .grid-child #id-creation {
