@@ -30,11 +30,9 @@ const addEntry = async () => {
     document.querySelector("#archive-warn").setAttribute("hidden", "");
     document.querySelector("#button-add-req").disabled = false;
     document.querySelector("#checkmark").removeAttribute("hidden");
-    setTimeout(() => {
-        document.querySelector("#checkmark").setAttribute("hidden", "");
-    }, 2000);
     document.querySelector("#created-div").style.display = "block";
     setTimeout(() => {
+        document.querySelector("#checkmark").setAttribute("hidden", "");
         document.querySelector("#created-div").style.display = "none";
     }, 2000);
 };
