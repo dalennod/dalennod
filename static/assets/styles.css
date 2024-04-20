@@ -104,12 +104,21 @@ main {
     color: #2f9df7;
 }
 
-.grid-child #image img {
+.grid-child #thumbURL img {
     display: block;
     margin-left: auto;
     margin-right: auto;
     width: 50%;
     height: 50%;
+    object-fit: cover;
+}
+
+.grid-child #default-thumbURL img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 25%;
+    height: 25%;
     object-fit: cover;
 }
 
