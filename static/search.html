@@ -26,15 +26,15 @@
                     </div>
 
                     {{if .ThumbURL}}
-                    <div id="image">
+                    <div id="thumbURL">
                         <a href="{{.URL}}" target="_blank">
                             <img src="{{.ThumbURL}}" alt="[couldn't load thumbnail]">
                         </a>
                     </div>
                     {{else if not .ThumbURL}}
-                    <div id="image">
+                    <div id="default-thumbURL">
                         <a href="{{.URL}}" target="_blank">
-                            <img src="assets/imgs/41415.png" alt="[couldn't load thumbnail]" height="50%" width="50%">
+                            <img src="assets/imgs/41415.png" alt="[couldn't load thumbnail]">
                         </a>
                     </div>
                     {{end}}
