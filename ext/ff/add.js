@@ -47,7 +47,12 @@ const checkConnection = async () => {
             console.log(res.status, await res.text());
         } catch (e) {
             conn = false;
-            document.querySelector(".centered").innerHTML = "Dalennod (web-server) must be running.";
+            document.querySelector(".centered").innerHTML = `
+                <a href="https://github.com/dalennod/dalennod" target="_blank">
+                    <span style="text-decoration: underline;">
+                        Dalennod</span>
+                </a> 
+                (web-server) must be running.`;
             return;
         }
         conn = true;

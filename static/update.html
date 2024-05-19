@@ -21,23 +21,15 @@
         };
         window.onload = updateInputBox;
     </script>
-    <style>
-        .update-new-data input:focus {
-            outline: auto;
-            border: none;
-            border-radius: 0pt;
-        }
-        .update-new-data input,
-        .update-old-data input {
-            border-bottom: dotted 1px #aaa;
-        }
-    </style>
+    <style> .update-new-data input:focus { outline: auto; border: none; border-radius: 0px; } .update-new-data input, .update-old-data input { border-bottom: dotted 1px #aaa; } </style>
     <title>Dalennod - Update</title>
 </head>
 
 <body>
     <nav>
-        <a href="../"><button id="button-back">&lt;// Back</button></a>
+        <a href="../"><button id="button-back" class="button-svg" title="Go back">
+            <svg fill="#000000" id="svg-back" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"> <g stroke-width="0"></g> <g stroke-linecap="round" stroke-linejoin="round"></g> <path d="M49.132,21.984L12.714,48.039c-0.66,0.471-1.049,1.233-1.051,2.043c0,0.006,0,0.006,0,0.006 c0.002,0.815,0.396,1.575,1.059,2.048L49.14,78.023c0.767,0.546,1.776,0.616,2.612,0.183c0.835-0.426,1.361-1.291,1.361-2.236 V63.787l32.709,0.001c1.39,0,2.515-1.125,2.515-2.516l-0.001-22.541c0.001-1.389-1.124-2.515-2.516-2.516l-32.706,0V24.029 c0-0.94-0.53-1.803-1.367-2.237C50.911,21.359,49.9,21.434,49.132,21.984z"> </path> </svg>
+        </button></a>
     </nav>
 
     <main class="update-main">
@@ -52,16 +44,12 @@
                 <input type="radio" name="old-radio-archive" id="old-radio-yes" value="1" disabled>
                 <label for="old-radio-yes">Yes</label>
                 <input type="radio" name="old-radio-archive" id="old-radio-no" value="0" disabled>
-                <label for="old-radio-no">No</label>
-            </p>
-            <p style="font-size: 14px; text-align: center; color: #f53838;">
-                Old data [id:<span id="data-id"></span>]
-            </p>
+                <label for="old-radio-no">No</label> </p>
+            <p style="font-size: 14px; text-align: center; color: #f53838;">Old data [id:<span id="data-id"></span>]</p>
         </div>
 
         <div class="update-new-data">
-            <p>URL: <input type="text" id="input-url"
-                    placeholder="New URL to save" required></p>
+            <p>URL: <input type="text" id="input-url" placeholder="New URL to save" required></p>
             <p>Title: <input type="text" id="input-title" placeholder="New title for the bookmark"></p>
             <p>Notes: <input type="text" id="input-note" placeholder="New notes for bookmark"></p>
             <p>Keywords: <input type="text" id="input-keywords" placeholder="New keywords, to, search, bookmark"></p>
@@ -71,15 +59,10 @@
                 <input type="radio" name="radio-archive" id="radio-yes" value="1">
                 <label for="radio-yes">Yes</label>
                 <input type="radio" name="radio-archive" id="radio-no" value="0" checked>
-                <label for="radio-no">No</label>
-            </p>
-            <p style="font-size: 14px; text-align: right; color: #f53838;">
-                Empty fields will use old data
-            </p>
+                <label for="radio-no">No</label> </p>
+            <p style="font-size: 14px; text-align: right; color: #f53838;">Empty fields will use old data</p>
             <p style="text-align: center;">
-                <button id="button-add-req" onclick="updateEntry();">
-                    Update
-                </button> <span id="checkmark" hidden>&check;</span>
+                <button class="button-text" id="button-add-req" onclick="updateEntry();" title="Update">Update</button> <span id="checkmark" hidden>&check;</span>
             </p>
         </div>
     </main>
