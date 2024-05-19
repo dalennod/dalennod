@@ -13,7 +13,6 @@ Dalennod is a bookmark manager written using Go. It aims to be different from ot
 - Can create bookmarks using the browser extension; without even having to leave the active tab.
 - Can create, view, update or delete bookmarks from the Web Interface and CLI.
 - Option to archive bookmarked websites to the Internet Archive.
-- Option to backup the bookmark database to user's own Google Drive account.
 - Easy on system resources and very distributable as entire application is a singular binary.
 
 ### Screenshots:
