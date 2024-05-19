@@ -30,13 +30,21 @@ input:focus {
     outline: none;
 }
 
-button {
-    border-radius: 5pt;
+.button-svg {
+    width: 2em;
+    height: 2em;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+.button-text {
+    border-radius: 5px;
     cursor: pointer;
     color: #1f1f1f;
 }
 
-button.dark {
+.button-text.dark {
     background-color: #2875b5;
     border-color: #2875b5;
 }
@@ -147,6 +155,16 @@ main {
     bottom: 0;
     right: 2%;
     margin-bottom: 2%;
+}
+
+svg {
+    width: 1.5em;
+    height: 1.5em;
+    filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
+}
+
+svg.dark {
+    filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
 }
 
 .centered {

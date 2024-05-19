@@ -8,8 +8,6 @@ const deleteEntry = async (ele) => {
         method: "GET",
     });
 
-    console.log(res.status);
-
     document.querySelector("#delete-checkmark-" + dataID).removeAttribute("hidden")
     setTimeout(() => {
         document.querySelector("#delete-checkmark-" + dataID).setAttribute("hidden", "");
@@ -23,8 +21,6 @@ const getOldData = async (ele) => {
     const res = await fetch(fetchURL, {
         method: "GET",
     });
-
-    console.log(res.status);
 
     const oldData = await res.json();
     if (typeof (Storage) !== "undefined") {
@@ -51,8 +47,6 @@ const updateEntry = async () => {
         },
         body: JSON.stringify(newDataJSON),
     });
-
-    console.log(res.status);
 
     document.querySelector("#checkmark").removeAttribute("hidden");
     setTimeout(() => {
@@ -88,7 +82,6 @@ const addEntry = async () => {
         body: JSON.stringify(dataJSON),
     });
 
-    console.log(res.status);
     if (res.ok) {
         resizeInput();
     };
@@ -101,7 +94,6 @@ const addEntry = async () => {
 };
 
 const setValue = (term) => {
-    console.log(document.querySelector("#hidden-url-param").value);
     document.querySelector("#hidden-url-param").value = term;
 };
 
@@ -155,13 +147,13 @@ tapCheck();
 const dmToggle = () => {
     document.body.classList.toggle("dark");
     document.querySelector("nav").classList.toggle("dark");
-    document.querySelectorAll("button").forEach(b => b.classList.toggle("dark"));
+    try { document.querySelectorAll(".button-text").forEach(i => i.classList.toggle("dark")); } catch (err) { console.log(err); }
     try { document.querySelectorAll("input").forEach(i => i.classList.toggle("dark")); } catch (err) { console.log(err); }
     try { document.querySelectorAll(".grid-child").forEach(gc => gc.classList.toggle("dark")); } catch (err) { console.log(err); }
     try { document.querySelectorAll(".grid-child a").forEach(gca => gca.classList.toggle("dark")); } catch (err) { console.log(err); }
     try { document.querySelector(".centered").classList.toggle("dark"); } catch (err) { console.log(err); }
     try { document.querySelectorAll(".update-main div").forEach(um => um.classList.toggle("dark")); } catch (err) { console.log(err); }
-    // location.reload();
+    try { document.querySelectorAll("svg").forEach(um => um.classList.toggle("dark")); } catch (err) { console.log(err); }
 };
 
 const dmStateChange = async () => {
