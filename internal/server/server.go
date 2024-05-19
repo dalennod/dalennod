@@ -40,7 +40,6 @@ func Start(database *sql.DB) {
 	mux.HandleFunc("/getRow/", getRowHandler)
 	mux.HandleFunc("/update/", updateHandler)
 	mux.HandleFunc("/static/search.html", searchHandler)
-	mux.HandleFunc("/backupAuth/", backupAuthHandler)
 	mux.HandleFunc("/dm/", dmHandler)
 
 	logger.Info.Printf("Web-server starting on http://localhost%s\n", PORT)
@@ -209,15 +208,6 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 		tmpl = template.Must(template.ParseFS(Webui, "static/search.html"))
 		tmpl.Execute(w, bookmarks)
-	} else {
-		internalServerErrorHandler(w, r)
-	}
-}
-
-func backupAuthHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
-		var urlParse string = r.URL.Query().Get("code")
-		w.Write([]byte(urlParse))
 	} else {
 		internalServerErrorHandler(w, r)
 	}

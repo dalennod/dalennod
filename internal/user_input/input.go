@@ -36,8 +36,6 @@ func UserInput(data *sql.DB) {
 		addInput("", "", "", "", "", "", false, 0)
 	case flagVals.Backup && flagVals.JSONOut:
 		backup.JSONOut(database)
-	case flagVals.Backup:
-		backup.GDrive()
 	}
 
 	if flagVals.RemoveID != "" {
