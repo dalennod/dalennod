@@ -4,7 +4,7 @@ const deleteEntry = async (ele) => {
     const dataID = ele.parentNode.parentNode.id;
 
     const fetchURL = ENDPOINT + "delete/" + dataID;
-    const res = await fetch(fetchURL, {
+    await fetch(fetchURL, {
         method: "GET",
     });
 
@@ -40,7 +40,7 @@ const updateEntry = async () => {
 
     const dataID = document.querySelector("#data-id").innerText;
     const fetchURL = ENDPOINT + "update/" + dataID;
-    const res = await fetch(fetchURL, {
+    await fetch(fetchURL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json; charset=utf-8"
@@ -110,74 +110,6 @@ const inputEventKey = () => {
     });
 };
 inputEventKey();
-
-const dmCheck = async () => {
-    const fetchURL = ENDPOINT + "dm/";
-    const res = await fetch(fetchURL, {
-        method: "GET",
-    });
-    const dm = await res.json();
-    if (dm) {
-        dmToggle();
-    } else {
-        return;
-    }
-};
-dmCheck();
-
-const tapCheck = () => {
-    const gridChild = document.querySelector(".grid-child");
-    if (gridChild === null) {
-        return;
-    }
-    let count = 0;
-    gridChild.addEventListener("click", (e) => {
-        if (count === 6) {
-            dmToggle();
-            dmStateChange();
-            count = 0;
-        } else {
-            count++;
-        }
-        return;
-    })
-};
-tapCheck();
-
-const dmToggle = () => {
-    document.body.classList.toggle("dark");
-    document.querySelector("nav").classList.toggle("dark");
-    try { document.querySelectorAll(".button-text").forEach(i => i.classList.toggle("dark")); } catch (err) { console.log(err); }
-    try { document.querySelectorAll("input").forEach(i => i.classList.toggle("dark")); } catch (err) { console.log(err); }
-    try { document.querySelectorAll(".grid-child").forEach(gc => gc.classList.toggle("dark")); } catch (err) { console.log(err); }
-    try { document.querySelectorAll(".grid-child a").forEach(gca => gca.classList.toggle("dark")); } catch (err) { console.log(err); }
-    try { document.querySelector(".centered").classList.toggle("dark"); } catch (err) { console.log(err); }
-    try { document.querySelectorAll(".update-main div").forEach(um => um.classList.toggle("dark")); } catch (err) { console.log(err); }
-    try { document.querySelectorAll("svg").forEach(um => um.classList.toggle("dark")); } catch (err) { console.log(err); }
-};
-
-const dmStateChange = async () => {
-    const fetchURL = ENDPOINT + "dm/";
-    const res = await fetch(fetchURL, {
-        method: "GET",
-    });
-    const dm = await res.json();
-    if (!dm) {
-        dmPostReq(fetchURL, true);
-    } else {
-        dmPostReq(fetchURL, false);
-    };
-};
-
-const dmPostReq = async (fetchURL, s) => {
-    await fetch(fetchURL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json; charset=utf-8"
-        },
-        body: JSON.stringify({ darkMode: s }),
-    });
-}
 
 const resizeInput = () => {
     const input = document.querySelectorAll("input");
