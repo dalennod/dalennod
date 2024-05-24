@@ -4,12 +4,7 @@
 }
 
 body {
-    font-family: "InterReg", cursive;
-}
-
-body.dark {
-    background-color: #232323;
-    color: #eaeaea;
+    font-family: "InterReg", sans-serif;
 }
 
 body * {
@@ -20,10 +15,6 @@ input {
     background: none;
     border-width: 0px;
     text-decoration: none;
-}
-
-input.dark {
-    color: #eaeaea;
 }
 
 input:focus {
@@ -44,11 +35,6 @@ input:focus {
     color: #1f1f1f;
 }
 
-.button-text.dark {
-    background-color: #2875b5;
-    border-color: #2875b5;
-}
-
 nav {
     position: absolute;
     top: 0px;
@@ -60,12 +46,8 @@ nav {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    border-bottom-left-radius: 4pt;
-    border-bottom-right-radius: 4pt;
-}
-
-nav.dark {
-    background-color: #2d2d2d;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
 }
 
 #input-search {
@@ -89,22 +71,12 @@ main {
     position: relative;
     background-color: #f1f1f1;
     padding: 10px;
-    border-radius: 4pt;
-}
-
-.grid-child.dark,
-.centered.dark,
-.update-main div.dark {
-    background-color: #303030;
+    border-radius: 5px;
 }
 
 .grid-child a {
     text-decoration: none;
     color: black;
-}
-
-.grid-child a.dark {
-    color: #eaeaea;
 }
 
 .grid-child a:hover {
@@ -133,12 +105,12 @@ main {
 .grid-child #group,
 .grid-child #keywords {
     font-size: 13px;
-    padding: 2pt;
+    padding: 3px;
 }
 
 .grid-child #group {
     border: dotted 2px #aaa;
-    border-radius: 5pt;
+    border-radius: 5px;
 }
 
 .grid-child #keywords {
@@ -163,12 +135,12 @@ svg {
     filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
 }
 
-svg.dark {
-    filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
+svg:hover {
+    fill: #777;
 }
 
 .centered {
-    padding: 20pt;
+    padding: 25px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -184,7 +156,6 @@ svg.dark {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-gap: 15px;
-
     position: absolute;
     top: 50%;
     left: 50%;
@@ -197,5 +168,39 @@ svg.dark {
 }
 
 .update-main div {
-    padding: 20pt;
+    padding: 25px;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #232323;
+        color: #eaeaea;
+    }
+
+    input {
+        color: #eaeaea;
+    }
+
+    .button-text {
+        background-color: #2875b5;
+        border-color: #2875b5;
+    }
+
+    nav {
+        background-color: #2d2d2d;
+    }
+
+    .grid-child,
+    .centered,
+    .update-main div {
+        background-color: #303030;
+    }
+
+    .grid-child a {
+        color: #eaeaea;
+    }
+
+    svg {
+        filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
+    }
 }
