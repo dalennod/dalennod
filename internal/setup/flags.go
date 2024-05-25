@@ -11,6 +11,8 @@ type FlagValues struct {
 	StartServer bool
 	Backup      bool
 	JSONOut     bool
+	Import      string
+	Firefox     bool
 }
 
 var flagValues FlagValues
@@ -37,6 +39,11 @@ func cliFlags() {
 	flag.BoolVar(&flagValues.Backup, "b", false, "Start backup process.")
 	flag.BoolVar(&flagValues.Backup, "backup", false, "Start backup process.")
 	flag.BoolVar(&flagValues.JSONOut, "json", false, "Print entire DB in JSON. Use alongside --backup flag.")
+
+	flag.StringVar(&flagValues.Import, "i", "", "Import bookmarks from a browser.")
+	flag.StringVar(&flagValues.Import, "import", "", "Import bookmarks from a browser.")
+	flag.BoolVar(&flagValues.Firefox, "f", false, "Import bookmarks from Firefox. Use alongside -i flag.")
+	flag.BoolVar(&flagValues.Firefox, "firefox", false, "Import bookmarks from Firefox. Use alongside -i flag.")
 }
 
 func ParseFlags() FlagValues {
