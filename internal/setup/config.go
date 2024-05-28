@@ -7,23 +7,20 @@ import (
 )
 
 type CFG struct {
-	FirstRun        bool `json:"firstRun"`
-	DarkMode        bool `json:"darkMode"`
-	AlwaysOverwrite bool `json:"alwaysOverwrite"`
+	FirstRun bool `json:"firstRun"`
 }
 
-const CFG_FILE string = "config.json"
+const (
+	CFG_FILE string = "config.json"
+)
 
 func CfgSetup(cfgDir string) {
-	_, err := ReadCfg()
-	if err == nil {
+	if _, err := ReadCfg(); err == nil {
 		return
 	}
 
 	var config CFG = CFG{
-		FirstRun:        false,
-		DarkMode:        false,
-		AlwaysOverwrite: true,
+		FirstRun: false,
 	}
 	cfgJson, err := json.MarshalIndent(config, "", "\t")
 	if err != nil {
@@ -36,7 +33,9 @@ func CfgSetup(cfgDir string) {
 	}
 	defer cfgFile.Close()
 
-	cfgFile.Write(cfgJson)
+	if _, err = cfgFile.Write(cfgJson); err != nil {
+		log.Println(err)
+	}
 }
 
 func ReadCfg() (CFG, error) {
@@ -60,11 +59,9 @@ func ReadCfg() (CFG, error) {
 	return conf, nil
 }
 
-func WriteCfg(fr, dm, ao bool) error {
+func WriteCfg(fr bool) error {
 	var config CFG = CFG{
-		FirstRun:        fr,
-		DarkMode:        dm,
-		AlwaysOverwrite: ao,
+		FirstRun: fr,
 	}
 	cfgJson, err := json.MarshalIndent(config, "", "\t")
 	if err != nil {
