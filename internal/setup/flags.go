@@ -1,6 +1,10 @@
 package setup
 
-import "flag"
+import (
+	"flag"
+	"fmt"
+	"io"
+)
 
 type FlagValues struct {
 	RemoveID    string
@@ -18,32 +22,48 @@ type FlagValues struct {
 var flagValues FlagValues
 
 func cliFlags() {
-	flag.StringVar(&flagValues.RemoveID, "r", "", "Remove specific bookmark using its ID.")
-	flag.StringVar(&flagValues.RemoveID, "remove", "", "Remove specific bookmark using its ID.")
+	flag.Usage = func() {
+		var w io.Writer = flag.CommandLine.Output()
+		fmt.Fprintln(w, "Usage of dalennod: dalennod [OPTION] ...")
+		fmt.Fprintln(w, "\nOptions:")
+		fmt.Fprintln(w, "  -s, --serve\t\tStart webserver locally for Web UI & Extension")
+		fmt.Fprintln(w, "  -a, --add\t\tAdd a bookmark entry to the database")
+		fmt.Fprintln(w, "  -r, --remove [id]\tRemove specific bookmark using its ID")
+		fmt.Fprintln(w, "  -u, --update [id]\tUpdate specific bookmark using its ID")
+		fmt.Fprintln(w, "  -v, --view [id]\tView specific bookmark using its ID")
+		fmt.Fprintln(w, "  -va, --view-all\tView all bookmarks")
+		fmt.Fprintln(w, "  -i, --import [file]\tImport bookmarks from a browser")
+		fmt.Fprintln(w, "  -ff, --firefox\tImport bookmarks from Firefox.\n\t\t\t  Must use alongside -i, --import option")
+		fmt.Fprintln(w, "  -b, --backup\t\tStart backup process")
+		fmt.Fprintln(w, "  --json\t\tPrint entire DB in JSON.\n\t\t\t  Use alongside -b, --backup flag")
+	}
 
-	flag.StringVar(&flagValues.UpdateID, "u", "", "Update specific bookmark using its ID.")
-	flag.StringVar(&flagValues.UpdateID, "update", "", "Update specific bookmark using its ID.")
+	flag.BoolVar(&flagValues.StartServer, "s", false, "Start webserver locally for Web UI & Extension")
+	flag.BoolVar(&flagValues.StartServer, "serve", false, "Start webserver locally for Web UI & Extension")
 
-	flag.StringVar(&flagValues.ViewID, "v", "", "View specific bookmark using its ID.")
-	flag.StringVar(&flagValues.ViewID, "view", "", "View specific bookmark using its ID.")
+	flag.StringVar(&flagValues.RemoveID, "r", "", "Remove specific bookmark using its ID")
+	flag.StringVar(&flagValues.RemoveID, "remove", "", "Remove specific bookmark using its ID")
 
-	flag.BoolVar(&flagValues.ViewAll, "va", false, "View all bookmarks.")
-	flag.BoolVar(&flagValues.ViewAll, "view-all", false, "View all bookmarks.")
+	flag.StringVar(&flagValues.UpdateID, "u", "", "Update specific bookmark using its ID")
+	flag.StringVar(&flagValues.UpdateID, "update", "", "Update specific bookmark using its ID")
 
-	flag.BoolVar(&flagValues.AddEntry, "a", false, "Add a bookmark entry to the database.")
-	flag.BoolVar(&flagValues.AddEntry, "add", false, "Add a bookmark entry to the database.")
+	flag.StringVar(&flagValues.ViewID, "v", "", "View specific bookmark using its ID")
+	flag.StringVar(&flagValues.ViewID, "view", "", "View specific bookmark using its ID")
 
-	flag.BoolVar(&flagValues.StartServer, "s", false, "Start webserver locally for UI.")
-	flag.BoolVar(&flagValues.StartServer, "serve", false, "Start webserver locally for UI.")
+	flag.BoolVar(&flagValues.ViewAll, "va", false, "View all bookmarks")
+	flag.BoolVar(&flagValues.ViewAll, "view-all", false, "View all bookmarks")
 
-	flag.BoolVar(&flagValues.Backup, "b", false, "Start backup process.")
-	flag.BoolVar(&flagValues.Backup, "backup", false, "Start backup process.")
-	flag.BoolVar(&flagValues.JSONOut, "json", false, "Print entire DB in JSON. Use alongside --backup flag.")
+	flag.BoolVar(&flagValues.AddEntry, "a", false, "Add a bookmark entry to the database")
+	flag.BoolVar(&flagValues.AddEntry, "add", false, "Add a bookmark entry to the database")
 
-	flag.StringVar(&flagValues.Import, "i", "", "Import bookmarks from a browser.")
-	flag.StringVar(&flagValues.Import, "import", "", "Import bookmarks from a browser.")
-	flag.BoolVar(&flagValues.Firefox, "f", false, "Import bookmarks from Firefox. Use alongside -i flag.")
-	flag.BoolVar(&flagValues.Firefox, "firefox", false, "Import bookmarks from Firefox. Use alongside -i flag.")
+	flag.BoolVar(&flagValues.Backup, "b", false, "Start backup process")
+	flag.BoolVar(&flagValues.Backup, "backup", false, "Start backup process")
+	flag.BoolVar(&flagValues.JSONOut, "json", false, "Print entire DB in JSON. Use alongside --backup flag")
+
+	flag.StringVar(&flagValues.Import, "i", "", "Import bookmarks from a browser")
+	flag.StringVar(&flagValues.Import, "import", "", "Import bookmarks from a browser")
+	flag.BoolVar(&flagValues.Firefox, "ff", false, "Import bookmarks from Firefox. Use alongside -i flag")
+	flag.BoolVar(&flagValues.Firefox, "firefox", false, "Import bookmarks from Firefox. Use alongside -i flag")
 }
 
 func ParseFlags() FlagValues {
