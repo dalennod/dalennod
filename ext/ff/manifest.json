@@ -9,12 +9,7 @@
     },
     "homepage_url": "https://github.com/dalennod/dalennod",
     "permissions": [
-        "activeTab"
-    ],
-    "content_scripts": [
-        {
-            "matches": ["<all_urls>"]
-        }
+        "tabs"
     ],
     "browser_action": {
         "default_title": "Dalennod",

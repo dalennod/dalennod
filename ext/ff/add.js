@@ -22,7 +22,6 @@ const addEntry = async () => {
         body: JSON.stringify(dataJSON),
     });
 
-    console.log(res.status);
     if (res.ok) {
         resizeInput();
     };
@@ -64,11 +63,11 @@ const checkConnection = async () => {
     });
 };
 
-window.addEventListener("load", (event) => {
+window.addEventListener("load", () => {
     checkConnection();
 });
 
-document.querySelector("#button-add-req").addEventListener("click", (event) => {
+document.querySelector("#button-add-req").addEventListener("click", () => {
     addEntry();
 });
 
