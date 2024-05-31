@@ -1,16 +1,14 @@
-# dalennod
+# Dalennod
 
 Dalennod is a bookmark manager written using Go. It aims to be different from other projects by giving users a place to log reasonings or notes about a website they are bookmarking, so they can come back to a bookmark in the future with ease.
 
 ### Usage:
 - Web Interface
 - CLI
-- Browser Extension
-
-** For the moment, browser extension only supports creating bookmarks & is only available for Firefox.
+- Browser Extension (Firefox)
 
 ### Features:
-- Can create bookmarks using the browser extension; without even having to leave the active tab.
+- Can create, update or delete bookmarks using the Browser Extension; without even having to leave the active tab.
 - Can create, view, update or delete bookmarks from the Web Interface and CLI.
 - Option to archive bookmarked websites to the Internet Archive.
 - Easy on system resources and very distributable as entire application is a singular binary.
