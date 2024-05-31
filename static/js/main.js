@@ -4,9 +4,7 @@ const deleteEntry = async (ele) => {
     const dataID = ele.parentNode.parentNode.id;
 
     const fetchURL = ENDPOINT + "delete/" + dataID;
-    await fetch(fetchURL, {
-        method: "GET",
-    });
+    await fetch(fetchURL);
 
     document.querySelector("#delete-checkmark-" + dataID).removeAttribute("hidden")
     setTimeout(() => {
@@ -18,9 +16,7 @@ const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.id;
 
     const fetchURL = ENDPOINT + "getRow/" + entryID;
-    const res = await fetch(fetchURL, {
-        method: "GET",
-    });
+    const res = await fetch(fetchURL);
 
     const oldData = await res.json();
     if (typeof (Storage) !== "undefined") {
