@@ -26,15 +26,15 @@ const getOldData = async (ele) => {
 
 const updateEntry = async () => {
     const newDataJSON = {
-        url: (document.querySelector("#input-url").value === "") ? document.querySelector("#old-url").value : document.querySelector("#input-url").value,
-        title: (document.querySelector("#input-title").value === "") ? document.querySelector("#old-title").value : document.querySelector("#input-title").value,
-        note: (document.querySelector("#input-note").value === "") ? document.querySelector("#old-note").value : document.querySelector("#input-note").value,
-        keywords: (document.querySelector("#input-keywords").value === "") ? document.querySelector("#old-keywords").value : document.querySelector("#input-keywords").value,
-        bGroup: (document.querySelector("#input-bGroup").value === "") ? document.querySelector("#old-bGroup").value : document.querySelector("#input-bGroup").value,
-        archive: (document.querySelector("#radio-no").checked) ? false : true,
+        url: document.querySelector("#input-url").value,
+        title: document.querySelector("#input-title").value,
+        note: document.querySelector("#input-note").value,
+        keywords: document.querySelector("#input-keywords").value,
+        bGroup: document.querySelector("#input-bGroup").value,
+        archive: document.querySelector("#radio-no").checked ? false : true,
     };
 
-    const dataID = document.querySelector("#data-id").innerText;
+    const dataID = document.querySelector("#bm-id").innerText;
     const fetchURL = ENDPOINT + "update/" + dataID;
     await fetch(fetchURL, {
         method: "POST",
