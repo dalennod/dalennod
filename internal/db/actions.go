@@ -114,9 +114,6 @@ func ViewAll(database *sql.DB, s bool) []setup.Bookmark {
 		if s {
 			result = append(result, setup.Bookmark{ID: id, URL: url, Title: title, Note: note, Keywords: keywords, BGroup: bGroup, Archived: archived, SnapshotURL: snapshotURL, ThumbURL: thumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
 		} else {
-			// original
-			// fmt.Printf("%d : %s, %s, %s, %s, %s, %t, %s, %v\n", id, url, title, note, keywords, bGroup, archived, snapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
-
 			// Tabbed, new line format
 			fmt.Printf("\t#%d\nTitle:\t\t%s\nURL:\t\t%s\nNote:\t\t%s\nKeywords:\t%s\nGroup:\t\t%s\nArchived?:\t%t\nArchive URL:\t%s\nModified:\t%v\n\n", id, title, url, note, keywords, bGroup, archived, snapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
 
@@ -188,4 +185,22 @@ func ViewSingleRow(database *sql.DB, id int, s bool) (string, string, string, st
 	}
 
 	return url, title, note, keywords, bGroup, archived
+}
+
+func SearchByUrl(database *sql.DB, searchUrl string) setup.Bookmark {
+	stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE url=(?);")
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+	execRes, err := stmt.Query(searchUrl)
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+
+	var foundBookmark setup.Bookmark
+	for execRes.Next() {
+		execRes.Scan(&foundBookmark.ID, &foundBookmark.URL, &foundBookmark.Title, &foundBookmark.Note, &foundBookmark.Keywords, &foundBookmark.BGroup, &foundBookmark.Archived, &foundBookmark.SnapshotURL, &foundBookmark.ThumbURL, &foundBookmark.Modified)
+	}
+
+	return foundBookmark
 }

@@ -40,6 +40,7 @@ func Start(database *sql.DB) {
 	mux.HandleFunc("/getRow/", getRowHandler)
 	mux.HandleFunc("/update/", updateHandler)
 	mux.HandleFunc("/static/search.html", searchHandler)
+	mux.HandleFunc("/checkUrl/", checkUrlHandler)
 
 	logger.Info.Printf("Web-server starting on http://localhost%s\n", PORT)
 	fmt.Printf("Web-server starting on http://localhost%s\n", PORT)
@@ -48,6 +49,18 @@ func Start(database *sql.DB) {
 		fmt.Printf("Stopping (error: %v)\n", err)
 		logger.Error.Printf("Stopping (error: %v)\n", err)
 	}
+}
+
+func internalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write([]byte("500 Internal Server Error"))
+	logger.Warn.Printf("status 500 at '%s%s'\n", r.Host, r.URL)
+}
+
+func notFoundHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotFound)
+	w.Write([]byte("404 Not Found"))
+	logger.Warn.Printf("status 404 at '%s%s'\n", r.Host, r.URL)
 }
 
 func root(w http.ResponseWriter, r *http.Request) {
@@ -61,6 +74,8 @@ func root(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == "GET" {
 		var (
 			deleteID          = regexp.MustCompile("^/delete/([0-9]+)$")
@@ -149,6 +164,8 @@ func getRowHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == "POST" {
 		var (
 			newData       setup.Bookmark
@@ -212,14 +229,31 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func internalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Write([]byte("500 Internal Server Error"))
-	logger.Warn.Printf("status 500 at '%s%s'\n", r.Host, r.URL)
-}
+func checkUrlHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+	w.Header().Set("Access-Control-Allow-Headers", "*")
+	if r.Method == "POST" {
+		var getData setup.Bookmark
+		var err error = json.NewDecoder(r.Body).Decode(&getData)
+		if err != nil {
+			logger.Error.Println(err)
+		}
 
-func notFoundHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusNotFound)
-	w.Write([]byte("404 Not Found"))
-	logger.Warn.Printf("status 404 at '%s%s'\n", r.Host, r.URL)
+		var searchUrl string = getData.URL
+		getData = db.SearchByUrl(data, searchUrl)
+
+		if getData.ID == 0 {
+			notFoundHandler(w, r)
+			return
+		}
+
+		writeData, err := json.Marshal(&getData)
+		if err != nil {
+			logger.Error.Println(err)
+		}
+		w.Write([]byte(writeData))
+	} else {
+		internalServerErrorHandler(w, r)
+	}
 }
