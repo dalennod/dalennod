@@ -10,18 +10,18 @@
         const updateInputBox = () => {
             if (typeof (Storage) !== "undefined") {
                 const oldData = JSON.parse(localStorage.getItem("oldData"));
-                document.querySelector("#data-id").innerText = oldData.id;
-                document.querySelector("#old-url").value = oldData.url;
-                document.querySelector("#old-title").value = oldData.title;
-                document.querySelector("#old-note").value = oldData.note;
-                document.querySelector("#old-keywords").value = oldData.keywords;
-                document.querySelector("#old-bGroup").value = oldData.bGroup;
-                (oldData.archive) ? document.querySelector("#old-radio-yes").checked = true : document.querySelector("#old-radio-no").checked = true;
+                document.querySelector("#bm-id").innerText = oldData.id;
+                document.querySelector("#input-url").value = oldData.url;
+                document.querySelector("#input-title").value = oldData.title;
+                document.querySelector("#input-note").value = oldData.note;
+                document.querySelector("#input-keywords").value = oldData.keywords;
+                document.querySelector("#input-bGroup").value = oldData.bGroup;
+                oldData.archive ? document.querySelector("#radio-btn-archive").setAttribute("hidden", "") : document.querySelector("#radio-btn-archive").removeAttribute("hidden");
             };
         };
         window.onload = updateInputBox;
     </script>
-    <style> .update-new-data input:focus { outline: auto; border: none; border-radius: 0px; } .update-new-data input, .update-old-data input { border-bottom: dotted 1px #aaa; } </style>
+    <style> input:focus { outline: auto; border: none; border-radius: 0px; } input { border-bottom: dotted 1px #aaa; } </style>
     <title>Dalennod - Update</title>
 </head>
 
@@ -32,39 +32,23 @@
         </button></a>
     </nav>
 
-    <main class="update-main">
-        <div class="update-old-data">
-            <p>URL: <input type="text" id="old-url" placeholder="URL to save" disabled></p>
-            <p>Title: <input type="text" id="old-title" placeholder="Title for the bookmark" disabled></p>
-            <p>Notes: <input type="text" id="old-note" placeholder="Log notes for bookmark" disabled></p>
-            <p>Keywords: <input type="text" id="old-keywords" placeholder="Keywords, to, search, bookmark" disabled></p>
-            <p>Group: <input type="text" id="old-bGroup" placeholder="Group to store bookmark into" disabled></p>
-            <p>
-                Archived?:
-                <input type="radio" name="old-radio-archive" id="old-radio-yes" value="1" disabled>
-                <label for="old-radio-yes">Yes</label>
-                <input type="radio" name="old-radio-archive" id="old-radio-no" value="0" disabled>
-                <label for="old-radio-no">No</label> </p>
-            <p style="font-size: 14px; text-align: center; color: #f53838;">Old data [id:<span id="data-id"></span>]</p>
-        </div>
-
-        <div class="update-new-data">
-            <p>URL: <input type="text" id="input-url" placeholder="New URL to save" required></p>
-            <p>Title: <input type="text" id="input-title" placeholder="New title for the bookmark"></p>
-            <p>Notes: <input type="text" id="input-note" placeholder="New notes for bookmark"></p>
-            <p>Keywords: <input type="text" id="input-keywords" placeholder="New keywords, to, search, bookmark"></p>
-            <p>Group: <input type="text" id="input-bGroup" placeholder="New group to store bookmark into"></p>
-            <p>
-                Archive?:
-                <input type="radio" name="radio-archive" id="radio-yes" value="1">
-                <label for="radio-yes">Yes</label>
-                <input type="radio" name="radio-archive" id="radio-no" value="0" checked>
-                <label for="radio-no">No</label> </p>
-            <p style="font-size: 14px; text-align: right; color: #f53838;">Empty fields will use old data</p>
-            <p style="text-align: center;">
-                <button class="button-text" id="button-add-req" onclick="updateEntry();" title="Update">Update</button> <span id="checkmark" hidden>&check;</span>
-            </p>
-        </div>
+    <main class="centered">
+        <p id="bm-id" hidden></p>
+        <p>URL<span style="color: #f53838;">*</span>: <input type="text" id="input-url" placeholder="New URL to save" required></p>
+        <p>Title: <input type="text" id="input-title" placeholder="New title for the bookmark"></p>
+        <p>Notes: <input type="text" id="input-note" placeholder="New notes for bookmark"></p>
+        <p>Keywords: <input type="text" id="input-keywords" placeholder="New keywords, to, search, bookmark"></p>
+        <p>Group: <input type="text" id="input-bGroup" placeholder="New group to store bookmark into"></p>
+        <p id="radio-btn-archive">
+            Archive?:
+            <input type="radio" name="radio-archive" id="radio-yes" value="1">
+            <label for="radio-yes">Yes</label>
+            <input type="radio" name="radio-archive" id="radio-no" value="0" checked>
+            <label for="radio-no">No</label> </p>
+        <p style="font-size: 14px; text-align: right; color: #f53838;">* required</p>
+        <p style="text-align: center;">
+            <button class="button-text" id="button-add-req" onclick="updateEntry();" title="Update">Update</button> <span id="checkmark" hidden>&check;</span>
+        </p>
     </main>
 </body>
 

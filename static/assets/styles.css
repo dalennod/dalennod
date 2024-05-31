@@ -152,25 +152,6 @@ svg:hover {
     width: 50vw;
 }
 
-.update-main {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 15px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    margin-right: -50%;
-    transform: translate(-50%, -50%);
-}
-
-.update-main input[type=text] {
-    width: 25vw;
-}
-
-.update-main div {
-    padding: 25px;
-}
-
 @media (prefers-color-scheme: dark) {
     body {
         background-color: #232323;
