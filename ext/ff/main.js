@@ -73,7 +73,7 @@ const checkConnection = async () => {
         } catch (e) {
             conn = false;
             document.querySelector(".centered").innerHTML = `
-                <a href="https://github.com/dalennod/dalennod" target="_blank"> <span style="text-decoration: underline;"> Dalennod </span> </a>
+                <a href="https://github.com/dalennod/dalennod" target="_blank"> <span style="text-decoration: underline;">Dalennod</span> </a>
                 (web-server) must be running.`;
             return;
         }

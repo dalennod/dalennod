@@ -14,7 +14,7 @@ func SendSnapshot(url string) (bool, string) {
 		res, err := http.Get(fmt.Sprintf("https://web.archive.org/save/%s", url))
 		if err != nil {
 			logger.Warn.Println("Failed to archive due to error: ", err)
-			return false, "Failed to archive due to error."
+			return false, "Failed to archive due to error"
 		}
 		defer res.Body.Close()
 
@@ -24,14 +24,14 @@ func SendSnapshot(url string) (bool, string) {
 		return check, snapshotURL
 	} else {
 		logger.Warn.Printf("URL [%s] did not respond. Not sending to be archived.\n", url)
-		return check, "Failed to archive due to website not responding."
+		return check, "Failed to archive due to website not responding"
 	}
 }
 
 func checkURL(url string) bool {
 	res, err := http.Get(url)
 	if err != nil {
-		logger.Warn.Println("Failed to ping website.", err)
+		logger.Warn.Println("Failed to ping website", err)
 	}
 
 	if res != nil {

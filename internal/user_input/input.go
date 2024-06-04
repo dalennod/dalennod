@@ -27,6 +27,13 @@ var (
 func UserInput(data *sql.DB) {
 	enableLogs()
 
+	// should display config dir path and log dir path
+	// on first-run. todo in future
+	// cfgDir, logDir, err := enableLogs()
+	// if err != nil {
+	// 	logger.Warn.Println("Could not enable error logging")
+	// }
+
 	database = data
 
 	flagVals = setup.ParseFlags()
@@ -37,7 +44,7 @@ func UserInput(data *sql.DB) {
 	case flagVals.StartServer:
 		server.Start(database)
 	case flagVals.AddEntry:
-		addInput("", "", "", "", "", "", false, 0)
+		addInput(setup.Bookmark{}, false)
 	case flagVals.Backup && flagVals.JSONOut:
 		backup.JSONOut(database)
 	}
@@ -53,154 +60,157 @@ func UserInput(data *sql.DB) {
 	}
 }
 
-func addInput(url, title, note, keywords, group, archived string, update bool, id int) {
-	var (
-		archiveResult bool   = false
-		snapshotURL   string = ""
-		scanner              = bufio.NewScanner(os.Stdin)
-	)
+func addInput(bmStruct setup.Bookmark, callToUpdate bool) {
+	var archiveUrl string
+	bmStruct, archiveUrl = getBmInfo(bmStruct)
+
+	if !callToUpdate {
+		addBm(bmStruct, archiveUrl)
+	} else {
+		updateBm(bmStruct, archiveUrl)
+	}
+}
+
+func getBmInfo(bmStruct setup.Bookmark) (setup.Bookmark, string) {
+	var scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
+	var err error
 
 	fmt.Print("URL to save: ")
 	scanner.Scan()
-	url = scanner.Text()
+	bmStruct.URL = scanner.Text()
 
-	thumbURL, err := thumb_url.GetPageThumb(url)
+	bmStruct.ThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
 	if err != nil {
-		thumbURL = url
+		bmStruct.ThumbURL = bmStruct.URL
 	}
 
 	fmt.Print("Title for the bookmark: ")
 	scanner.Scan()
-	title = scanner.Text()
+	bmStruct.Title = scanner.Text()
 
 	fmt.Print("Notes/log reason for bookmark: ")
 	scanner.Scan()
-	note = scanner.Text()
+	bmStruct.Note = scanner.Text()
 
 	fmt.Print("Keywords for searching later: ")
 	scanner.Scan()
-	keywords = scanner.Text()
+	bmStruct.Keywords = scanner.Text()
 
 	fmt.Print("Group to store the bookmark into: ")
 	scanner.Scan()
-	group = scanner.Text()
+	bmStruct.BGroup = scanner.Text()
 
 	fmt.Print("Archive URL? (y/N): ")
 	scanner.Scan()
-	archived = scanner.Text()
+	var archiveUrl string = scanner.Text()
 
-	if !update {
-		switch archived {
-		case "y", "Y":
-			archiveResult, snapshotURL = archive.SendSnapshot(url)
-			if archiveResult {
-				db.Add(database, url, title, note, keywords, group, true, snapshotURL, thumbURL)
-			} else {
-				logger.Warn.Println("Snapshot failed.")
-				db.Add(database, url, title, note, keywords, group, false, snapshotURL, thumbURL)
-			}
-		case "n", "N":
-			db.Add(database, url, title, note, keywords, group, false, snapshotURL, thumbURL)
-		default:
-			db.Add(database, url, title, note, keywords, group, false, snapshotURL, thumbURL)
-			logger.Warn.Println("Invalid input for archive request. URL has not been archived.")
+	return bmStruct, archiveUrl
+}
+
+func updateBm(bmStruct setup.Bookmark, archiveUrl string) {
+	switch archiveUrl {
+	case "y", "Y":
+		bmStruct.Archived, bmStruct.SnapshotURL = archive.SendSnapshot(bmStruct.URL)
+		if bmStruct.Archived {
+			db.Update(database, bmStruct, false)
+		} else {
+			logger.Warn.Println("Snapshot failed")
+			db.Update(database, bmStruct, false)
 		}
-	} else {
-		switch archived {
-		case "y", "Y":
-			archiveResult, snapshotURL = archive.SendSnapshot(url)
-			if archiveResult {
-				db.Update(database, url, title, note, keywords, group, id, true, false, snapshotURL)
-			} else {
-				logger.Warn.Println("Snapshot failed.")
-				db.Update(database, url, title, note, keywords, group, id, false, false, snapshotURL)
-			}
-		case "n", "N":
-			db.Update(database, url, title, note, keywords, group, id, false, false, snapshotURL)
-		default:
-			db.Update(database, url, title, note, keywords, group, id, false, false, snapshotURL)
-			logger.Warn.Println("Invalid input for archive request. URL has not been archived.")
+	case "n", "N", "":
+		db.Update(database, bmStruct, false)
+	default:
+		db.Update(database, bmStruct, false)
+		logger.Warn.Println("Invalid input for archive request. URL has not been archived")
+	}
+}
+
+func addBm(bmStruct setup.Bookmark, archiveUrl string) {
+	switch archiveUrl {
+	case "y", "Y":
+		bmStruct.Archived, bmStruct.SnapshotURL = archive.SendSnapshot(bmStruct.URL)
+		if bmStruct.Archived {
+			db.Add(database, bmStruct)
+		} else {
+			logger.Warn.Println("Snapshot failed")
+			db.Add(database, bmStruct)
 		}
+	case "n", "N", "":
+		db.Add(database, bmStruct)
+	default:
+		db.Add(database, bmStruct)
+		logger.Warn.Println("Invalid input for archive request. URL has not been archived")
 	}
 }
 
 func updateInput(updateID string) {
 	var (
-		id, url, title, note, keywords, group, archived, confirm string
-		scanner                                                  = bufio.NewScanner(os.Stdin)
+		confirm string
+		bmAtID  setup.Bookmark
+		scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
 	)
 
-	// fmt.Print("ID of bookmark to update: ")
-	// scanner.Scan()
-	// id = scanner.Text()
-
-	id = updateID
-
-	idToINT, err := strconv.Atoi(id)
+	idToINT, err := strconv.Atoi(updateID)
 	if err != nil {
-		logger.Error.Println("invalid input")
+		logger.Error.Println("Invalid input")
 	}
 
-	url, title, note, keywords, group, _ = db.ViewSingleRow(database, idToINT, false)
-	if url == "" {
-		fmt.Println("id does not exist")
-		logger.Info.Println("id does not exist")
+	bmAtID, err = db.ViewSingleRow(database, idToINT, false)
+	if err != nil {
+		fmt.Println(err)
+		logger.Error.Println(err)
 		return
 	}
+	fmt.Println(bmAtID)
 
-	fmt.Print("Update this entry? (y/N): ")
+	fmt.Print("Update this entry? (Y/n): ")
 	scanner.Scan()
 	confirm = scanner.Text()
 
 	switch confirm {
-	case "y", "Y":
-		fmt.Println("Leave empty to retain old information.")
-		addInput(url, title, note, keywords, group, archived, true, idToINT)
+	case "y", "Y", "":
+		fmt.Println("Leave empty to retain old information")
+		addInput(bmAtID, true)
 	case "n", "N":
 		return
 	default:
-		logger.Info.Println("Invalid input received:", confirm)
-		fmt.Println("Invalid input. Exiting.")
+		logger.Info.Println("Invalid input. Received:", confirm)
+		fmt.Println("Invalid input. Exiting")
 		return
 	}
 }
 
 func removeInput(removeID string) {
 	var (
-		id, confirm string
-		scanner     = bufio.NewScanner(os.Stdin)
+		confirm string
+		scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
 	)
 
-	// fmt.Print("ID to remove: ")
-	// scanner.Scan()
-	// id = scanner.Text()
-
-	id = removeID
-
-	idToINT, err := strconv.Atoi(id)
+	idToINT, err := strconv.Atoi(removeID)
 	if err != nil {
-		logger.Error.Println("Invalid input.")
-	}
-
-	url, _, _, _, _, _ := db.ViewSingleRow(database, idToINT, false)
-	if url == "" {
-		fmt.Println("id does not exist")
-		logger.Info.Println("id does not exist")
+		logger.Error.Println("Invalid input")
 		return
 	}
 
-	fmt.Print("Remove this entry? (y/n): ")
+	_, err = db.ViewSingleRow(database, idToINT, false)
+	if err != nil {
+		fmt.Println(err)
+		logger.Error.Println(err)
+		return
+	}
+
+	fmt.Print("Remove this entry? (Y/n): ")
 	scanner.Scan()
 	confirm = scanner.Text()
 
 	switch confirm {
-	case "y", "Y":
+	case "y", "Y", "":
 		db.Remove(database, idToINT)
 	case "n", "N":
 		return
 	default:
 		logger.Info.Println("Invalid input received:", confirm)
-		fmt.Println("Invalid input. Exiting.")
+		fmt.Println("Invalid input. Exiting")
 		return
 	}
 }
@@ -208,9 +218,15 @@ func removeInput(removeID string) {
 func viewInput(viewID string) {
 	idToINT, err := strconv.Atoi(viewID)
 	if err != nil {
-		logger.Error.Println("Invalid input.")
+		logger.Error.Println("Invalid input")
+		return
 	}
-	db.ViewSingleRow(database, idToINT, false)
+	_, err = db.ViewSingleRow(database, idToINT, false)
+	if err != nil {
+		fmt.Println(err)
+		logger.Error.Println(err)
+		return
+	}
 }
 
 // try to figure out how to import in Group values too at some point
@@ -228,7 +244,7 @@ func importFirefoxInput(file string) {
 	var parsedBookmarksCount = len(parsedBookmarks)
 
 	for i, parsedBookmark := range parsedBookmarks {
-		db.Add(database, parsedBookmark.URL, parsedBookmark.Title, "", parsedBookmark.Keywords, "", false, "", parsedBookmark.ThumbURL)
+		db.Add(database, parsedBookmark)
 		fmt.Printf("\rAdded %d / %d", i+1, parsedBookmarksCount)
 	}
 	fmt.Println()
@@ -300,10 +316,21 @@ func processNode(n *html.Node, parsedBookmarks []setup.Bookmark) []setup.Bookmar
 	return parsedBookmarks
 }
 
-func enableLogs() {
+func enableLogs() (string, string, error) {
 	logger.Enable()
-	cfgDir, _ := setup.ConfigDir()
-	logDir, _ := setup.CacheDir()
+
+	cfgDir, err := setup.ConfigDir()
+	if err != nil {
+		return "", "", err
+	}
+
+	logDir, err := setup.CacheDir()
+	if err != nil {
+		return "", "", err
+	}
+
 	logger.Info.Printf("Database and config directory: %s\n", cfgDir)
 	logger.Info.Printf("Error logs directory: %s\n", logDir)
+
+	return cfgDir, logDir, nil
 }
