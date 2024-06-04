@@ -52,7 +52,7 @@ const updateEntry = async () => {
 
 const addEntry = async () => {
     if (document.querySelector("#input-url").value === "") {
-        alert("URL is required.");
+        alert("URL is required");
         return
     };
 
