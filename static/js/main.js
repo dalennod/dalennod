@@ -89,8 +89,14 @@ const addEntry = async () => {
     }, 2000);
 };
 
-const setValue = (term) => {
-    document.querySelector("#hidden-url-param").value = term;
+const setValue = (ele, inputSearch=false) => {
+    if (inputSearch) {
+        document.querySelector("#hidden-url-param").value = document.querySelector('#input-search').value;
+        return;
+    }
+    const bmId = ele.parentNode.parentNode.parentNode.id;
+    document.querySelector("#hidden-url-param-"+bmId).value = document.querySelector("#group-"+bmId).textContent;
+    return;
 };
 
 const inputEventKey = () => {
