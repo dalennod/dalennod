@@ -162,6 +162,10 @@ svg:hover {
         color: #eaeaea;
     }
 
+    .grid-child #group {
+        color: #eaeaea;
+    }
+
     .button-text {
         background-color: #2875b5;
         border-color: #2875b5;
