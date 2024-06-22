@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+// With thumbnail URL, there is a possibility to create a local database, use a Foreign Key Reference with
+// ON DELETE CASCADE (have to check if possible with sqlite), get the thumbnail image data, turn it into base64
+// and then save that to the DB, so on page load the numerous calls to URLs to get image data won't be necessary.
+// Doing this would also allow a push back on making pagination to only load 20 bookmarks per page. (I don't know how to work this yet with templates.)
 func Add(database *sql.DB, bmStruct setup.Bookmark) {
 	if bmStruct.ThumbURL == "" {
 		var err error
