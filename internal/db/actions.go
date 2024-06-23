@@ -9,25 +9,21 @@ import (
 	"time"
 )
 
-// With thumbnail URL, there is a possibility to create a local database, use a Foreign Key Reference with
-// ON DELETE CASCADE (have to check if possible with sqlite), get the thumbnail image data, turn it into base64
-// and then save that to the DB, so on page load the numerous calls to URLs to get image data won't be necessary.
-// Doing this would also allow a push back on making pagination to only load 20 bookmarks per page. (I don't know how to work this yet with templates.)
 func Add(database *sql.DB, bmStruct setup.Bookmark) {
-	if bmStruct.ThumbURL == "" {
+	if bmStruct.ThumbURL == "" || bmStruct.B64ThumbURL == "" {
 		var err error
-		bmStruct.ThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
+		bmStruct.ThumbURL, bmStruct.B64ThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
 		if err != nil {
 			logger.Error.Println(err)
 		}
 	}
 
-	stmt, err := database.Prepare("INSERT INTO bookmarks (url, title, note, keywords, bGroup, archived, snapshotURL, thumbURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?);")
+	stmt, err := database.Prepare("INSERT INTO bookmarks (url, title, note, keywords, bGroup, archived, snapshotURL, thumbURL, b64ThumbURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);")
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
 
-	_, err = stmt.Exec(bmStruct.URL, bmStruct.Title, bmStruct.Note, bmStruct.Keywords, bmStruct.BGroup, bmStruct.Archived, bmStruct.SnapshotURL, bmStruct.ThumbURL)
+	_, err = stmt.Exec(bmStruct.URL, bmStruct.Title, bmStruct.Note, bmStruct.Keywords, bmStruct.BGroup, bmStruct.Archived, bmStruct.SnapshotURL, bmStruct.ThumbURL, bmStruct.B64ThumbURL)
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
@@ -102,9 +98,9 @@ func ViewAll(database *sql.DB, serverCall bool) []setup.Bookmark {
 
 	for rows.Next() {
 		result = setup.Bookmark{}
-		rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
+		rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.B64ThumbURL, &modified)
 		if serverCall {
-			results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BGroup: result.BGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+			results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BGroup: result.BGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, B64ThumbURL: result.B64ThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
 		} else {
 			fmt.Printf("\t#%d\nTitle:\t\t%s\nURL:\t\t%s\nNote:\t\t%s\nKeywords:\t%s\nGroup:\t\t%s\nArchived?:\t%t\nArchive URL:\t%s\nModified:\t%v\n\n", result.ID, result.Title, result.URL, result.Note, result.Keywords, result.BGroup, result.Archived, result.SnapshotURL, modified.Local().Format("2006-01-02 15:04:05"))
 		}
@@ -134,8 +130,8 @@ func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
 
 	for execRes.Next() {
 		result = setup.Bookmark{}
-		execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
-		results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BGroup: result.BGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+		execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.B64ThumbURL, &modified)
+		results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BGroup: result.BGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, B64ThumbURL: result.B64ThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
 	}
 
 	return results
@@ -156,7 +152,7 @@ func ViewSingleRow(database *sql.DB, id int, serverCall bool) (setup.Bookmark, e
 	}
 
 	for execRes.Next() {
-		err = execRes.Scan(&rowResult.ID, &rowResult.URL, &rowResult.Title, &rowResult.Note, &rowResult.Keywords, &rowResult.BGroup, &rowResult.Archived, &rowResult.SnapshotURL, &rowResult.ThumbURL, &modified)
+		err = execRes.Scan(&rowResult.ID, &rowResult.URL, &rowResult.Title, &rowResult.Note, &rowResult.Keywords, &rowResult.BGroup, &rowResult.Archived, &rowResult.SnapshotURL, &rowResult.ThumbURL, &rowResult.B64ThumbURL, &modified)
 		if err != nil {
 			return rowResult, err
 		}
@@ -187,7 +183,7 @@ func SearchByUrl(database *sql.DB, searchUrl string) (setup.Bookmark, error) {
 	}
 
 	for execRes.Next() {
-		err = execRes.Scan(&foundBookmark.ID, &foundBookmark.URL, &foundBookmark.Title, &foundBookmark.Note, &foundBookmark.Keywords, &foundBookmark.BGroup, &foundBookmark.Archived, &foundBookmark.SnapshotURL, &foundBookmark.ThumbURL, &foundBookmark.Modified)
+		err = execRes.Scan(&foundBookmark.ID, &foundBookmark.URL, &foundBookmark.Title, &foundBookmark.Note, &foundBookmark.Keywords, &foundBookmark.BGroup, &foundBookmark.Archived, &foundBookmark.SnapshotURL, &foundBookmark.ThumbURL, &foundBookmark.B64ThumbURL, &foundBookmark.Modified)
 		if err != nil {
 			return foundBookmark, err
 		}
