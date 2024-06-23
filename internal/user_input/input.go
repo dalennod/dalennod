@@ -79,7 +79,7 @@ func getBmInfo(bmStruct setup.Bookmark) (setup.Bookmark, string) {
 	scanner.Scan()
 	bmStruct.URL = scanner.Text()
 
-	bmStruct.ThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
+	bmStruct.ThumbURL, bmStruct.B64ThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
 	if err != nil {
 		bmStruct.ThumbURL = bmStruct.URL
 	}

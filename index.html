@@ -37,13 +37,14 @@
                         <span style="font-size: 12px;">{{.Modified}}</span>
                     </div>
 
-                    {{if .ThumbURL}}
+                    <!-- Multiple `if...else if` statements does not work properly. So, currently this is assuming that every thumbURL was successfully converted to B64ThumbURL. Not necessarily a problem because if the src gets improper image data then the alt text will be shown, but maybe there is a better way to implement this. TODO in future -->
+                    {{if .B64ThumbURL}}
                     <div id="thumbURL">
                         <a href="{{.URL}}" target="_blank">
-                            <img src="{{.ThumbURL}}" alt="[couldn't load thumbnail]">
+                            <img src="data:image/{{.B64ThumbURL}}" alt="[couldn't load thumbnail]">
                         </a>
                     </div>
-                    {{else if not .ThumbURL}}
+                    {{else}}
                     <div id="default-thumbURL">
                         <a href="{{.URL}}" target="_blank">
                             <img src="static/assets/imgs/41415.png" alt="[couldn't load thumbnail]">
