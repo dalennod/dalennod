@@ -162,7 +162,8 @@ svg:hover {
         color: #eaeaea;
     }
 
-    .grid-child #group {
+    .grid-child #group,
+    .grid-child #keywords {
         color: #eaeaea;
     }
 

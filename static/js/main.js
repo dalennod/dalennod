@@ -89,13 +89,12 @@ const addEntry = async () => {
     }, 2000);
 };
 
-const setValue = (ele, inputSearch=false) => {
+const setValue = (getValueID, setValueID, inputSearch=false) => {
     if (inputSearch) {
-        document.querySelector("#hidden-url-param").value = document.querySelector('#input-search').value;
+        document.querySelector(setValueID).value = document.querySelector(getValueID).value;
         return;
     }
-    const bmId = ele.parentNode.parentNode.parentNode.id;
-    document.querySelector("#hidden-url-param-"+bmId).value = document.querySelector("#group-"+bmId).textContent;
+    document.querySelector(setValueID).value = document.querySelector(getValueID).textContent;
     return;
 };
 

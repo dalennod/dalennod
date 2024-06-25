@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 const PORT string = ":41415"
@@ -65,7 +66,11 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 
 func root(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		tmpl = template.Must(template.ParseFS(IndexHtml, "index.html"))
+		var tmplFuncMap template.FuncMap = make(template.FuncMap)
+		tmplFuncMap["keywordSplit"] = keywordSplit
+
+		tmpl = template.Must(template.New("index.html").Funcs(tmplFuncMap).ParseFS(IndexHtml, "index.html"))
+
 		var bookmarks []setup.Bookmark = db.ViewAll(database, true)
 		tmpl.Execute(w, bookmarks)
 	} else {
@@ -255,4 +260,8 @@ func checkUrlHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		internalServerErrorHandler(w, r)
 	}
+}
+
+func keywordSplit(keywords string, delimiter string) []string {
+	return strings.Split(keywords, delimiter)
 }
