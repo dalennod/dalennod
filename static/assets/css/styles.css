@@ -129,13 +129,13 @@ main {
     margin-bottom: 2%;
 }
 
-svg {
+.svg-img {
     width: 1.5em;
     height: 1.5em;
     filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
 }
 
-svg:hover {
+.svg-img:hover {
     fill: #777;
 }
 
@@ -186,7 +186,7 @@ svg:hover {
         color: #eaeaea;
     }
 
-    svg {
+    .svg-img {
         filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
     }
 }
