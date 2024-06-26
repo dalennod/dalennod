@@ -4,25 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/assets/styles.css">
-    <script src="static/js/main.js" type="text/javascript" defer></script>
+    <link rel="stylesheet" href="static/assets/css/styles.css">
+    <script src="static/assets/js/main.js" type="text/javascript" defer></script>
+    <!-- <script src="static/assets/js/htmx.min.js"></script> -->
     <script type="text/javascript"> localStorage.clear(); </script>
     <title>Dalennod</title>
 </head>
 
 <body>
-    <!-- Dalennod -->
     <nav>
         <input type="text" id="input-search" placeholder="Search a keyword">
         <form action="static/search.html" method="post">
             <input type="hidden" name="searchTerm" id="hidden-url-param" value="">
                 <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#input-search', '#hidden-url-param', true);" title="Search">
-                <svg fill="#000000" id="svg-search" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve" transform="matrix(-1, 0, 0, 1, 0, 0)"> <g stroke-width="0"></g> <g stroke-linecap="round" stroke-linejoin="round"></g> <path d="M56.774,10.391c-17.679,0-32.001,14.329-32.001,32c0,6.044,1.676,11.695,4.588,16.517L13.846,74.423l0.054,0.054 c-1.656,1.585-2.673,3.835-2.673,6.378c-0.001,4.913,3.913,8.755,8.821,8.754c2.507-0.001,4.749-1.004,6.349-2.636l0.039,0.039 l16.008-16.009c4.312,2.163,9.176,3.388,14.33,3.388c17.68,0,31.999-14.327,31.999-32C88.773,24.72,74.453,10.391,56.774,10.391z M56.968,61.808c-11.05,0-20.001-8.954-20.001-20c0-11.044,8.951-20,20.001-20c11.05,0,19.999,8.955,19.999,20 C76.968,52.854,68.018,61.808,56.968,61.808z"> </path> </svg>
+                    <img class="svg-img" src="static/assets/imgs/search_button.svg" alt="Search button">
             </button>
         </form> &nbsp;&nbsp;
         <a href="static/add.html">
             <button class="button-svg" id="button-add-html" title="Create">
-                <svg fill="#000000" id="svg-create" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"> <g stroke-width="0"></g> <g stroke-linecap="round" stroke-linejoin="round"></g> <path d="M84.437,39.721l-24.164,0l0-24.158c0-1.001-0.812-1.812-1.812-1.813L41.536,13.75c-1.001,0-1.812,0.812-1.812,1.813 l-0.001,24.16l-24.159-0.001c-0.961,0-1.812,0.851-1.813,1.813l0,16.925c-0.001,0.481,0.191,0.943,0.531,1.282 c0.339,0.339,0.801,0.531,1.282,0.53h24.16v24.165c0,0.48,0.191,0.942,0.531,1.282c0.34,0.34,0.802,0.531,1.282,0.531L58.46,86.25 c0.48,0,0.943-0.192,1.284-0.533c0.338-0.338,0.529-0.8,0.529-1.28V60.273l24.163-0.001c0.5,0,0.953-0.202,1.282-0.53 c0.329-0.329,0.531-0.782,0.531-1.283l0.001-16.925C86.25,40.533,85.439,39.722,84.437,39.721z"> </path> </svg>
+                <img class="svg-img" src="static/assets/imgs/create_button.svg" alt="Create button">
             </button>
         </a>
     </nav>
@@ -71,13 +71,13 @@
                         {{$id := .ID}}
                         {{$keywords := keywordSplit .Keywords ","}}
                         {{range $index, $keyword := $keywords}}
-                            <span><span id="keywords-{{$id}}-{{$index}}" hidden>{{$keyword}}</span>
+                            <div><span id="keywords-{{$id}}-{{$index}}" hidden>{{$keyword}}</span>
                             <form action="static/search.html" method="post">
                                 <input type="hidden" name="searchTerm" id="hidden-url-param-{{$id}}-{{$index}}" value="">
                                 <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#keywords-{{$id}}-{{$index}}', '#hidden-url-param-{{$id}}-{{$index}}');" title="Search for this term">
                                     <span id="keywords">{{$keyword}}</span>
                                 </button>
-                            </form></span>
+                            </form></div>
                         {{end}}
                     </div>
                     {{end}}
@@ -96,11 +96,9 @@
 
                 <div id="buttons">
                     <button class="button-svg" id="button-update" onclick="window.location.href='static/update.html'; getOldData(this);" title="Update">
-                        <svg fill="#000000" id="svg-update" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"> <g stroke-width="0"></g> <g stroke-linecap="round" stroke-linejoin="round"></g> <path d="M88.79,29.297L70.702,11.209c-1.052-1.052-2.756-1.052-3.808,0L17.389,60.713l0.109,0.109l-0.171-0.046l-6.772,25.272 l0.004,0.001c-0.309,0.935-0.103,2.004,0.642,2.748c0.822,0.822,2.038,0.993,3.033,0.531l0.002,0.009l25.027-6.706l-0.016-0.059 l0.038,0.038L88.79,33.105C89.842,32.053,89.842,30.349,88.79,29.297z M18.792,81.147l4.022-15.009l10.988,10.988L18.792,81.147z"> </path> </svg>
-                    </button>
+                        <img class="svg-img" src="static/assets/imgs/update_button.svg" alt="Update button"> </button> 
                     <button class="button-svg" id="button-delete" onclick="deleteEntry(this);" title="Delete">
-                        <svg fill="#000000" id="svg-delete" viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve"> <g stroke-width="0"></g> <g stroke-linecap="round" stroke-linejoin="round"></g> <path d="M75.834,33.388h-51.67c-1.311,0-2.375,1.058-2.375,2.373v49.887c0,1.314,1.064,2.377,2.375,2.377h51.67 c1.314,0,2.375-1.063,2.375-2.377V35.76C78.209,34.446,77.148,33.388,75.834,33.388z"> </path> <path d="M79.004,17.352H59.402v-2.999c0-1.314-1.061-2.377-2.373-2.377H42.971c-1.312,0-2.375,1.063-2.375,2.377v2.999H20.996 c-1.312,0-2.375,1.059-2.375,2.373v6.932c0,1.314,1.063,2.373,2.375,2.373h58.008c1.314,0,2.375-1.059,2.375-2.373v-6.932 C81.379,18.41,80.318,17.352,79.004,17.352z"> </path> </svg>
-                    </button>
+                        <img class="svg-img" src="static/assets/imgs/delete_button.svg" alt="Delete button"> </button>
                     <span id="delete-checkmark-{{.ID}}" hidden>&check;</span>
                 </div>
             </div>
