@@ -1,17 +1,5 @@
 const ENDPOINT = "http://localhost:41415/";
 
-const deleteEntry = async (ele) => {
-    const dataID = ele.parentNode.parentNode.id;
-
-    const fetchURL = ENDPOINT + "delete/" + dataID;
-    await fetch(fetchURL);
-
-    document.querySelector("#delete-checkmark-" + dataID).removeAttribute("hidden")
-    setTimeout(() => {
-        document.querySelector("#delete-checkmark-" + dataID).setAttribute("hidden", "");
-    }, 2000);
-};
-
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.id;
 

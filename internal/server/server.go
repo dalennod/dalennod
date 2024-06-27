@@ -20,32 +20,38 @@ import (
 const PORT string = ":41415"
 
 var (
-	database *sql.DB
-	tmpl     *template.Template
-
-	IndexHtml embed.FS
-	Webui     embed.FS
+	tmplFuncMap template.FuncMap = make(template.FuncMap)
+	database    *sql.DB
+	tmpl        *template.Template
+	IndexHtml   embed.FS
+	Webui       embed.FS
 )
 
 func Start(data *sql.DB) {
 	database = data
+
 	var mux *http.ServeMux = http.NewServeMux()
 
-	fsopen := fs.FS(Webui)
-	webuiStatic, _ := fs.Sub(fsopen, "static")
+	var fsopen fs.FS = fs.FS(Webui)
+	webuiStatic, err := fs.Sub(fsopen, "static")
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webuiStatic))))
 
-	mux.HandleFunc("/", root)
+	tmplFuncMap["keywordSplit"] = keywordSplit
+
+	mux.HandleFunc("/", rootHandler)
 	mux.HandleFunc("/delete/", deleteHandler)
 	mux.HandleFunc("/add/", addHandler)
 	mux.HandleFunc("/getRow/", getRowHandler)
 	mux.HandleFunc("/update/", updateHandler)
-	mux.HandleFunc("/static/search.html", searchHandler)
+	mux.HandleFunc("/search/", searchHandler)
 	mux.HandleFunc("/checkUrl/", checkUrlHandler)
 
 	logger.Info.Printf("Web-server starting on http://localhost%s\n", PORT)
 	fmt.Printf("Web-server starting on http://localhost%s\n", PORT)
-	err := http.ListenAndServe(PORT, mux)
+	err = http.ListenAndServe(PORT, mux)
 	if err != nil {
 		fmt.Printf("Stopping (error: %v)\n", err)
 		logger.Error.Printf("Stopping (error: %v)\n", err)
@@ -64,12 +70,9 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 	logger.Warn.Printf("status 404 at '%s%s'\n", r.Host, r.URL)
 }
 
-func root(w http.ResponseWriter, r *http.Request) {
+func rootHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		var tmplFuncMap template.FuncMap = make(template.FuncMap)
-		tmplFuncMap["keywordSplit"] = keywordSplit
-
-		tmpl = template.Must(template.New("index.html").Funcs(tmplFuncMap).ParseFS(IndexHtml, "index.html"))
+		tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(IndexHtml, "index.html"))
 
 		var bookmarks []setup.Bookmark = db.ViewAll(database, true)
 		tmpl.Execute(w, bookmarks)
@@ -83,8 +86,8 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == "GET" {
 		var (
-			deleteID          = regexp.MustCompile("^/delete/([0-9]+)$")
-			match    []string = deleteID.FindStringSubmatch(r.URL.Path)
+			deleteID *regexp.Regexp = regexp.MustCompile("^/delete/([0-9]+)$")
+			match    []string       = deleteID.FindStringSubmatch(r.URL.Path)
 		)
 		if len(match) < 2 {
 			internalServerErrorHandler(w, r)
@@ -97,6 +100,12 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 
 		db.Remove(database, matchInt)
 		w.WriteHeader(http.StatusOK)
+
+		// rootHandler(w, r)
+		err = tmpl.ExecuteTemplate(w, "bm_list", db.ViewAll(database, true))
+		if err != nil {
+			logger.Error.Println(err)
+		}
 	} else {
 		internalServerErrorHandler(w, r)
 	}
@@ -135,8 +144,8 @@ func getRowHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		var (
 			oldData  setup.Bookmark
-			getRowID          = regexp.MustCompile("^/getRow/([0-9]+)$")
-			match    []string = getRowID.FindStringSubmatch(r.URL.Path)
+			getRowID *regexp.Regexp = regexp.MustCompile("^/getRow/([0-9]+)$")
+			match    []string       = getRowID.FindStringSubmatch(r.URL.Path)
 		)
 
 		if len(match) < 2 {
@@ -173,7 +182,8 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 		var (
 			newData  setup.Bookmark
 			updateID *regexp.Regexp = regexp.MustCompile("^/update/([0-9]+)$")
-			match    []string       = updateID.FindStringSubmatch(r.URL.Path)
+
+			match []string = updateID.FindStringSubmatch(r.URL.Path)
 		)
 		if len(match) < 2 {
 			internalServerErrorHandler(w, r)
@@ -208,6 +218,8 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func searchHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == "POST" {
 		r.ParseForm()
 
@@ -223,8 +235,11 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		tmpl = template.Must(template.ParseFS(Webui, "static/search.html"))
-		tmpl.Execute(w, bookmarks)
+		tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(IndexHtml, "index.html"))
+		err := tmpl.ExecuteTemplate(w, "bm_list", bookmarks)
+		if err != nil {
+			logger.Error.Println(err)
+		}
 	} else {
 		internalServerErrorHandler(w, r)
 	}
@@ -233,7 +248,6 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 func checkUrlHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
-	// w.Header().Set("Access-Control-Allow-Headers", "*")
 	if r.Method == "POST" {
 		var getData setup.Bookmark
 		var err error = json.NewDecoder(r.Body).Decode(&getData)

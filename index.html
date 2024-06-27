@@ -1,3 +1,4 @@
+{{ block "index" . }}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/assets/css/styles.css">
     <script src="static/assets/js/main.js" type="text/javascript" defer></script>
-    <!-- <script src="static/assets/js/htmx.min.js"></script> -->
+    <script src="static/assets/js/htmx.min.js"></script>
     <script type="text/javascript"> localStorage.clear(); </script>
     <title>Dalennod</title>
 </head>
@@ -14,12 +15,11 @@
 <body>
     <nav>
         <input type="text" id="input-search" placeholder="Search a keyword">
-        <form action="static/search.html" method="post">
+        <form hx-post="/search/">
             <input type="hidden" name="searchTerm" id="hidden-url-param" value="">
-                <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#input-search', '#hidden-url-param', true);" title="Search">
-                    <img class="svg-img" src="static/assets/imgs/search_button.svg" alt="Search button">
-            </button>
-        </form> &nbsp;&nbsp;
+            <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#input-search', '#hidden-url-param', true);" hx-target="main" hx-post="/search/" title="Search"> <img class="svg-img" src="static/assets/imgs/search_button.svg" alt="Search button"> </button>
+        </form> 
+        &nbsp;&nbsp;
         <a href="static/add.html">
             <button class="button-svg" id="button-add-html" title="Create">
                 <img class="svg-img" src="static/assets/imgs/create_button.svg" alt="Create button">
@@ -27,84 +27,84 @@
         </a>
     </nav>
 
+    {{ block "bm_list" . }}
     <main>
         <div class="grid-view-list">
             {{ range. }}
-            <div class="grid-child" id="{{.ID}}">
+            <div class="grid-child" id="{{ .ID }}">
                 <div id="bm-info">
                     <div id="id-creation">
-                        <p><a href="{{.URL}}" target="_blank">{{.ID}}.</a></p>
-                        <span style="font-size: 12px;">{{.Modified}}</span>
+                        <p><a href="{{ .URL }}" target="_blank">{{ .ID }}.</a></p>
+                        <span style="font-size: 12px;">{{ .Modified }}</span>
                     </div>
 
                     <!-- Multiple `if...else if` statements does not work properly. So, currently this is assuming that every thumbURL was successfully converted to B64ThumbURL. Not necessarily a problem because if the src gets improper image data then the alt text will be shown, but maybe there is a better way to implement this. TODO in future -->
-                    {{if .B64ThumbURL}}
+                    {{ if .B64ThumbURL }}
                     <div id="thumbURL">
-                        <a href="{{.URL}}" target="_blank">
-                            <img src="data:image/{{.B64ThumbURL}}" alt="[couldn't load thumbnail]">
+                        <a href="{{.URL }}" target="_blank">
+                            <img src="data:image/{{.B64ThumbURL }}" alt="[couldn't load thumbnail]">
                         </a>
                     </div>
-                    {{else}}
+                    {{ else }}
                     <div id="default-thumbURL">
-                        <a href="{{.URL}}" target="_blank">
+                        <a href="{{.URL }}" target="_blank">
                             <img src="static/assets/imgs/41415.png" alt="[couldn't load thumbnail]">
                         </a>
                     </div>
-                    {{end}}
+                    {{ end }}
 
-                    {{if .Title}}
-                    <p><a href="{{.URL}}" target="_blank">{{.Title}}</a></p>
-                    {{else if not .Title}}
-                    <p><a href="{{.URL}}" target="_blank">{{.URL}}</a></p>
-                    {{end}}
+                    {{ if .Title }}
+                    <p><a href="{{ .URL }}" target="_blank">{{ .Title }}</a></p>
+                    {{ else if not .Title }}
+                    <p><a href="{{ .URL }}" target="_blank">{{ .URL }}</a></p>
+                    {{ end }}
 
-                    {{if .Note}}
-                    <p>Notes: {{.Note}}</p>
-                    {{end}}
+                    {{ if .Note }}
+                    <p>Notes: {{ .Note }}</p>
+                    {{ end }}
 
-                    {{if .Archived}}
-                    <p>Archive: <a href="{{.SnapshotURL}}" target="_blank">[click here]</a></p>
-                    {{end}}
+                    {{ if .Archived }}
+                    <p>Archive: <a href="{{ .SnapshotURL }}" target="_blank">[click here]</a></p>
+                    {{ end }}
 
-                    {{if .Keywords}}
+                    {{ if .Keywords }}
                     <div>
-                        {{$id := .ID}}
-                        {{$keywords := keywordSplit .Keywords ","}}
-                        {{range $index, $keyword := $keywords}}
-                            <div><span id="keywords-{{$id}}-{{$index}}" hidden>{{$keyword}}</span>
-                            <form action="static/search.html" method="post">
-                                <input type="hidden" name="searchTerm" id="hidden-url-param-{{$id}}-{{$index}}" value="">
-                                <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#keywords-{{$id}}-{{$index}}', '#hidden-url-param-{{$id}}-{{$index}}');" title="Search for this term">
-                                    <span id="keywords">{{$keyword}}</span>
-                                </button>
-                            </form></div>
-                        {{end}}
+                        {{ $id := .ID }}
+                        {{ $keywords := keywordSplit .Keywords "," }}
+                        {{ range $index, $keyword := $keywords }}
+                            <div> <span id="keywords-{{ $id }}-{{ $index }}" hidden>{{ $keyword }}</span>
+                            <form hx-post="/search/">
+                                <input type="hidden" name="searchTerm" id="hidden-url-param-{{ $id }}-{{ $index }}" value="">
+                                <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#keywords-{{ $id }}-{{ $index }}', '#hidden-url-param-{{ $id }}-{{ $index }}');" hx-target="main" hx-post="/search/" title="Search"> <span id="keywords">{{ $keyword }}</span> </button>
+                            </form> </div>
+                        {{ end }}
                     </div>
-                    {{end}}
+                    {{ end }}
 
-                    {{if .BGroup}}
+                    {{ if .BGroup }}
                     <p>
-                        <span id="group-{{.ID}}" hidden>{{.BGroup}}</span>
-                        <form action="static/search.html" method="post">
-                            <input type="hidden" name="searchTerm" id="hidden-url-param-{{.ID}}" value="">
-                            <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#group-{{.ID}}', '#hidden-url-param-{{.ID}}');" title="Search for this term">
-                                <span id="group">{{.BGroup}}</span> </button>
-                        </form>
+                        <div><span id="group-{{ .ID }}" hidden>{{ .BGroup }}</span>
+                        <form hx-post="/search/">
+                            <input type="hidden" name="searchTerm" id="hidden-url-param-{{ .ID }}" value="">
+                            <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#group-{{ .ID }}', '#hidden-url-param-{{ .ID }}');" hx-target="main" hx-post="/search/" title="Search"> <span id="group">{{ .BGroup }}</span> </button>
+                        </form> </div>
                     </p>
-                    {{end}}
+                    {{ end }}
                 </div>
 
                 <div id="buttons">
                     <button class="button-svg" id="button-update" onclick="window.location.href='static/update.html'; getOldData(this);" title="Update">
                         <img class="svg-img" src="static/assets/imgs/update_button.svg" alt="Update button"> </button> 
-                    <button class="button-svg" id="button-delete" onclick="deleteEntry(this);" title="Delete">
+                    <button class="button-svg" id="button-delete" hx-target="main" hx-get="/delete/{{.ID }}" title="Delete">
                         <img class="svg-img" src="static/assets/imgs/delete_button.svg" alt="Delete button"> </button>
-                    <span id="delete-checkmark-{{.ID}}" hidden>&check;</span>
+                    <span id="delete-checkmark-{{.ID }}" hidden>&check;</span>
                 </div>
             </div>
             {{ end }}
         </div>
     </main>
+    {{ end }}
 </body>
 
 </html>
+{{ end }}

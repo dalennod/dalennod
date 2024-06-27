@@ -1,6 +1,6 @@
 @font-face {
     font-family: "InterReg";
-    src: url("fonts/Inter-Regular.woff2") format("woff2");
+    src: url("../fonts/Inter-Regular.woff2") format("woff2");
 }
 
 body {
@@ -135,6 +135,7 @@ main {
     filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
 }
 
+/* broken */
 .svg-img:hover {
     fill: #777;
 }
