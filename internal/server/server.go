@@ -222,18 +222,23 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == "POST" {
 		r.ParseForm()
+		var searchTerm string = r.FormValue("searchTerm")
 
-		var bookmarks []setup.Bookmark
-		for _, vs := range r.Form {
-			for _, v := range vs {
-				bookmarks = db.ViewAllWhere(database, v)
+		if searchTerm == "" {
+			err := tmpl.ExecuteTemplate(w, "bm_list", db.ViewAll(database, true))
+			if err != nil {
+				logger.Error.Println(err)
 			}
-		}
-
-		if len(bookmarks) == 0 {
-			notFoundHandler(w, r)
 			return
 		}
+
+		var bookmarks []setup.Bookmark = db.ViewAllWhere(database, searchTerm)
+
+		// TODO: look into htmx pop-up on 404 status. no need to prioritize for now.
+		// if len(bookmarks) == 0 {
+		// 	notFoundHandler(w, r)
+		// 	return
+		// }
 
 		tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(IndexHtml, "index.html"))
 		err := tmpl.ExecuteTemplate(w, "bm_list", bookmarks)

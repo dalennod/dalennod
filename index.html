@@ -18,8 +18,7 @@
         <form hx-post="/search/">
             <input type="hidden" name="searchTerm" id="hidden-url-param" value="">
             <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#input-search', '#hidden-url-param', true);" hx-target="main" hx-post="/search/" title="Search"> <img class="svg-img" src="static/assets/imgs/search_button.svg" alt="Search button"> </button>
-        </form> 
-        &nbsp;&nbsp;
+        </form> &nbsp;&nbsp;
         <a href="static/add.html">
             <button class="button-svg" id="button-add-html" title="Create">
                 <img class="svg-img" src="static/assets/imgs/create_button.svg" alt="Create button">
@@ -68,11 +67,11 @@
                     {{ end }}
 
                     {{ if .Keywords }}
-                    <div>
+                    <div style="display: flex; flex-direction: row;">
                         {{ $id := .ID }}
                         {{ $keywords := keywordSplit .Keywords "," }}
                         {{ range $index, $keyword := $keywords }}
-                            <div> <span id="keywords-{{ $id }}-{{ $index }}" hidden>{{ $keyword }}</span>
+                            <div style="flex: 1;"> <span id="keywords-{{ $id }}-{{ $index }}" hidden>{{ $keyword }}</span>
                             <form hx-post="/search/">
                                 <input type="hidden" name="searchTerm" id="hidden-url-param-{{ $id }}-{{ $index }}" value="">
                                 <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#keywords-{{ $id }}-{{ $index }}', '#hidden-url-param-{{ $id }}-{{ $index }}');" hx-target="main" hx-post="/search/" title="Search"> <span id="keywords">{{ $keyword }}</span> </button>
