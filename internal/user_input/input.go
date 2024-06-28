@@ -98,7 +98,7 @@ func getBmInfo(bmStruct setup.Bookmark) (setup.Bookmark, string) {
 
 	fmt.Print("Group to store the bookmark into: ")
 	scanner.Scan()
-	bmStruct.BGroup = scanner.Text()
+	bmStruct.BmGroup = scanner.Text()
 
 	fmt.Print("Archive URL? (y/N): ")
 	scanner.Scan()

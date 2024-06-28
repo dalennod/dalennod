@@ -15,7 +15,7 @@
                 document.querySelector("#input-title").value = oldData.title;
                 document.querySelector("#input-note").value = oldData.note;
                 document.querySelector("#input-keywords").value = oldData.keywords;
-                document.querySelector("#input-bGroup").value = oldData.bGroup;
+                document.querySelector("#input-bmGroup").value = oldData.bmGroup;
                 oldData.archive ? document.querySelector("#radio-btn-archive").setAttribute("hidden", "") : document.querySelector("#radio-btn-archive").removeAttribute("hidden");
             };
         };
@@ -39,7 +39,7 @@
             <p>Title: <input type="text" id="input-title" placeholder="New title for the bookmark"></p>
             <p>Notes: <input type="text" id="input-note" placeholder="New notes for bookmark"></p>
             <p>Keywords: <input type="text" id="input-keywords" placeholder="New keywords, to, search, bookmark"></p>
-            <p>Group: <input type="text" id="input-bGroup" placeholder="New group to store bookmark into"></p>
+            <p>Group: <input type="text" id="input-bmGroup" placeholder="New group to store bookmark into"></p>
             <p id="radio-btn-archive">
                 Archive?:
                 <input type="radio" name="radio-archive" id="radio-yes" value="1">

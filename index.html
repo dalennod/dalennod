@@ -8,26 +8,20 @@
     <link rel="stylesheet" href="static/assets/css/styles.css">
     <script src="static/assets/js/main.js" type="text/javascript" defer></script>
     <script src="static/assets/js/htmx.min.js"></script>
-    <script type="text/javascript"> localStorage.clear(); </script>
     <title>Dalennod</title>
 </head>
 
 <body>
     <nav>
-        <input type="text" id="input-search" placeholder="Search a keyword">
-        <form hx-post="/search/">
-            <input type="hidden" name="searchTerm" id="hidden-url-param" value="">
-            <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#input-search', '#hidden-url-param', true);" hx-target="main" hx-post="/search/" title="Search"> <img class="svg-img" src="static/assets/imgs/search_button.svg" alt="Search button"> </button>
-        </form> &nbsp;&nbsp;
-        <a href="static/add.html">
-            <button class="button-svg" id="button-add-html" title="Create">
-                <img class="svg-img" src="static/assets/imgs/create_button.svg" alt="Create button">
-            </button>
-        </a>
+        <form class="search-form" hx-post="/search/">
+            <input type="text" name="searchTerm" class="input-search" placeholder="Search a keyword...">
+            <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/search/" title="Search"> <img class="svg-img" src="static/assets/imgs/search_button.svg" alt="Search button"> </button>
+        </form>
+        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();"> <img class="svg-img" src="static/assets/imgs/create_button.svg" alt="Create button"> </button>
     </nav>
 
-    {{ block "bm_list" . }}
     <main>
+        {{ block "bm_list" . }}
         <div class="grid-view-list">
             {{ range. }}
             <div class="grid-child" id="{{ .ID }}">
@@ -67,27 +61,23 @@
                     {{ end }}
 
                     {{ if .Keywords }}
-                    <div style="display: flex; flex-direction: row;">
+                    <div>
                         {{ $id := .ID }}
                         {{ $keywords := keywordSplit .Keywords "," }}
-                        {{ range $index, $keyword := $keywords }}
-                            <div style="flex: 1;"> <span id="keywords-{{ $id }}-{{ $index }}" hidden>{{ $keyword }}</span>
-                            <form hx-post="/search/">
-                                <input type="hidden" name="searchTerm" id="hidden-url-param-{{ $id }}-{{ $index }}" value="">
-                                <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#keywords-{{ $id }}-{{ $index }}', '#hidden-url-param-{{ $id }}-{{ $index }}');" hx-target="main" hx-post="/search/" title="Search"> <span id="keywords">{{ $keyword }}</span> </button>
+                        {{ range $_, $keyword := $keywords }}
+                            <div> <form hx-post="/search/">
+                                <input hidden name="searchTerm" value="{{ $keyword }}">
+                                <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/search/" title="Search for this term"> <span id="keywords">{{ $keyword }}</span> </button>
                             </form> </div>
                         {{ end }}
                     </div>
                     {{ end }}
 
-                    {{ if .BGroup }}
-                    <p>
-                        <div><span id="group-{{ .ID }}" hidden>{{ .BGroup }}</span>
-                        <form hx-post="/search/">
-                            <input type="hidden" name="searchTerm" id="hidden-url-param-{{ .ID }}" value="">
-                            <button class="button-svg" type="submit" id="button-search-html" onclick="setValue('#group-{{ .ID }}', '#hidden-url-param-{{ .ID }}');" hx-target="main" hx-post="/search/" title="Search"> <span id="group">{{ .BGroup }}</span> </button>
-                        </form> </div>
-                    </p>
+                    {{ if .BmGroup }}
+                    <p> <form hx-post="/search/">
+                            <input hidden name="searchTerm" value="{{ .BmGroup }}">
+                            <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/search/" title="Search for this term"> <span id="group">{{ .BmGroup }}</span> </button>
+                        </form> </p>
                     {{ end }}
                 </div>
 
@@ -96,13 +86,58 @@
                         <img class="svg-img" src="static/assets/imgs/update_button.svg" alt="Update button"> </button> 
                     <button class="button-svg" id="button-delete" hx-target="main" hx-get="/delete/{{.ID }}" title="Delete">
                         <img class="svg-img" src="static/assets/imgs/delete_button.svg" alt="Delete button"> </button>
-                    <span id="delete-checkmark-{{.ID }}" hidden>&check;</span>
                 </div>
             </div>
             {{ end }}
         </div>
+        {{ end }}
     </main>
-    {{ end }}
+
+    <dialog class="dialog-create">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; padding: 5px;"> 
+            <span style="flex: 1;">Create a new bookmark</span>
+            <button onclick="closeCreateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-back" title="Close modal"><img class="svg-img" src="static/assets/imgs/cross_button.svg" alt="Close button"></button> </div>
+        <div class="dialog-inputs">
+            <p>URL<span class="red-text">*</span>:<br><input autofocus type="text" class="uac-input" id="input-url" placeholder="URL to save" required></p>
+            <p>Title:<br><input type="text" class="uac-input" id="input-title" placeholder="Title for the bookmark"></p>
+            <p>Notes:<br><input type="text" class="uac-input" id="input-note" placeholder="Log notes for bookmark"></p>
+            <p>Keywords:<br><input type="text" class="uac-input" id="input-keywords" placeholder="Keywords, to, search, bookmark"></p>
+            <p>Group:<br><input type="text" class="uac-input" id="input-bmGroup" placeholder="Group to store bookmark into"></p>
+            <p>Archive?:
+                <input type="radio" name="radio-yes" id="radio-yes" value="1">
+                <label for="radio-yes">Yes</label>
+                <input type="radio" name="radio-no" id="radio-no" value="0" checked>
+                <label for="radio-no">No</label> </p>
+            <p class="red-text">* required</p>
+            <p style="text-align: center;">
+                <button class="button-text" id="button-add-req" onclick="addEntry();" title="Create">Create</button> <span id="checkmark" hidden>&check;</span>
+                <span id="archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
+            </p>
+        </div>
+    </dialog>
+
+    <!-- <dialog class="dialog-update">
+        <div style="display: flex; flex-direction: row; justify-content: space-between; padding: 5px;"> 
+            <span style="flex: 1;">Update a bookmark</span>
+            <button onclick="closeCreateDialog();" class="button-svg" id="button-back" title="Close modal"><img class="svg-img" src="static/assets/imgs/cross_button.svg" alt="Close button"></button> </div>
+        <div class="dialog-inputs">
+            <p>URL<span class="red-text">*</span>:<br><input autofocus type="text" id="input-url" placeholder="URL to save" required></p>
+            <p>Title:<br><input type="text" id="input-title" placeholder="Title for the bookmark"></p>
+            <p>Notes:<br><input type="text" id="input-note" placeholder="Log notes for bookmark"></p>
+            <p>Keywords:<br><input type="text" id="input-keywords" placeholder="Keywords, to, search, bookmark"></p>
+            <p>Group:<br><input type="text" id="input-bmGroup" placeholder="Group to store bookmark into"></p>
+            <p>Archive?:
+                <input type="radio" name="radio-yes" id="radio-yes" value="1">
+                <label for="radio-yes">Yes</label>
+                <input type="radio" name="radio-no" id="radio-no" value="0" checked>
+                <label for="radio-no">No</label> </p>
+            <p class="red-text">* required</p>
+            <p style="text-align: center;">
+                <button class="button-text" id="button-add-req" onclick="addEntry();" title="Create">Create</button> <span id="checkmark" hidden>&check;</span>
+                <span id="archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
+            </p>
+        </div>
+    </dialog> -->
 </body>
 
 </html>
