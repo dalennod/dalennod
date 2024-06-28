@@ -1,3 +1,5 @@
+"use strict";
+
 const ENDPOINT = "http://localhost:41415/";
 
 const overlayDiv = document.querySelector("#done-overlay-div");
@@ -14,7 +16,7 @@ const inputUrl = document.querySelector("#input-url");
 const inputTitle = document.querySelector("#input-title");
 const inputNote = document.querySelector("#input-note");
 const inputKeywords = document.querySelector("#input-keywords");
-const inputBGroup = document.querySelector("#input-bGroup");
+const inputBmGroup = document.querySelector("#input-bmGroup");
 const archiveRadioNo = document.querySelector("#radio-no");
 
 let conn = false;
@@ -26,14 +28,14 @@ const addEntry = async () => {
         title: inputTitle.value,
         note: inputNote.value,
         keywords: inputKeywords.value,
-        bGroup: inputBGroup.value,
+        bmGroup: inputBmGroup.value,
         archive: archiveRadioNo.checked ? false : true,
-    };
+    }
 
     if (dataJSON.archive) {
         archiveWarn.removeAttribute("hidden");
         btnCreate.disabled = true;
-    };
+    }
 
     const fetchURL = ENDPOINT + "add/";
     const res = await fetch(fetchURL, {
@@ -43,7 +45,7 @@ const addEntry = async () => {
 
     if (res.ok) {
         resizeInput();
-    };
+    }
 
     archiveWarn.setAttribute("hidden", "");
     btnCreate.disabled = false;
@@ -54,7 +56,7 @@ const addEntry = async () => {
         checkmark.setAttribute("hidden", "");
         overlayDiv.style.display = "none";
     }, 2000);
-};
+}
 
 const getCurrTab = () => {
     browser.tabs.query({ currentWindow: true, active: true }).then((tabs) => {
@@ -62,7 +64,7 @@ const getCurrTab = () => {
         inputUrl.value = currTab.url;
         inputTitle.value = currTab.title;
     });
-};
+}
 
 const checkConnection = async () => {
     if (!conn) {
@@ -78,9 +80,9 @@ const checkConnection = async () => {
             return;
         }
         conn = true;
-    };
+    }
     checkUrl(currTab.url);
-};
+}
 
 const checkUrl = async (currTabUrl) => {
     const fetchUrl = ENDPOINT + "checkUrl/";
@@ -90,14 +92,14 @@ const checkUrl = async (currTabUrl) => {
     })
     if (res.status == 404) {
         return;
-    };
+    }
     const receviedData = await res.json();
 
     btnUpdate.removeAttribute("hidden");
     btnRemove.removeAttribute("hidden");
     btnCreate.setAttribute("hidden", "");
     fillData(JSON.parse(JSON.stringify(receviedData)));
-};
+}
 
 const fillData = (dataFromDb) => {
     bmId.innerHTML = dataFromDb.id;
@@ -105,9 +107,9 @@ const fillData = (dataFromDb) => {
     inputTitle.value = dataFromDb.title;
     inputNote.value = dataFromDb.note;
     inputKeywords.value = dataFromDb.keywords;
-    inputBGroup.value = dataFromDb.bGroup;
+    inputBmGroup.value = dataFromDb.bmGroup;
     dataFromDb.archive ? btnArchive.setAttribute("hidden", "") : btnArchive.removeAttribute("hidden");
-};
+}
 
 window.addEventListener("load", () => {
     getCurrTab();
@@ -132,9 +134,9 @@ const updateEntry = async (idInDb) => {
         title: inputTitle.value,
         note: inputNote.value,
         keywords: inputKeywords.value,
-        bGroup: inputBGroup.value,
+        bmGroup: inputBmGroup.value,
         archive: archiveRadioNo.checked ? false : true,
-    };
+    }
 
     const fetchURL = ENDPOINT + "update/" + idInDb;
     await fetch(fetchURL, {
@@ -149,7 +151,7 @@ const updateEntry = async (idInDb) => {
         checkmark.setAttribute("hidden", "");
         overlayDiv.style.display = "none";
     }, 2000);
-};
+}
 
 const removeEntry = async (idInDb) => {
     const fetchURL = ENDPOINT + "delete/" + idInDb;
@@ -162,13 +164,13 @@ const removeEntry = async (idInDb) => {
         checkmark.setAttribute("hidden", "");
         overlayDiv.style.display = "none";
     }, 2000);
-};
+}
 
 const resizeInput = () => {
     const input = document.querySelectorAll("input");
     for (i = 0; i < input.length; i++) {
         (input[i].type === "text") ? input[i].setAttribute("size", input[i].getAttribute("placeholder").length) : {};
         input[i].value = "";
-    };
-};
+    }
+}
 resizeInput();

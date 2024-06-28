@@ -234,13 +234,13 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 
 		var bookmarks []setup.Bookmark = db.ViewAllWhere(database, searchTerm)
 
-		// TODO: look into htmx pop-up on 404 status. no need to prioritize for now.
+		// TODO: in future look into htmx pop-up on 404 status
 		// if len(bookmarks) == 0 {
 		// 	notFoundHandler(w, r)
 		// 	return
 		// }
 
-		tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(IndexHtml, "index.html"))
+		// tmpl = template.Must(template.New("bm_list").Funcs(tmplFuncMap).ParseFS(IndexHtml, "index.html"))
 		err := tmpl.ExecuteTemplate(w, "bm_list", bookmarks)
 		if err != nil {
 			logger.Error.Println(err)
