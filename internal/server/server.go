@@ -23,8 +23,7 @@ var (
 	tmplFuncMap template.FuncMap = make(template.FuncMap)
 	database    *sql.DB
 	tmpl        *template.Template
-	IndexHtml   embed.FS
-	Webui       embed.FS
+	Web         embed.FS
 )
 
 func Start(data *sql.DB) {
@@ -32,19 +31,19 @@ func Start(data *sql.DB) {
 
 	var mux *http.ServeMux = http.NewServeMux()
 
-	var fsopen fs.FS = fs.FS(Webui)
-	webuiStatic, err := fs.Sub(fsopen, "static")
+	var fsopen fs.FS = fs.FS(Web)
+	webStatic, err := fs.Sub(fsopen, "web/static")
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
-	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webuiStatic))))
+	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webStatic))))
 
 	tmplFuncMap["keywordSplit"] = keywordSplit
 
 	mux.HandleFunc("/", rootHandler)
 	mux.HandleFunc("/delete/", deleteHandler)
 	mux.HandleFunc("/add/", addHandler)
-	mux.HandleFunc("/getRow/", getRowHandler)
+	mux.HandleFunc("/row/", rowHandler)
 	mux.HandleFunc("/update/", updateHandler)
 	mux.HandleFunc("/search/", searchHandler)
 	mux.HandleFunc("/checkUrl/", checkUrlHandler)
@@ -72,7 +71,7 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(IndexHtml, "index.html"))
+		tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(Web, "web/index.html"))
 
 		var bookmarks []setup.Bookmark = db.ViewAll(database, true)
 		tmpl.Execute(w, bookmarks)
@@ -139,12 +138,12 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func getRowHandler(w http.ResponseWriter, r *http.Request) {
+func rowHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
 		var (
-			oldData  setup.Bookmark
-			getRowID *regexp.Regexp = regexp.MustCompile("^/getRow/([0-9]+)$")
-			match    []string       = getRowID.FindStringSubmatch(r.URL.Path)
+			oldData setup.Bookmark
+			rowID   *regexp.Regexp = regexp.MustCompile("^/row/([0-9]+)$")
+			match   []string       = rowID.FindStringSubmatch(r.URL.Path)
 		)
 
 		if len(match) < 2 {

@@ -10,15 +10,12 @@ import (
 )
 
 var (
-	//go:embed index.html
-	indexHtml embed.FS
-	//go:embed static
-	webui embed.FS
+	//go:embed web
+	web embed.FS
 )
 
 func init() {
-	server.IndexHtml = indexHtml
-	server.Webui = webui
+	server.Web = web
 }
 
 func main() {

@@ -12,7 +12,7 @@ const closeUpdateDialog = () => updateDialog.close();
 
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.id;
-    const fetchURL = ENDPOINT + "getRow/" + entryID;
+    const fetchURL = ENDPOINT + "row/" + entryID;
 
     const res = await fetch(fetchURL);
     const oldData = await res.json();

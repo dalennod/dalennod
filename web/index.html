@@ -5,9 +5,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="static/assets/css/styles.css">
-    <script src="static/assets/js/main.js" type="text/javascript" defer></script>
-    <script src="static/assets/js/htmx.min.js"></script>
+    <link rel="stylesheet" href="static/css/styles.css">
+    <script src="static/js/main.js" type="text/javascript" defer></script>
+    <script src="static/js/htmx.min.js"></script>
     <title>Dalennod</title>
 </head>
 
@@ -15,9 +15,9 @@
     <nav>
         <form class="search-form" hx-post="/search/">
             <input type="text" name="searchTerm" class="input-search" placeholder="Search a keyword...">
-            <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/search/" title="Search"> <img class="svg-img" src="static/assets/imgs/search_button.svg" alt="Search button"> </button>
+            <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/search/" title="Search"> <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button"> </button>
         </form>
-        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();"> <img class="svg-img" src="static/assets/imgs/create_button.svg" alt="Create button"> </button>
+        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();"> <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button"> </button>
     </nav>
 
     <main>
@@ -37,7 +37,7 @@
                         <a href="{{ .URL }}" target="_blank"> <img src="{{ .ThumbURL }}" alt="[couldn't load thumbnail]"> </a> </div>
                     {{ else }}
                     <div id="default-thumbURL"> 
-                        <a href="{{ .URL }}" target="_blank"> <img src="static/assets/imgs/41415.png" alt="[couldn't load thumbnail]"> </a> </div>
+                        <a href="{{ .URL }}" target="_blank"> <img src="static/imgs/41415.png" alt="[couldn't load thumbnail]"> </a> </div>
                     {{ end }}
 
                     {{ if .Title }}
@@ -77,9 +77,9 @@
 
                 <div id="buttons">
                     <button class="button-svg" id="button-update" onclick="getOldData(this);" title="Update">
-                        <img class="svg-img" src="static/assets/imgs/update_button.svg" alt="Update button"> </button> 
+                        <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button"> </button> 
                     <button class="button-svg" id="button-delete" hx-target="main" hx-get="/delete/{{ .ID }}" title="Delete">
-                        <img class="svg-img" src="static/assets/imgs/delete_button.svg" alt="Delete button"> </button>
+                        <img class="svg-img" src="static/imgs/delete_button.svg" alt="Delete button"> </button>
                 </div>
             </div>
             {{ end }}
@@ -90,7 +90,7 @@
     <dialog class="dialog-create">
         <div class="dialog-top"> 
             <span class="dialog-type">Create a new bookmark</span>
-            <button onclick="closeCreateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/assets/imgs/cross_button.svg" alt="Close button"></button> </div>
+            <button onclick="closeCreateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/imgs/close_button.svg" alt="Close button"></button> </div>
         <div class="dialog-inputs">
             <p>URL<span class="red-text">*</span>:<br><input autofocus type="text" class="uac-input" id="create-url" placeholder="URL to save" required></p>
             <p>Title:<br><input type="text" class="uac-input" id="create-title" placeholder="Title for the bookmark"></p>
@@ -112,7 +112,7 @@
     <dialog class="dialog-update">
         <div class="dialog-top"> 
             <span class="dialog-type">Update a bookmark</span>
-            <button onclick="closeUpdateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/assets/imgs/cross_button.svg" alt="Close button"></button> </div>
+            <button onclick="closeUpdateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/imgs/close_button.svg" alt="Close button"></button> </div>
         <div class="dialog-inputs">
             <span id="bm-id" hidden></span>
             <p>URL<span class="red-text">*</span>:<br><input type="text" class="uac-input" id="update-url" placeholder="URL to save" required></p>
