@@ -28,22 +28,16 @@
                 <div id="bm-info">
                     <div id="id-creation">
                         <p><a href="{{ .URL }}" target="_blank">{{ .ID }}.</a></p>
-                        <span style="font-size: 12px;">{{ .Modified }}</span>
-                    </div>
-
-                    <!-- Multiple `if...else if` statements does not work properly. So, currently this is assuming that every thumbURL was successfully converted to B64ThumbURL. Not necessarily a problem because if the src gets improper image data then the alt text will be shown, but maybe there is a better way to implement this. TODO in future -->
+                        <span>{{ .Modified }}</span> </div>
                     {{ if .B64ThumbURL }}
-                    <div id="thumbURL">
-                        <a href="{{.URL }}" target="_blank">
-                            <img src="data:image/{{.B64ThumbURL }}" alt="[couldn't load thumbnail]">
-                        </a>
-                    </div>
+                    <div id="thumbURL"> 
+                        <a href="{{ .URL }}" target="_blank"> <img src="data:image/{{ .B64ThumbURL }}" alt="[couldn't load thumbnail]"> </a> </div>
+                    {{ else if .ThumbURL }}
+                    <div id="thumbURL"> 
+                        <a href="{{ .URL }}" target="_blank"> <img src="{{ .ThumbURL }}" alt="[couldn't load thumbnail]"> </a> </div>
                     {{ else }}
-                    <div id="default-thumbURL">
-                        <a href="{{.URL }}" target="_blank">
-                            <img src="static/assets/imgs/41415.png" alt="[couldn't load thumbnail]">
-                        </a>
-                    </div>
+                    <div id="default-thumbURL"> 
+                        <a href="{{ .URL }}" target="_blank"> <img src="static/assets/imgs/41415.png" alt="[couldn't load thumbnail]"> </a> </div>
                     {{ end }}
 
                     {{ if .Title }}
@@ -82,9 +76,9 @@
                 </div>
 
                 <div id="buttons">
-                    <button class="button-svg" id="button-update" onclick="window.location.href='static/update.html'; getOldData(this);" title="Update">
+                    <button class="button-svg" id="button-update" onclick="getOldData(this);" title="Update">
                         <img class="svg-img" src="static/assets/imgs/update_button.svg" alt="Update button"> </button> 
-                    <button class="button-svg" id="button-delete" hx-target="main" hx-get="/delete/{{.ID }}" title="Delete">
+                    <button class="button-svg" id="button-delete" hx-target="main" hx-get="/delete/{{ .ID }}" title="Delete">
                         <img class="svg-img" src="static/assets/imgs/delete_button.svg" alt="Delete button"> </button>
                 </div>
             </div>
@@ -94,50 +88,49 @@
     </main>
 
     <dialog class="dialog-create">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; padding: 5px;"> 
-            <span style="flex: 1;">Create a new bookmark</span>
-            <button onclick="closeCreateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-back" title="Close modal"><img class="svg-img" src="static/assets/imgs/cross_button.svg" alt="Close button"></button> </div>
+        <div class="dialog-top"> 
+            <span class="dialog-type">Create a new bookmark</span>
+            <button onclick="closeCreateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/assets/imgs/cross_button.svg" alt="Close button"></button> </div>
         <div class="dialog-inputs">
-            <p>URL<span class="red-text">*</span>:<br><input autofocus type="text" class="uac-input" id="input-url" placeholder="URL to save" required></p>
-            <p>Title:<br><input type="text" class="uac-input" id="input-title" placeholder="Title for the bookmark"></p>
-            <p>Notes:<br><input type="text" class="uac-input" id="input-note" placeholder="Log notes for bookmark"></p>
-            <p>Keywords:<br><input type="text" class="uac-input" id="input-keywords" placeholder="Keywords, to, search, bookmark"></p>
-            <p>Group:<br><input type="text" class="uac-input" id="input-bmGroup" placeholder="Group to store bookmark into"></p>
+            <p>URL<span class="red-text">*</span>:<br><input autofocus type="text" class="uac-input" id="create-url" placeholder="URL to save" required></p>
+            <p>Title:<br><input type="text" class="uac-input" id="create-title" placeholder="Title for the bookmark"></p>
+            <p>Notes:<br><input type="text" class="uac-input" id="create-note" placeholder="Log notes for bookmark"></p>
+            <p>Keywords:<br><input type="text" class="uac-input" id="create-keywords" placeholder="Keywords, to, search, bookmark"></p>
+            <p>Group:<br><input type="text" class="uac-input" id="create-bmGroup" placeholder="Group to store bookmark into"></p>
             <p>Archive?:
-                <input type="radio" name="radio-yes" id="radio-yes" value="1">
-                <label for="radio-yes">Yes</label>
-                <input type="radio" name="radio-no" id="radio-no" value="0" checked>
-                <label for="radio-no">No</label> </p>
+                <input type="radio" name="create-radio-yes" id="create-radio-yes" value="1">
+                <label for="create-radio-yes">Yes</label>
+                <input type="radio" name="create-radio-yes" id="create-radio-no" value="0" checked>
+                <label for="create-radio-yes">No</label> </p>
             <p class="red-text">* required</p>
-            <p style="text-align: center;">
-                <button class="button-text" id="button-add-req" onclick="addEntry();" title="Create">Create</button> <span id="checkmark" hidden>&check;</span>
-                <span id="archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
-            </p>
+            <p class="center-text">
+                <button class="button-text" id="button-add-req" onclick="addEntry();" title="Create">Create</button> <span id="create-checkmark" hidden>&check;</span> 
+                <span id="create-archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span> </p>
         </div>
     </dialog>
 
-    <!-- <dialog class="dialog-update">
-        <div style="display: flex; flex-direction: row; justify-content: space-between; padding: 5px;"> 
-            <span style="flex: 1;">Update a bookmark</span>
-            <button onclick="closeCreateDialog();" class="button-svg" id="button-back" title="Close modal"><img class="svg-img" src="static/assets/imgs/cross_button.svg" alt="Close button"></button> </div>
+    <dialog class="dialog-update">
+        <div class="dialog-top"> 
+            <span class="dialog-type">Update a bookmark</span>
+            <button onclick="closeUpdateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/assets/imgs/cross_button.svg" alt="Close button"></button> </div>
         <div class="dialog-inputs">
-            <p>URL<span class="red-text">*</span>:<br><input autofocus type="text" id="input-url" placeholder="URL to save" required></p>
-            <p>Title:<br><input type="text" id="input-title" placeholder="Title for the bookmark"></p>
-            <p>Notes:<br><input type="text" id="input-note" placeholder="Log notes for bookmark"></p>
-            <p>Keywords:<br><input type="text" id="input-keywords" placeholder="Keywords, to, search, bookmark"></p>
-            <p>Group:<br><input type="text" id="input-bmGroup" placeholder="Group to store bookmark into"></p>
-            <p>Archive?:
-                <input type="radio" name="radio-yes" id="radio-yes" value="1">
-                <label for="radio-yes">Yes</label>
-                <input type="radio" name="radio-no" id="radio-no" value="0" checked>
-                <label for="radio-no">No</label> </p>
+            <span id="bm-id" hidden></span>
+            <p>URL<span class="red-text">*</span>:<br><input type="text" class="uac-input" id="update-url" placeholder="URL to save" required></p>
+            <p>Title:<br><input type="text" class="uac-input" id="update-title" placeholder="Title for the bookmark"></p>
+            <p>Notes:<br><input type="text" class="uac-input" id="update-note" autofocus placeholder="Log notes for bookmark"></p>
+            <p>Keywords:<br><input type="text" class="uac-input" id="update-keywords" placeholder="Keywords, to, search, bookmark"></p>
+            <p>Group:<br><input type="text" class="uac-input" id="update-bmGroup" placeholder="Group to store bookmark into"></p>
+            <p id="update-archive">Archive?:
+                <input type="radio" name="update-radio-yes" id="update-radio-yes" value="1">
+                <label for="update-radio-yes">Yes</label>
+                <input type="radio" name="update-radio-yes" id="update-radio-no" value="0" checked>
+                <label for="update-radio-yes">No</label> </p>
             <p class="red-text">* required</p>
-            <p style="text-align: center;">
-                <button class="button-text" id="button-add-req" onclick="addEntry();" title="Create">Create</button> <span id="checkmark" hidden>&check;</span>
-                <span id="archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
-            </p>
+            <p class="center-text">
+                <button class="button-text" id="button-update-req" onclick="updateEntry();" title="Create">Update</button> <span id="update-checkmark" hidden>&check;</span>
+                <span id="update-archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span> </p>
         </div>
-    </dialog> -->
+    </dialog>
 </body>
 
 </html>

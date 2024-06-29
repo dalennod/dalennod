@@ -61,10 +61,6 @@ nav {
     width: 100%;
 }
 
-.input-search {
-    flex: 1;
-}
-
 main {
     margin-top: 66px;
 }
@@ -114,15 +110,14 @@ main {
     object-fit: cover;
 }
 
-.grid-child #group,
-.grid-child #keywords {
+.grid-child #group, .grid-child #keywords, #id-creation {
     font-size: 13px;
-    padding: 3px;
 }
 
 .grid-child #group {
     border: dotted 2px #aaa;
     border-radius: 5px;
+    padding: 3px;
 }
 
 .grid-child #keywords {
@@ -182,37 +177,33 @@ body:has(dialog[open]) {
     overflow: hidden;
 }
 
-@keyframes fade-in {
-    0% {
-        opacity: 0;
-        transform: scaleY(0);
-        display: none;
-    }
+.dialog-top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 5px;
+}
 
-    100% {
-        opacity: 1;
-        transform: scaleY(1);
-        display: block;
-    }
+.dialog-type, .input-search {
+    flex: 1;
+}
+
+.center-text {
+    text-align: center;
+}
+
+@keyframes fade-in {
+    0% { opacity: 0; transform: scaleY(0); display: none; }
+    100% { opacity: 1; transform: scaleY(1); display: block; }
 }
 
 @keyframes fade-out {
-    0% {
-        opacity: 1;
-        transform: scaleY(1);
-        display: block;
-    }
-
-    100% {
-        opacity: 0;
-        transform: scaleY(0);
-        display: none;
-    }
+    0% { opacity: 1; transform: scaleY(1); display: block; }
+    100% { opacity: 0; transform: scaleY(0); display: none; }
 }
 
 @keyframes backdrop-fade-in {
     0% { background-color: rgba(0, 0, 0, 0) }
-
     100% { background-color: rgba(0, 0, 0, 0.8); }
 }
 
@@ -222,12 +213,7 @@ body:has(dialog[open]) {
         color: #eaeaea;
     }
 
-    input {
-        color: #eaeaea;
-    }
-
-    .grid-child #group,
-    .grid-child #keywords {
+    input, .grid-child #group, .grid-child #keywords, .grid-child a {
         color: #eaeaea;
     }
 
@@ -240,14 +226,8 @@ body:has(dialog[open]) {
         background-color: #2d2d2d;
     }
 
-    .grid-child,
-    .dialog-inputs,
-    .update-main div {
+    .grid-child, .dialog-inputs, .update-main div {
         background-color: #303030;
-    }
-
-    .grid-child a {
-        color: #eaeaea;
     }
 
     .svg-img {

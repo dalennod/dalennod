@@ -12,29 +12,45 @@ const closeUpdateDialog = () => updateDialog.close();
 
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.id;
-
     const fetchURL = ENDPOINT + "getRow/" + entryID;
-    const res = await fetch(fetchURL);
 
+    const res = await fetch(fetchURL);
     const oldData = await res.json();
     if (typeof (Storage) !== "undefined") {
         localStorage.setItem("oldData", JSON.stringify(oldData));
     }
+    setOldData();
+}
+
+const setOldData = () => {
+    if (typeof (Storage) !== "undefined") {
+        const oldData = JSON.parse(localStorage.getItem("oldData"));
+        document.querySelector("#bm-id").innerText = oldData.id;
+        document.querySelector("#update-url").value = oldData.url;
+        document.querySelector("#update-title").value = oldData.title;
+        document.querySelector("#update-note").value = oldData.note;
+        document.querySelector("#update-keywords").value = oldData.keywords;
+        document.querySelector("#update-bmGroup").value = oldData.bmGroup;
+        oldData.archive ? document.querySelector("#update-archive").setAttribute("hidden", "") : document.querySelector("#update-archive").removeAttribute("hidden");
+    }
+    showUpdateDialog();
 }
 
 const updateEntry = async () => {
     const newDataJSON = {
-        url: document.querySelector("#input-url").value,
-        title: document.querySelector("#input-title").value,
-        note: document.querySelector("#input-note").value,
-        keywords: document.querySelector("#input-keywords").value,
-        bmGroup: document.querySelector("#input-bmGroup").value,
-        archive: document.querySelector("#radio-no").checked ? false : true,
+        url: document.querySelector("#update-url").value,
+        title: document.querySelector("#update-title").value,
+        note: document.querySelector("#update-note").value,
+        keywords: document.querySelector("#update-keywords").value,
+        bmGroup: document.querySelector("#update-bmGroup").value,
+        archive: document.querySelector("#update-radio-no").checked ? false : true,
     }
 
+    if (newDataJSON.archive) document.querySelector("update-#archive-warn").removeAttribute("hidden");
+    
     const dataID = document.querySelector("#bm-id").innerText;
     const fetchURL = ENDPOINT + "update/" + dataID;
-    await fetch(fetchURL, {
+    const res = await fetch(fetchURL, {
         method: "POST",
         headers: {
             "Content-Type": "application/json; charset=utf-8"
@@ -42,30 +58,28 @@ const updateEntry = async () => {
         body: JSON.stringify(newDataJSON),
     });
 
-    document.querySelector("#checkmark").removeAttribute("hidden");
+    if (res.ok) clearInputs();
+
+    document.querySelector("#update-archive-warn").setAttribute("hidden", "");
+    document.querySelector("#update-checkmark").removeAttribute("hidden");
     setTimeout(() => {
-        document.querySelector("#checkmark").setAttribute("hidden", "");
+        document.querySelector("#update-checkmark").setAttribute("hidden", "");
     }, 2000);
 }
 
 const addEntry = async () => {
-    if (document.querySelector("#input-url").value === "") {
-        alert("URL is required");
-        return;
-    }
+    if (document.querySelector("#create-url").value === "") { alert("URL is required"); return; }
 
     const dataJSON = {
-        url: document.querySelector("#input-url").value,
-        title: document.querySelector("#input-title").value,
-        note: document.querySelector("#input-note").value,
-        keywords: document.querySelector("#input-keywords").value,
-        bmGroup: document.querySelector("#input-bmGroup").value,
-        archive: (document.querySelector("#radio-no").checked) ? false : true,
+        url: document.querySelector("#create-url").value,
+        title: document.querySelector("#create-title").value,
+        note: document.querySelector("#create-note").value,
+        keywords: document.querySelector("#create-keywords").value,
+        bmGroup: document.querySelector("#create-bmGroup").value,
+        archive: (document.querySelector("#create-radio-no").checked) ? false : true,
     }
 
-    if (dataJSON.archive) {
-        document.querySelector("#archive-warn").removeAttribute("hidden");
-    }
+    if (dataJSON.archive) document.querySelector("#create-archive-warn").removeAttribute("hidden");
 
     const fetchURL = ENDPOINT + "add/";
     const res = await fetch(fetchURL, {
@@ -76,33 +90,13 @@ const addEntry = async () => {
         body: JSON.stringify(dataJSON),
     });
 
-    if (res.ok) {
-        clearInputs();
-    }
+    if (res.ok) clearInputs();
 
-    document.querySelector("#archive-warn").setAttribute("hidden", "");
-    document.querySelector("#checkmark").removeAttribute("hidden");
+    document.querySelector("#create-archive-warn").setAttribute("hidden", "");
+    document.querySelector("#create-checkmark").removeAttribute("hidden");
     setTimeout(() => {
-        document.querySelector("#checkmark").setAttribute("hidden", "");
+        document.querySelector("#create-checkmark").setAttribute("hidden", "");
     }, 2000);
 }
 
-const inputEventKey = () => {
-    const inputSearch = document.querySelector("#input-search");
-    if (inputSearch === null) {
-        return;
-    }
-    inputSearch.addEventListener("keypress", function (event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            document.querySelector("#button-search-html").click();
-        }
-    });
-}
-inputEventKey();
-
-const clearInputs = () => { 
-    const input = document.querySelectorAll(".uac-input");
-    if (input.length === 0) return;
-    for (let i = 0; i < input.length; i++) input[i].value = ""; 
-}
+const clearInputs = () => { const input = document.querySelectorAll(".uac-input"); if (input.length === 0) return; for (let i = 0; i < input.length; i++) input[i].value = ""; }
