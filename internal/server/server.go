@@ -101,7 +101,6 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 		db.Remove(database, matchInt)
 		w.WriteHeader(http.StatusOK)
 
-		// rootHandler(w, r)
 		err = tmpl.ExecuteTemplate(w, "bm_list", db.ViewAll(database, true))
 		if err != nil {
 			logger.Error.Println(err)
@@ -240,7 +239,6 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		// 	return
 		// }
 
-		// tmpl = template.Must(template.New("bm_list").Funcs(tmplFuncMap).ParseFS(IndexHtml, "index.html"))
 		err := tmpl.ExecuteTemplate(w, "bm_list", bookmarks)
 		if err != nil {
 			logger.Error.Println(err)
