@@ -16,9 +16,7 @@ const getOldData = async (ele) => {
 
     const res = await fetch(fetchURL);
     const oldData = await res.json();
-    if (typeof (Storage) !== "undefined") {
-        localStorage.setItem("oldData", JSON.stringify(oldData));
-    }
+    if (typeof (Storage) !== "undefined") localStorage.setItem("oldData", JSON.stringify(oldData));
     setOldData();
 }
 
@@ -32,7 +30,7 @@ const setOldData = () => {
         document.querySelector("#update-keywords").value = oldData.keywords;
         document.querySelector("#update-bmGroup").value = oldData.bmGroup;
         oldData.archive ? document.querySelector("#update-archive").setAttribute("hidden", "") : document.querySelector("#update-archive").removeAttribute("hidden");
-    }
+    };
     showUpdateDialog();
 }
 
@@ -58,13 +56,11 @@ const updateEntry = async () => {
         body: JSON.stringify(newDataJSON),
     });
 
-    if (res.ok) clearInputs();
-
-    document.querySelector("#update-archive-warn").setAttribute("hidden", "");
-    document.querySelector("#update-checkmark").removeAttribute("hidden");
-    setTimeout(() => {
-        document.querySelector("#update-checkmark").setAttribute("hidden", "");
-    }, 2000);
+    if (res.ok) {
+        document.querySelector("#update-archive-warn").setAttribute("hidden", "");
+        document.querySelector("#update-checkmark").removeAttribute("hidden");
+        setTimeout(() => document.querySelector("#update-checkmark").setAttribute("hidden", ""), 2000);
+    }
 }
 
 const addEntry = async () => {
@@ -94,9 +90,7 @@ const addEntry = async () => {
 
     document.querySelector("#create-archive-warn").setAttribute("hidden", "");
     document.querySelector("#create-checkmark").removeAttribute("hidden");
-    setTimeout(() => {
-        document.querySelector("#create-checkmark").setAttribute("hidden", "");
-    }, 2000);
+    setTimeout(() => document.querySelector("#create-checkmark").setAttribute("hidden", ""), 2000);
 }
 
 const clearInputs = () => { const input = document.querySelectorAll(".uac-input"); if (input.length === 0) return; for (let i = 0; i < input.length; i++) input[i].value = ""; }
