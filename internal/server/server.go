@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"io/fs"
 	"net/http"
 	"regexp"
@@ -44,12 +45,14 @@ func Start(data *sql.DB) {
 	mux.HandleFunc("/delete/", deleteHandler)
 	mux.HandleFunc("/add/", addHandler)
 	mux.HandleFunc("/row/", rowHandler)
+	mux.HandleFunc("/groups/", groupsHandler)
 	mux.HandleFunc("/update/", updateHandler)
 	mux.HandleFunc("/search/", searchHandler)
 	mux.HandleFunc("/checkUrl/", checkUrlHandler)
 
-	logger.Info.Printf("Web-server starting on http://localhost%s\n", PORT)
-	fmt.Printf("Web-server starting on http://localhost%s\n", PORT)
+	logger.Info.Printf("Web-server starting on http://localhost%s/\n", PORT)
+	fmt.Printf("Web-server starting on http://localhost%s/\n", PORT)
+	// TODO: use own Server to gracefully shutdown
 	err = http.ListenAndServe(PORT, mux)
 	if err != nil {
 		fmt.Printf("Stopping (error: %v)\n", err)
@@ -74,7 +77,9 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(Web, "web/index.html"))
 
 		var bookmarks []setup.Bookmark = db.ViewAll(database, true)
-		tmpl.Execute(w, bookmarks)
+		if err := execTmplBmInterface(w, "index", bookmarks); err != nil {
+			logger.Warn.Println(err)
+		}
 	} else {
 		internalServerErrorHandler(w, r)
 	}
@@ -100,8 +105,7 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 		db.Remove(database, matchInt)
 		w.WriteHeader(http.StatusOK)
 
-		err = tmpl.ExecuteTemplate(w, "bm_list", db.ViewAll(database, true))
-		if err != nil {
+		if err := execTmplBmInterface(w, "bm_list", db.ViewAll(database, true)); err != nil {
 			logger.Error.Println(err)
 		}
 	} else {
@@ -223,8 +227,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		var searchTerm string = r.FormValue("searchTerm")
 
 		if searchTerm == "" {
-			err := tmpl.ExecuteTemplate(w, "bm_list", db.ViewAll(database, true))
-			if err != nil {
+			if err := execTmplBmInterface(w, "bm_list", db.ViewAll(database, true)); err != nil {
 				logger.Error.Println(err)
 			}
 			return
@@ -238,8 +241,7 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		// 	return
 		// }
 
-		err := tmpl.ExecuteTemplate(w, "bm_list", bookmarks)
-		if err != nil {
+		if err := execTmplBmInterface(w, "bm_list", bookmarks); err != nil {
 			logger.Error.Println(err)
 		}
 	} else {
@@ -280,4 +282,32 @@ func checkUrlHandler(w http.ResponseWriter, r *http.Request) {
 
 func keywordSplit(keywords string, delimiter string) []string {
 	return strings.Split(keywords, delimiter)
+}
+
+func groupsHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Method", "*")
+	if r.Method == "GET" {
+		var currGroups map[string]interface{} = make(map[string]interface{})
+		listCurrGroups, err := db.GetAllGroups(database)
+		if err != nil {
+			logger.Error.Println(err)
+		}
+		currGroups["AllGroups"] = listCurrGroups
+
+		if err := tmpl.ExecuteTemplate(w, "curr_groups", currGroups); err != nil {
+			logger.Error.Println(err)
+		}
+	} else {
+		internalServerErrorHandler(w, r)
+	}
+}
+
+func execTmplBmInterface(wr io.Writer, name string, data any) error {
+	var allBookmarks map[string]interface{} = make(map[string]interface{})
+	allBookmarks["Bookmarks"] = data
+	if err := tmpl.ExecuteTemplate(wr, name, allBookmarks); err != nil {
+		return err
+	}
+	return nil
 }

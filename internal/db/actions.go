@@ -183,11 +183,33 @@ func SearchByUrl(database *sql.DB, searchUrl string) (setup.Bookmark, error) {
 	}
 
 	for execRes.Next() {
-		err = execRes.Scan(&foundBookmark.ID, &foundBookmark.URL, &foundBookmark.Title, &foundBookmark.Note, &foundBookmark.Keywords, &foundBookmark.BmGroup, &foundBookmark.Archived, &foundBookmark.SnapshotURL, &foundBookmark.ThumbURL, &foundBookmark.B64ThumbURL, &foundBookmark.Modified)
+		var err error = execRes.Scan(&foundBookmark.ID, &foundBookmark.URL, &foundBookmark.Title, &foundBookmark.Note, &foundBookmark.Keywords, &foundBookmark.BmGroup, &foundBookmark.Archived, &foundBookmark.SnapshotURL, &foundBookmark.ThumbURL, &foundBookmark.B64ThumbURL, &foundBookmark.Modified)
 		if err != nil {
 			return foundBookmark, err
 		}
 	}
 
 	return foundBookmark, nil
+}
+
+func GetAllGroups(database *sql.DB) ([]string, error) {
+	var allGroups []string
+
+	rows, err := database.Query("SELECT * FROM bookmarks GROUP BY bmGroup ORDER BY id DESC;")
+	if err != nil {
+		return allGroups, err
+	}
+
+	var bm setup.Bookmark
+	for rows.Next() {
+		var err error = rows.Scan(&bm.ID, &bm.URL, &bm.Title, &bm.Note, &bm.Keywords, &bm.BmGroup, &bm.Archived, &bm.SnapshotURL, &bm.ThumbURL, &bm.B64ThumbURL, &bm.Modified)
+		if err != nil {
+			logger.Error.Printf("ERRRO when scanning row: %v", err)
+		}
+		if bm.BmGroup != "" {
+			allGroups = append(allGroups, bm.BmGroup)
+		}
+	}
+
+	return allGroups, nil
 }

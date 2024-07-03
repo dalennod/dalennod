@@ -17,13 +17,13 @@
             <input type="text" name="searchTerm" class="input-search" placeholder="Search a keyword...">
             <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/search/" title="Search"> <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button"> </button>
         </form>
-        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();"> <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button"> </button>
+        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();" hx-target="#bmGroups-list" hx-get="/groups/"> <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button"> </button>
     </nav>
 
     <main>
         {{ block "bm_list" . }}
         <div class="grid-view-list">
-            {{ range. }}
+            {{ range .Bookmarks }}
             <div class="grid-child" id="{{ .ID }}">
                 <div id="bm-info">
                     <div id="id-creation">
@@ -76,7 +76,7 @@
                 </div>
 
                 <div id="buttons">
-                    <button class="button-svg" id="button-update" onclick="getOldData(this);" title="Update">
+                    <button class="button-svg" id="button-update" onclick="getOldData(this);" hx-target="#bmGroups-list" hx-get="/groups/" title="Update">
                         <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button"> </button> 
                     <button class="button-svg" id="button-delete" hx-target="main" hx-get="/delete/{{ .ID }}" title="Delete">
                         <img class="svg-img" src="static/imgs/delete_button.svg" alt="Delete button"> </button>
@@ -96,7 +96,8 @@
             <p>Title:<br><input type="text" class="uac-input" id="create-title" placeholder="Title for the bookmark"></p>
             <p>Notes:<br><input type="text" class="uac-input" id="create-note" placeholder="Log notes for bookmark"></p>
             <p>Keywords:<br><input type="text" class="uac-input" id="create-keywords" placeholder="Keywords, to, search, bookmark"></p>
-            <p>Group:<br><input type="text" class="uac-input" id="create-bmGroup" placeholder="Group to store bookmark into"></p>
+            <p>Group:<br><input type="text" class="uac-input" id="create-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list">
+                <datalist id="bmGroups-list"> {{ template "curr_groups" . }} </datalist> </p>
             <p>Archive?:
                 <input type="radio" name="create-radio-yes" id="create-radio-yes" value="1">
                 <label for="create-radio-yes">Yes</label>
@@ -119,7 +120,8 @@
             <p>Title:<br><input type="text" class="uac-input" id="update-title" placeholder="Title for the bookmark"></p>
             <p>Notes:<br><input type="text" class="uac-input" id="update-note" autofocus placeholder="Log notes for bookmark"></p>
             <p>Keywords:<br><input type="text" class="uac-input" id="update-keywords" placeholder="Keywords, to, search, bookmark"></p>
-            <p>Group:<br><input type="text" class="uac-input" id="update-bmGroup" placeholder="Group to store bookmark into"></p>
+            <p>Group:<br><input type="text" class="uac-input" id="update-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list">
+                <datalist id="bmGroups-list"> {{ template "curr_groups" . }} </datalist> </p>
             <p id="update-archive">Archive?:
                 <input type="radio" name="update-radio-yes" id="update-radio-yes" value="1">
                 <label for="update-radio-yes">Yes</label>
@@ -134,4 +136,10 @@
 </body>
 
 </html>
+{{ end }}
+
+{{ define "curr_groups" }}
+    {{ range .AllGroups }}
+        <option value="{{ . }}"></option>
+    {{ end }}
 {{ end }}
