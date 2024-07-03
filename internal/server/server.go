@@ -103,11 +103,8 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		db.Remove(database, matchInt)
-		w.WriteHeader(http.StatusOK)
 
-		if err := execTmplBmInterface(w, "bm_list", db.ViewAll(database, true)); err != nil {
-			logger.Error.Println(err)
-		}
+		rootHandler(w, r)
 	} else {
 		internalServerErrorHandler(w, r)
 	}
@@ -134,6 +131,7 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 				db.Add(database, insData)
 			}
 		}
+
 		w.WriteHeader(http.StatusCreated)
 	} else if r.Method == "GET" {
 		w.Write([]byte("Alive"))
@@ -213,6 +211,7 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 				db.Update(database, newData, true)
 			}
 		}
+
 		w.WriteHeader(http.StatusCreated)
 	} else {
 		internalServerErrorHandler(w, r)
@@ -286,7 +285,7 @@ func keywordSplit(keywords string, delimiter string) []string {
 
 func groupsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
-	w.Header().Set("Access-Control-Allow-Method", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == "GET" {
 		var currGroups map[string]interface{} = make(map[string]interface{})
 		listCurrGroups, err := db.GetAllGroups(database)
@@ -295,8 +294,8 @@ func groupsHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		currGroups["AllGroups"] = listCurrGroups
 
-		if err := tmpl.ExecuteTemplate(w, "curr_groups", currGroups); err != nil {
-			logger.Error.Println(err)
+		for _, group := range listCurrGroups {
+			fmt.Fprintf(w, "<option value=\"%s\"></option>", group)
 		}
 	} else {
 		internalServerErrorHandler(w, r)
