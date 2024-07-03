@@ -27,8 +27,6 @@ input:focus {
 }
 
 .button-svg {
-    width: 2em;
-    height: 2em;
     border: none;
     background-color: transparent;
     cursor: pointer;
