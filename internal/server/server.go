@@ -48,6 +48,8 @@ func Start(data *sql.DB) {
 	mux.HandleFunc("/groups/", groupsHandler)
 	mux.HandleFunc("/update/", updateHandler)
 	mux.HandleFunc("/search/", searchHandler)
+	mux.HandleFunc("/searchKeyword/", searchKeywordHandler)
+	mux.HandleFunc("/searchGroup/", searchGroupHandler)
 	mux.HandleFunc("/checkUrl/", checkUrlHandler)
 
 	logger.Info.Printf("Web-server starting on http://localhost%s/\n", PORT)
@@ -240,6 +242,38 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		// 	return
 		// }
 
+		if err := execTmplBmInterface(w, "bm_list", bookmarks); err != nil {
+			logger.Error.Println(err)
+		}
+	} else {
+		internalServerErrorHandler(w, r)
+	}
+}
+
+func searchKeywordHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+	if r.Method == "POST" {
+		r.ParseForm()
+		var searchTerm string = r.FormValue("searchTerm")
+
+		var bookmarks []setup.Bookmark = db.ViewAllWhereKeyword(database, searchTerm)
+		if err := execTmplBmInterface(w, "bm_list", bookmarks); err != nil {
+			logger.Error.Println(err)
+		}
+	} else {
+		internalServerErrorHandler(w, r)
+	}
+}
+
+func searchGroupHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+	if r.Method == "POST" {
+		r.ParseForm()
+		var searchTerm string = r.FormValue("searchTerm")
+
+		var bookmarks []setup.Bookmark = db.ViewAllWhereGroup(database, searchTerm)
 		if err := execTmplBmInterface(w, "bm_list", bookmarks); err != nil {
 			logger.Error.Println(err)
 		}
