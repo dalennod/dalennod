@@ -17,6 +17,8 @@ type FlagValues struct {
 	JSONOut     bool
 	Import      string
 	Firefox     bool
+	Dalennod    bool
+	Where       bool
 }
 
 var flagValues FlagValues
@@ -33,9 +35,12 @@ func cliFlags() {
 		fmt.Fprintln(w, "  -v, --view [id]\tView specific bookmark using its ID")
 		fmt.Fprintln(w, "  -va, --view-all\tView all bookmarks")
 		fmt.Fprintln(w, "  -i, --import [file]\tImport bookmarks from a browser")
-		fmt.Fprintln(w, "  -ff, --firefox\tImport bookmarks from Firefox.\n\t\t\t  Must use alongside -i, --import option")
+		fmt.Fprintln(w, "  -ff, --firefox\tImport bookmarks from Firefox \n\t\t\t  Must use alongside -i, --import option")
+		fmt.Fprintln(w, "  -41, --dalennod\tImport bookmarks from exported Dalennod JSON \n\t\t\t  Must use alongside -i, --import option")
 		fmt.Fprintln(w, "  -b, --backup\t\tStart backup process")
-		fmt.Fprintln(w, "  --json\t\tPrint entire DB in JSON.\n\t\t\t  Use alongside -b, --backup flag")
+		fmt.Fprintln(w, "  --json\t\tPrint entire DB in JSON \n\t\t\t  Use alongside -b, --backup flag")
+		fmt.Fprintln(w, "  --where\t\tPrint config and logs directory path")
+		fmt.Fprintln(w, "  -h, --help\t\tShows this message")
 	}
 
 	flag.BoolVar(&flagValues.StartServer, "s", false, "Start webserver locally for Web UI & Extension")
@@ -64,6 +69,10 @@ func cliFlags() {
 	flag.StringVar(&flagValues.Import, "import", "", "Import bookmarks from a browser")
 	flag.BoolVar(&flagValues.Firefox, "ff", false, "Import bookmarks from Firefox. Use alongside -i flag")
 	flag.BoolVar(&flagValues.Firefox, "firefox", false, "Import bookmarks from Firefox. Use alongside -i flag")
+	flag.BoolVar(&flagValues.Dalennod, "41", false, "Import bookmarks exported Dalennod JSON. Use alongside -i flag")
+	flag.BoolVar(&flagValues.Dalennod, "dalennod", false, "Import bookmarks exported Dalennod JSON. Use alongside -i flag")
+
+	flag.BoolVar(&flagValues.Where, "where", false, "Print config and logs directory path")
 }
 
 func ParseFlags() FlagValues {

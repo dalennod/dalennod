@@ -5,7 +5,6 @@ package thumb_url
 
 import (
 	"dalennod/internal/logger"
-	"encoding/base64"
 	"io"
 	"net/http"
 	"strings"
@@ -31,41 +30,39 @@ type Images struct {
 	Type      string `json:"type"`
 }
 
-func GetPageThumb(url string) (string, string, error) {
+func GetPageThumb(url string) (string, []byte, error) {
 	res, err := http.Get(url)
 	if err != nil {
-		return "", "", err
+		return "", nil, err
 	}
 	defer res.Body.Close()
 
 	pageHtml, err := io.ReadAll(res.Body)
 	if err != nil {
-		return "", "", err
+		return "", nil, err
 	}
 
 	var og *OGData = &OGData{}
 	err = og.readHTML(strings.NewReader(string(pageHtml)))
 	if err != nil {
-		return "", "", err
+		return "", nil, err
 	}
 
 	if len(og.Images) == 0 {
-		return "", "", nil
+		return "", nil, nil
 	}
 
 	var thumbURL string = og.Images[0].URL
 
 	if thumbURL == "" {
-		return thumbURL, "", nil
+		return thumbURL, nil, nil
 	} else {
-		var b64ThumURL string = getBase64(thumbURL)
-		return thumbURL, b64ThumURL, nil
+		var byteThumbURL []byte = getBase64(thumbURL)
+		return thumbURL, byteThumbURL, nil
 	}
 }
 
-func getBase64(thumbURL string) string {
-	var base64Encoded string
-
+func getBase64(thumbURL string) []byte {
 	resp, err := http.Get(thumbURL)
 	if err != nil {
 		logger.Warn.Println("could not request thumburl")
@@ -76,18 +73,9 @@ func getBase64(thumbURL string) string {
 	if err != nil {
 		logger.Warn.Println("could not read thumburl")
 	}
+	defer resp.Body.Close()
 
-	var mimeType string = http.DetectContentType(thumbUrlBytes)
-	switch mimeType {
-	case "image/jpeg":
-		base64Encoded = "jpeg;base64,"
-	case "image/png":
-		base64Encoded = "png;base64,"
-	}
-
-	base64Encoded += base64.StdEncoding.EncodeToString(thumbUrlBytes)
-
-	return base64Encoded
+	return thumbUrlBytes
 }
 
 func (og *OGData) readHTML(buffer io.Reader) error {

@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/css/styles.css">
     <script src="static/js/main.js" type="text/javascript" defer></script>
-    <script src="static/js/htmx.min.js"></script>
+    <script src="static/js/htmx.min.js" type="text/javascript" defer></script>
     <title>Dalennod</title>
 </head>
 
@@ -29,9 +29,9 @@
                     <div id="id-creation">
                         <p><a href="{{ .URL }}" target="_blank">{{ .ID }}.</a></p>
                         <span>{{ .Modified }}</span> </div>
-                    {{ if .B64ThumbURL }}
+                    {{ if .ByteThumbURL }}
                     <div id="thumbURL"> 
-                        <a href="{{ .URL }}" target="_blank"> <img src="data:image/{{ .B64ThumbURL }}" alt="[couldn't load thumbnail]"> </a> </div>
+                        <a href="{{ .URL }}" target="_blank"> <img src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]"> </a> </div>
                     {{ else if .ThumbURL }}
                     <div id="thumbURL"> 
                         <a href="{{ .URL }}" target="_blank"> <img src="{{ .ThumbURL }}" alt="[couldn't load thumbnail]"> </a> </div>
@@ -113,7 +113,7 @@
     <dialog class="dialog-update">
         <div class="dialog-top"> 
             <span class="dialog-type">Update a bookmark</span>
-            <button onclick="closeUpdateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/imgs/close_button.svg" alt="Close button"></button> </div>
+            <button onclick="closeUpdateDialog();" hx-target="index" hx-get="/" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/imgs/close_button.svg" alt="Close button"></button> </div>
         <div class="dialog-inputs">
             <span id="bm-id" hidden></span>
             <p>URL<span class="red-text">*</span>:<br><input type="text" class="uac-input" id="update-url" placeholder="URL to save" required></p>
