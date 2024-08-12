@@ -7,17 +7,17 @@ import (
 )
 
 type Bookmark struct {
-	ID          int    `json:"id"`
-	URL         string `json:"url"`
-	Title       string `json:"title"`
-	Note        string `json:"note"`
-	Keywords    string `json:"keywords"`
-	BmGroup     string `json:"bmGroup"`
-	Archived    bool   `json:"archive"`
-	SnapshotURL string `json:"snapshotURL"`
-	ThumbURL    string `json:"thumbURL"`
-	B64ThumbURL string `json:"b64ThumbURL"`
-	Modified    string `json:"modified"`
+	ID           int    `json:"id"`
+	URL          string `json:"url"`
+	Title        string `json:"title"`
+	Note         string `json:"note"`
+	Keywords     string `json:"keywords"`
+	BmGroup      string `json:"bmGroup"`
+	Archived     bool   `json:"archive"`
+	SnapshotURL  string `json:"snapshotURL"`
+	ThumbURL     string `json:"thumbURL"`
+	ByteThumbURL []byte `json:"byteThumbURL"`
+	Modified     string `json:"modified"`
 }
 
 const DB_FILENAME string = "dalennod.db"
@@ -39,7 +39,7 @@ func CreateDB(dbSavePath string) *sql.DB {
 			archived BOOLEAN NOT NULL,
 			snapshotURL TEXT,
 			thumbURL TEXT,
-			b64ThumbURL TEXT,
+			byteThumbURL BLOB,
 			modified DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL
 		);
 	`)

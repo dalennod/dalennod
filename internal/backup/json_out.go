@@ -10,7 +10,7 @@ import (
 )
 
 func JSONOut(database *sql.DB) {
-	var data []setup.Bookmark = db.ViewAll(database, true)
+	var data []setup.Bookmark = db.BackupViewAll(database)
 	jsonIndent, err := json.MarshalIndent(data, "", "\t")
 	if err != nil {
 		logger.Error.Println(err)

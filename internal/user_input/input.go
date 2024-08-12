@@ -11,6 +11,7 @@ import (
 	"dalennod/internal/setup"
 	"dalennod/internal/thumb_url"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"io"
 	"os"
@@ -47,6 +48,8 @@ func UserInput(data *sql.DB) {
 		addInput(setup.Bookmark{}, false)
 	case flagVals.Backup && flagVals.JSONOut:
 		backup.JSONOut(database)
+	case flagVals.Where:
+		whereConfigLog()
 	}
 
 	if flagVals.RemoveID != "" {
@@ -57,6 +60,8 @@ func UserInput(data *sql.DB) {
 		viewInput(flagVals.ViewID)
 	} else if flagVals.Import != "" && flagVals.Firefox {
 		importFirefoxInput(flagVals.Import)
+	} else if flagVals.Import != "" && flagVals.Dalennod {
+		importDalennodInput(flagVals.Import)
 	}
 }
 
@@ -79,7 +84,7 @@ func getBmInfo(bmStruct setup.Bookmark) (setup.Bookmark, string) {
 	scanner.Scan()
 	bmStruct.URL = scanner.Text()
 
-	bmStruct.ThumbURL, bmStruct.B64ThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
+	bmStruct.ThumbURL, bmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
 	if err != nil {
 		bmStruct.ThumbURL = bmStruct.URL
 	}
@@ -229,6 +234,25 @@ func viewInput(viewID string) {
 	}
 }
 
+func importDalennodInput(file string) {
+	fContent, err := os.ReadFile(file)
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+
+	var importedBookmarks []setup.Bookmark
+	err = json.Unmarshal(fContent, &importedBookmarks)
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+	var importedBookmarksCount = len(importedBookmarks)
+	for i, importedData := range importedBookmarks {
+		db.Add(database, importedData)
+		fmt.Printf("\rAdded %d / %d", i+1, importedBookmarksCount)
+	}
+	fmt.Println()
+}
+
 // try to figure out how to import in Group values too at some point
 func importFirefoxInput(file string) {
 	rf, err := os.ReadFile(file)
@@ -314,6 +338,21 @@ func processNode(n *html.Node, parsedBookmarks []setup.Bookmark) []setup.Bookmar
 	}
 
 	return parsedBookmarks
+}
+
+func whereConfigLog() {
+	cfgDir, err := setup.ConfigDir()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	logDir, err := setup.CacheDir()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf("Database and config directory: %s\n", cfgDir)
+	fmt.Printf("Error logs directory: %s\n", logDir)
 }
 
 func enableLogs() (string, string, error) {

@@ -7,6 +7,7 @@ import (
 	"dalennod/internal/setup"
 	"database/sql"
 	"embed"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -40,6 +41,7 @@ func Start(data *sql.DB) {
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webStatic))))
 
 	tmplFuncMap["keywordSplit"] = keywordSplit
+	tmplFuncMap["byteConversion"] = byteConversion
 
 	mux.HandleFunc("/", rootHandler)
 	mux.HandleFunc("/delete/", deleteHandler)
@@ -315,6 +317,21 @@ func checkUrlHandler(w http.ResponseWriter, r *http.Request) {
 
 func keywordSplit(keywords string, delimiter string) []string {
 	return strings.Split(keywords, delimiter)
+}
+
+func byteConversion(blobImage []byte) string {
+	var base64Encoded string
+
+	var mimeType string = http.DetectContentType(blobImage)
+	switch mimeType {
+	case "image/jpeg":
+		base64Encoded = "jpeg;base64,"
+	case "image/png":
+		base64Encoded = "png;base64,"
+	}
+	base64Encoded += base64.StdEncoding.EncodeToString(blobImage)
+
+	return base64Encoded
 }
 
 func groupsHandler(w http.ResponseWriter, r *http.Request) {
