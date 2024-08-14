@@ -59,7 +59,7 @@
                         {{ $id := .ID }}
                         {{ $keywords := keywordSplit .Keywords "," }}
                         {{ range $_, $keyword := $keywords }}
-                            <div> <form hx-post="/searchKeyword/">
+                            <div class="bm-keywords"> <form hx-post="/searchKeyword/">
                                 <input hidden name="searchTerm" value="{{ $keyword }}">
                                 <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/searchKeyword/" title="Search for this keyword"> <span id="keywords">{{ $keyword }}</span> </button>
                             </form> </div>

@@ -56,7 +56,7 @@ func Start(data *sql.DB) {
 
 	logger.Info.Printf("Web-server starting on http://localhost%s/\n", PORT)
 	fmt.Printf("Web-server starting on http://localhost%s/\n", PORT)
-	// TODO: use own Server to gracefully shutdown
+
 	err = http.ListenAndServe(PORT, mux)
 	if err != nil {
 		fmt.Printf("Stopping (error: %v)\n", err)

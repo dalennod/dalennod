@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="main.js" type="text/javascript" defer></script>
+    <style> html { width: 25em; height: 25em; } body { font-family: "Roboto", Arial, Helvetica, sans-serif; background-color: #232323; color: #eaeaea; } button { border-radius: 5px; background-color: #2875b5; border-color: #2875b5; cursor: pointer; } .centered { padding: 10px 10px 0px 10px; } .centered input[type=text] { width: 100%; } input:focus { outline: none; } input { background: none; text-decoration: none; border-width: 0px; border-bottom: dotted 1px #aaa; color: #eaeaea; } nav { padding: 3px; background-color: #2d2d2d; display: flex; flex-direction: row; justify-content: center; align-items: center; border-radius: 5px; } a { text-decoration: none; color: #eaeaea; } a:hover { color: #2f9df7; } .done-overlay-div { position: fixed; display: none; width: 100%; height: 100%; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 2; } .done-overlay-div>.done-overlay-text { position: absolute; top: 50%; left: 50%; font-size: 40px; color: #eaeaea; transform: translate(-50%, -50%); -ms-transform: translate(-50%, -50%); } .red-text { color: #ff3535; text-align: right; } .center-text { text-align: center; } </style>
+    <title>Dalennod</title>
+</head>
+
+<body>
+    <nav>
+        <a href="http://localhost:41415/" target="_blank"> <img src="icons/dalennod-96.png" alt="dalennod" width="38" height="38">&nbsp; </a>
+        <a href="http://localhost:41415/" target="_blank"> <h3>Dalennod</h3> </a> </nav>
+    <main>
+        <div class="done-overlay-div" id="done-overlay-div"> 
+            <span class="done-overlay-text" id="done-overlay-text"></span> </div>
+        <div class="centered">
+            <p id="bm-id" hidden>ID</p>
+            <p>URL<span class="red-text">*</span>: <input type="text" id="input-url" placeholder="URL to save" required></p>
+            <p>Title: <input type="text" id="input-title" placeholder="Title for the bookmark"></p>
+            <p>Notes: <input type="text" id="input-note" placeholder="Log notes for bookmark" autofocus></p>
+            <p>Keywords: <input type="text" id="input-keywords" placeholder="Keywords, to, search, bookmark"></p>
+            <p>Group: <input type="text" id="input-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list">
+                <datalist id="bmGroups-list"> </datalist> </p>
+            <p id="radio-btn-archive">
+                Archive?:
+                <input type="radio" name="radio-archive" id="radio-yes" value="1">
+                <label for="radio-yes">Yes</label>
+                <input type="radio" name="radio-archive" id="radio-no" value="0" checked>
+                <label for="radio-no">No</label> </p>
+            <p class="red-text">* required</p>
+            <p class="center-text">
+                <button id="button-add-req">Create</button>
+                <button id="button-update-req" hidden>Update</button>
+                <button id="button-remove-req" hidden>Remove</button> <span id="checkmark" hidden>&check;</span>
+                <span class="red-text" id="archive-warn" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span> </p>
+        </div>
+    </main>
+</body>
+
+</html>
