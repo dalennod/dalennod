@@ -1,8 +1,8 @@
 module dalennod
 
-go 1.22.3
+go 1.23.0
 
 require (
 	github.com/mattn/go-sqlite3 v1.14.22
-	golang.org/x/net v0.25.0
+	golang.org/x/net v0.28.0
 )
