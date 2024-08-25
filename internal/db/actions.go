@@ -136,12 +136,12 @@ func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
 	}
 	keyword = "%" + keyword + "%"
 
-	stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) or bmGroup LIKE (?) or note LIKE (?) or title LIKE (?) ORDER BY id DESC;")
+	stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) or bmGroup LIKE (?) or note LIKE (?) or title LIKE (?) or url LIKE (?) ORDER BY id DESC;")
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
 
-	execRes, err := stmt.Query(keyword, keyword, keyword, keyword)
+	execRes, err := stmt.Query(keyword, keyword, keyword, keyword, keyword)
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
