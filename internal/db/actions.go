@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const PAGE_UPDATE_LIMIT = 50
+
 func Add(database *sql.DB, bmStruct setup.Bookmark) {
 	if bmStruct.ThumbURL == "" || len(bmStruct.ByteThumbURL) == 0 {
 		var err error
@@ -82,10 +84,31 @@ func Remove(database *sql.DB, id int) {
 	}
 }
 
-// SELECT * FROM bookmarks ORDER by id DESC LIMIT 5 OFFSET 0;
-// SELECT * FROM bookmarks ORDER by id DESC LIMIT 5 OFFSET 5;
-// ... OFFSET 10;
-// in 20 intervals for multiple pages
+func ViewAllWebUI(database *sql.DB, pageNo int) []setup.Bookmark {
+	var results []setup.Bookmark
+	var result setup.Bookmark
+	var modified time.Time
+
+	stmt, err := database.Prepare("SELECT * FROM bookmarks ORDER BY id DESC LIMIT (?) OFFSET (?);")
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+
+	pageOffset := pageNo * PAGE_UPDATE_LIMIT
+
+	rows, err := stmt.Query(PAGE_UPDATE_LIMIT, pageOffset)
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+
+	for rows.Next() {
+		result = setup.Bookmark{}
+		rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
+		results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BmGroup: result.BmGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, ByteThumbURL: result.ByteThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+	}
+	return results
+}
+
 func ViewAll(database *sql.DB, serverCall bool) []setup.Bookmark {
 	var results []setup.Bookmark
 	var result setup.Bookmark

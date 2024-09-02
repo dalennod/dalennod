@@ -71,7 +71,8 @@ main {
     margin-bottom: 0;
 }
 
-.grid-child, .dialog-inputs {
+.grid-child,
+.dialog-inputs {
     background-color: #f1f1f1;
 }
 
@@ -109,7 +110,9 @@ main {
     object-fit: cover;
 }
 
-.grid-child #group, .grid-child #keywords, #id-creation {
+.grid-child #group,
+.grid-child #keywords,
+#id-creation {
     font-size: 0.7vw;
 }
 
@@ -155,7 +158,7 @@ main {
     border-radius: 5px;
 }
 
-.dialog-inputs input[type=text] {
+.dialog-inputs input[type="text"] {
     width: 50vw;
     border-bottom: 1px dotted #aaa;
 }
@@ -187,7 +190,8 @@ body:has(dialog[open]) {
     padding: 5px;
 }
 
-.dialog-type, .input-search {
+.dialog-type,
+.input-search {
     flex: 1;
 }
 
@@ -195,29 +199,74 @@ body:has(dialog[open]) {
     text-align: center;
 }
 
+.pagination a {
+    color: black;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.pagination a.active {
+    background-color: dodgerblue;
+    color: black;
+}
+
+.pagination a:hover:not(.active) {
+    background-color: #eee;
+}
+
 @keyframes fade-in {
-    0% { opacity: 0; transform: scaleY(0); display: none; }
-    100% { opacity: 1; transform: scaleY(1); display: block; }
+    0% {
+        opacity: 0;
+        transform: scaleY(0);
+        display: none;
+    }
+    100% {
+        opacity: 1;
+        transform: scaleY(1);
+        display: block;
+    }
 }
 
 @keyframes fade-out {
-    0% { opacity: 1; transform: scaleY(1); display: block; }
-    100% { opacity: 0; transform: scaleY(0); display: none; }
+    0% {
+        opacity: 1;
+        transform: scaleY(1);
+        display: block;
+    }
+    100% {
+        opacity: 0;
+        transform: scaleY(0);
+        display: none;
+    }
 }
 
 @keyframes backdrop-fade-in {
-    0% { background-color: rgba(0, 0, 0, 0) }
-    100% { background-color: rgba(0, 0, 0, 0.8); }
+    0% {
+        background-color: rgba(0, 0, 0, 0);
+    }
+    100% {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
 }
 
 @media (prefers-color-scheme: dark) {
-    body, dialog {
+    body,
+    dialog {
         background-color: #232323;
         color: #eaeaea;
     }
 
-    input, .grid-child #group, .grid-child #keywords, .grid-child a {
+    input,
+    .grid-child #group,
+    .grid-child #keywords,
+    .grid-child a,
+    .pagination a {
         color: #eaeaea;
+    }
+
+    .pagination a:hover:not(.active) {
+        background-color: #303030;
     }
 
     .button-text {
@@ -229,11 +278,14 @@ body:has(dialog[open]) {
         background-color: #2d2d2d;
     }
 
-    .grid-child, .dialog-inputs, .update-main div {
+    .grid-child,
+    .dialog-inputs,
+    .update-main div {
         background-color: #303030;
     }
 
     .svg-img {
-        filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
+        filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg)
+            brightness(112%) contrast(84%);
     }
 }

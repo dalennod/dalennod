@@ -16,12 +16,12 @@ const getOldData = async (ele) => {
 
     const res = await fetch(fetchURL);
     const oldData = await res.json();
-    if (typeof (Storage) !== "undefined") localStorage.setItem("oldData", JSON.stringify(oldData));
+    if (typeof Storage !== "undefined") localStorage.setItem("oldData", JSON.stringify(oldData));
     setOldData();
-}
+};
 
 const setOldData = () => {
-    if (typeof (Storage) !== "undefined") {
+    if (typeof Storage !== "undefined") {
         const oldData = JSON.parse(localStorage.getItem("oldData"));
         document.querySelector("#bm-id").innerText = oldData.id;
         document.querySelector("#update-url").value = oldData.url;
@@ -30,9 +30,9 @@ const setOldData = () => {
         document.querySelector("#update-keywords").value = oldData.keywords;
         document.querySelector("#update-bmGroup").value = oldData.bmGroup;
         oldData.archive ? document.querySelector("#update-archive").setAttribute("hidden", "") : document.querySelector("#update-archive").removeAttribute("hidden");
-    };
+    }
     showUpdateDialog();
-}
+};
 
 const updateEntry = async () => {
     const newDataJSON = {
@@ -42,16 +42,16 @@ const updateEntry = async () => {
         keywords: document.querySelector("#update-keywords").value,
         bmGroup: document.querySelector("#update-bmGroup").value,
         archive: document.querySelector("#update-radio-no").checked ? false : true,
-    }
+    };
 
     if (newDataJSON.archive) document.querySelector("update-#archive-warn").removeAttribute("hidden");
-    
+
     const dataID = document.querySelector("#bm-id").innerText;
     const fetchURL = ENDPOINT + "update/" + dataID;
     const res = await fetch(fetchURL, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json; charset=utf-8"
+            "Content-Type": "application/json; charset=utf-8",
         },
         body: JSON.stringify(newDataJSON),
     });
@@ -59,12 +59,18 @@ const updateEntry = async () => {
     if (res.ok) {
         document.querySelector("#update-archive-warn").setAttribute("hidden", "");
         document.querySelector("#update-checkmark").removeAttribute("hidden");
-        setTimeout(() => document.querySelector("#update-checkmark").setAttribute("hidden", ""), 2000);
+        setTimeout(() =>
+            document.querySelector("#update-checkmark").setAttribute("hidden", ""),
+            2000,
+        );
     }
-}
+};
 
 const addEntry = async () => {
-    if (document.querySelector("#create-url").value === "") { alert("URL is required"); return; }
+    if (document.querySelector("#create-url").value === "") {
+        alert("URL is required");
+        return;
+    }
 
     const dataJSON = {
         url: document.querySelector("#create-url").value,
@@ -72,8 +78,8 @@ const addEntry = async () => {
         note: document.querySelector("#create-note").value,
         keywords: document.querySelector("#create-keywords").value,
         bmGroup: document.querySelector("#create-bmGroup").value,
-        archive: (document.querySelector("#create-radio-no").checked) ? false : true,
-    }
+        archive: document.querySelector("#create-radio-no").checked ? false : true,
+    };
 
     if (dataJSON.archive) document.querySelector("#create-archive-warn").removeAttribute("hidden");
 
@@ -81,7 +87,7 @@ const addEntry = async () => {
     const res = await fetch(fetchURL, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json; charset=utf-8"
+            "Content-Type": "application/json; charset=utf-8",
         },
         body: JSON.stringify(dataJSON),
     });
@@ -90,7 +96,14 @@ const addEntry = async () => {
 
     document.querySelector("#create-archive-warn").setAttribute("hidden", "");
     document.querySelector("#create-checkmark").removeAttribute("hidden");
-    setTimeout(() => document.querySelector("#create-checkmark").setAttribute("hidden", ""), 2000);
-}
+    setTimeout(() =>
+        document.querySelector("#create-checkmark").setAttribute("hidden", ""),
+        2000,
+    );
+};
 
-const clearInputs = () => { const input = document.querySelectorAll(".uac-input"); if (input.length === 0) return; for (let i = 0; i < input.length; i++) input[i].value = ""; }
+const clearInputs = () => {
+    const input = document.querySelectorAll(".uac-input");
+    if (input.length === 0) return;
+    for (let i = 0; i < input.length; i++) input[i].value = "";
+};
