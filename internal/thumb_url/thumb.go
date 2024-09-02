@@ -63,17 +63,18 @@ func GetPageThumb(url string) (string, []byte, error) {
 }
 
 func getBase64(thumbURL string) []byte {
+	var thumbUrlBytes []byte
 	resp, err := http.Get(thumbURL)
 	if err != nil {
 		logger.Warn.Println("could not request thumburl")
+		return thumbUrlBytes
 	}
 	defer resp.Body.Close()
 
-	thumbUrlBytes, err := io.ReadAll(resp.Body)
+	thumbUrlBytes, err = io.ReadAll(resp.Body)
 	if err != nil {
 		logger.Warn.Println("could not read thumburl")
 	}
-	defer resp.Body.Close()
 
 	return thumbUrlBytes
 }

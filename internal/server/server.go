@@ -14,6 +14,7 @@ import (
 	"io"
 	"io/fs"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -22,6 +23,7 @@ import (
 const PORT string = ":41415"
 
 var (
+	pageCount   int              = 0
 	tmplFuncMap template.FuncMap = make(template.FuncMap)
 	database    *sql.DB
 	tmpl        *template.Template
@@ -42,6 +44,10 @@ func Start(data *sql.DB) {
 
 	tmplFuncMap["keywordSplit"] = keywordSplit
 	tmplFuncMap["byteConversion"] = byteConversion
+	tmplFuncMap["pageCountUp"] = pageCountUp
+	tmplFuncMap["pageCountDown"] = pageCountDown
+	tmplFuncMap["pageCountNowUpdate"] = pageCountNowUpdate
+	tmplFuncMap["pageCountNowDelete"] = pageCountNowDelete
 
 	mux.HandleFunc("/", rootHandler)
 	mux.HandleFunc("/delete/", deleteHandler)
@@ -57,8 +63,7 @@ func Start(data *sql.DB) {
 	logger.Info.Printf("Web-server starting on http://localhost%s/\n", PORT)
 	fmt.Printf("Web-server starting on http://localhost%s/\n", PORT)
 
-	err = http.ListenAndServe(PORT, mux)
-	if err != nil {
+	if err = http.ListenAndServe(PORT, mux); err != nil {
 		fmt.Printf("Stopping (error: %v)\n", err)
 		logger.Error.Printf("Stopping (error: %v)\n", err)
 	}
@@ -78,9 +83,23 @@ func notFoundHandler(w http.ResponseWriter, r *http.Request) {
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "GET" {
-		tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(Web, "web/index.html"))
+		pageCount = 0
+		var bookmarks []setup.Bookmark
+		r.ParseForm()
 
-		var bookmarks []setup.Bookmark = db.ViewAll(database, true)
+		var pageNo string = r.FormValue("page")
+		if pageNo == "" {
+			bookmarks = db.ViewAllWebUI(database, 0)
+		} else {
+			pageNoInt, err := strconv.Atoi(pageNo)
+			pageCount = pageNoInt
+			if err != nil {
+				logger.Error.Printf("error: invalid page no. %v", err)
+			}
+			bookmarks = db.ViewAllWebUI(database, pageNoInt)
+		}
+
+		tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(Web, "web/index.html"))
 		if err := execTmplBmInterface(w, "index", bookmarks); err != nil {
 			logger.Warn.Println(err)
 		}
@@ -107,8 +126,6 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		db.Remove(database, matchInt)
-
-		rootHandler(w, r)
 	} else {
 		internalServerErrorHandler(w, r)
 	}
@@ -230,19 +247,14 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		var searchTerm string = r.FormValue("searchTerm")
 
 		if searchTerm == "" {
-			if err := execTmplBmInterface(w, "bm_list", db.ViewAll(database, true)); err != nil {
-				logger.Error.Println(err)
-			}
+			rootHandler(w, &http.Request{
+				Method: "GET",
+				Form:   make(url.Values),
+			})
 			return
 		}
 
 		var bookmarks []setup.Bookmark = db.ViewAllWhere(database, searchTerm)
-
-		// TODO: in future look into htmx pop-up on 404 status
-		// if len(bookmarks) == 0 {
-		// 	notFoundHandler(w, r)
-		// 	return
-		// }
 
 		if err := execTmplBmInterface(w, "bm_list", bookmarks); err != nil {
 			logger.Error.Println(err)
@@ -333,6 +345,32 @@ func byteConversion(blobImage []byte) string {
 
 	return base64Encoded
 }
+
+// (start _0)
+// Do not ever touch this.
+// I simply cannot visualize how this is working.
+// Especially the *NowUpdate and *NowDelete.
+// They both do the same thing.
+// But one need to return -1 in order to function as intended.
+func pageCountUp() int {
+	pageCount = pageCount + 2
+	return pageCount
+}
+
+func pageCountDown() int {
+	pageCount = pageCount - 1
+	return pageCount
+}
+
+func pageCountNowUpdate() int {
+	return pageCount - 1
+}
+
+func pageCountNowDelete() int {
+	return pageCount
+}
+
+// (end _0)
 
 func groupsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")

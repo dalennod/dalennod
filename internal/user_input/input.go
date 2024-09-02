@@ -27,18 +27,9 @@ var (
 
 func UserInput(data *sql.DB) {
 	enableLogs()
-
-	// should display config dir path and log dir path
-	// on first-run. todo in future
-	// cfgDir, logDir, err := enableLogs()
-	// if err != nil {
-	// 	logger.Warn.Println("Could not enable error logging")
-	// }
-
 	database = data
 
 	flagVals = setup.ParseFlags()
-
 	switch true {
 	case flagVals.ViewAll:
 		db.ViewAll(database, false)
