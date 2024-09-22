@@ -1,8 +1,8 @@
 package archive
 
 import (
+	"dalennod/internal/default_client"
 	"dalennod/internal/logger"
-	"fmt"
 	"net/http"
 )
 
@@ -11,7 +11,9 @@ func SendSnapshot(url string) (bool, string) {
 	var snapshotURL string
 
 	if check {
-		res, err := http.Get(fmt.Sprintf("https://web.archive.org/save/%s", url))
+		urlToRequest := "https://web.archive.org/save/" + url
+		// res, err := http.Get(fmt.Sprintf("https://web.archive.org/save/%s", url))
+		res, err := default_client.HttpDefaultClientDo(http.MethodGet, urlToRequest)
 		if err != nil {
 			logger.Warn.Println("Failed to archive due to error: ", err)
 			return false, "Failed to archive due to error"
@@ -29,10 +31,12 @@ func SendSnapshot(url string) (bool, string) {
 }
 
 func checkURL(url string) bool {
-	res, err := http.Get(url)
+	// res, err := http.Get(url)
+	res, err := default_client.HttpDefaultClientDo(http.MethodGet, url)
 	if err != nil {
 		logger.Warn.Println("Failed to ping website", err)
 	}
+	defer res.Body.Close()
 
 	if res != nil {
 		defer res.Body.Close()

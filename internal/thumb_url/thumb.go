@@ -4,9 +4,11 @@
 package thumb_url
 
 import (
+	"dalennod/internal/default_client"
 	"dalennod/internal/logger"
-	"io"
 	"net/http"
+
+	"io"
 	"strings"
 
 	"golang.org/x/net/html"
@@ -31,7 +33,13 @@ type Images struct {
 }
 
 func GetPageThumb(url string) (string, []byte, error) {
-	res, err := http.Get(url)
+	// Need to include headers in the request for some sites to not send blank data..
+	// res, err := http.Get(url)
+	// if err != nil {
+	// 	return "", nil, err
+	// }
+
+	res, err := default_client.HttpDefaultClientDo(http.MethodGet, url)
 	if err != nil {
 		return "", nil, err
 	}
@@ -53,7 +61,6 @@ func GetPageThumb(url string) (string, []byte, error) {
 	}
 
 	var thumbURL string = og.Images[0].URL
-
 	if thumbURL == "" {
 		return thumbURL, nil, nil
 	} else {
@@ -64,7 +71,8 @@ func GetPageThumb(url string) (string, []byte, error) {
 
 func getBase64(thumbURL string) []byte {
 	var thumbUrlBytes []byte
-	resp, err := http.Get(thumbURL)
+	// resp, err := http.Get(thumbURL)
+	resp, err := default_client.HttpDefaultClientDo(http.MethodGet, thumbURL)
 	if err != nil {
 		logger.Warn.Println("could not request thumburl")
 		return thumbUrlBytes
