@@ -336,22 +336,23 @@ func byteConversion(blobImage []byte) string {
 
 	var mimeType string = http.DetectContentType(blobImage)
 	switch mimeType {
-	case "image/jpeg":
-		base64Encoded = "jpeg;base64,"
+	case "image/avif":
+		base64Encoded = "avif;base64,"
+	case "image/webp":
+		base64Encoded = "webp;base64,"
 	case "image/png":
 		base64Encoded = "png;base64,"
+	case "image/jpeg":
+		base64Encoded = "jpeg;base64,"
+	default:
+		base64Encoded = "jpeg;base64,"
 	}
 	base64Encoded += base64.StdEncoding.EncodeToString(blobImage)
 
 	return base64Encoded
 }
 
-// (start _0)
-// Do not ever touch this.
-// I simply cannot visualize how this is working.
-// Especially the *NowUpdate and *NowDelete.
-// They both do the same thing.
-// But one need to return -1 in order to function as intended.
+// (start _0) -- I got it
 func pageCountUp() int {
 	pageCount = pageCount + 2
 	return pageCount
