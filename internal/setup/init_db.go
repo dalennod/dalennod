@@ -28,6 +28,11 @@ func CreateDB(dbSavePath string) *sql.DB {
 		log.Fatalln(err)
 	}
 
+	// TODO: pin column
+	// limit, maybe, to certain amount (10)
+	// to show frequent bookmarks always on top.
+	// possibly useless because any browser will
+	// have frequently visited sites in history.
 	stmt, err := db.Prepare(`
 		CREATE TABLE IF NOT EXISTS bookmarks (
 			id INTEGER PRIMARY KEY,

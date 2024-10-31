@@ -1,11 +1,5 @@
-@font-face {
-    font-family: "InterReg";
-    src: url("../fonts/Inter-Regular.woff2") format("woff2");
-}
-
 body {
-    font-family: "InterReg", sans-serif;
-    font-size: 0.8vw;
+    font-family: "Roboto", Arial, Helvetica, sans-serif;
 }
 
 body * {
@@ -43,7 +37,7 @@ nav {
     position: absolute;
     top: 0px;
     width: 99%;
-    padding: 0.7em;
+    padding: 10px;
     height: 50px;
     background-color: #f9f9f9;
     display: flex;
@@ -67,7 +61,7 @@ main {
 .grid-view-list {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    grid-gap: 0.6em;
+    grid-gap: 10px;
     margin-bottom: 0;
 }
 
@@ -78,7 +72,7 @@ main {
 
 .grid-child {
     position: relative;
-    padding: 0.8em;
+    padding: 10px;
     border-radius: 5px;
 }
 
@@ -113,13 +107,13 @@ main {
 .grid-child #group,
 .grid-child #keywords,
 #id-creation {
-    font-size: 0.7vw;
+    font-size: 13px;
 }
 
 .grid-child #group {
     border: dotted 1px #aaa;
     border-radius: 5px;
-    padding: 0.3em;
+    padding: 3px;
 }
 
 .bm-keywords {
@@ -143,9 +137,10 @@ main {
 }
 
 .svg-img {
-    width: 1vw;
-    height: 1vw;
-    filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
+    width: 1.5em;
+    height: 1.5em;
+    filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg)
+        brightness(104%) contrast(89%);
 }
 
 .svg-img:hover {

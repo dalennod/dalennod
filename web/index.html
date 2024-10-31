@@ -15,7 +15,7 @@
 <body>
     <nav>
         <form class="search-form" hx-post="/search/">
-            <input autofocus type="text" name="searchTerm" class="input-search" hx-trigger="keyup changed delay:150ms" hx-target="main" hx-post="/search/" placeholder="Search a keyword...">
+            <input autofocus type="text" name="searchTerm" class="input-search" hx-target="main" hx-post="/search/" placeholder="Search a keyword...">
             <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/search/" title="Search"> <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button"> </button>
         </form>
         <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();" hx-target="#bmGroups-list" hx-get="/groups/"> <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button"> </button>
@@ -76,8 +76,8 @@
                 <div id="buttons">
                     <button class="button-svg" id="button-update" onclick="getOldData(this);" hx-target="#bmGroups-list" hx-get="/groups/" title="Update">
                         <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button"> </button>
-                    <button class="button-svg" id="button-delete" hx-target="main" hx-get="/?page={{ pageCountNowDelete }}" hx-trigger="click" title="Delete"> 
-                        <img class="svg-img" src="static/imgs/delete_button.svg" hx-get="/delete/{{ .ID }}" alt="Delete button"> </button>
+                    <button class="button-svg" id="button-delete" hx-target="main" hx-get="/?page={{ pageCountNowDelete }}" hx-trigger="dblclick" title="Delete">
+                        <img class="svg-img" src="static/imgs/delete_button.svg" hx-get="/delete/{{ .ID }}" hx-trigger="dblclick" alt="Delete button"> </button>
                 </div>
             </div>
             {{ end }}
