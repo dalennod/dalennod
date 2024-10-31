@@ -42,6 +42,9 @@ func Start(data *sql.DB) {
 	}
 	mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webStatic))))
 
+	// TODO: add another tmplFuncMap to show just the hostname right under thumbnail
+	// gray colored. maybe clickable as well to either open the bookmark
+	// or filter all saved bookmarks under same domain
 	tmplFuncMap["keywordSplit"] = keywordSplit
 	tmplFuncMap["byteConversion"] = byteConversion
 	tmplFuncMap["pageCountUp"] = pageCountUp

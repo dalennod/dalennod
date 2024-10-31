@@ -8,14 +8,19 @@
         "96": "icons/dalennod-96.png"
     },
     "homepage_url": "https://github.com/dalennod/dalennod",
-    "permissions": [
-        "tabs"
-    ],
+    "permissions": ["tabs"],
     "action": {
         "default_title": "Dalennod",
-        "default_popup": "index.html"
+        "default_popup": "index.html",
+        "default_icon": {
+            "48": "icons/dalennod-48.png",
+            "96": "icons/dalennod-96.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
     },
     "content_security_policy": {
         "extension_pages": "script-src 'self'; object-src 'self'"
-    } 
+    }
 }
