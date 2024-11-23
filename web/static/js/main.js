@@ -10,6 +10,8 @@ const updateDialog = document.querySelector(".dialog-update");
 const showUpdateDialog = () => updateDialog.showModal();
 const closeUpdateDialog = () => updateDialog.close();
 
+// TODO: remove reload/refetch when closing modal on update.
+// * have to do in index
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.id;
     const fetchURL = ENDPOINT + "row/" + entryID;

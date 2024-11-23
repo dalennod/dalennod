@@ -2,7 +2,6 @@ package logger
 
 import (
 	"dalennod/internal/setup"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -23,7 +22,7 @@ func Enable() {
 		log.Fatalln(err)
 	}
 
-	logFile, err := os.Create(fmt.Sprintf("%s/%s.log", logPath, logFileName))
+	logFile, err := os.Create(logPath + "/" + logFileName + ".log")
 	if err != nil {
 		log.Fatalln("Error creating log file:", err)
 	}

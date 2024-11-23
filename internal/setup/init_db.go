@@ -2,7 +2,6 @@ package setup
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 )
 
@@ -23,16 +22,12 @@ type Bookmark struct {
 const DB_FILENAME string = "dalennod.db"
 
 func CreateDB(dbSavePath string) *sql.DB {
-	db, err := sql.Open("sqlite3", fmt.Sprint(dbSavePath+DB_FILENAME))
+	// db, err := sql.Open("sqlite3", dbSavePath+DB_FILENAME) // For CGo driver
+	db, err := sql.Open("sqlite", dbSavePath+DB_FILENAME) // For CGo-free driver
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("error opening database. ERROR:", err)
 	}
 
-	// TODO: pin column
-	// limit, maybe, to certain amount (10)
-	// to show frequent bookmarks always on top.
-	// possibly useless because any browser will
-	// have frequently visited sites in history.
 	stmt, err := db.Prepare(`
 		CREATE TABLE IF NOT EXISTS bookmarks (
 			id INTEGER PRIMARY KEY,
@@ -49,12 +44,12 @@ func CreateDB(dbSavePath string) *sql.DB {
 		);
 	`)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("error when preparing db. ERROR:", err)
 	}
 
 	_, err = stmt.Exec()
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalln("error executing db. ERROR:", err)
 	}
 
 	return db

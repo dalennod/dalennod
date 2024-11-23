@@ -12,7 +12,6 @@ func SendSnapshot(url string) (bool, string) {
 
 	if check {
 		urlToRequest := "https://web.archive.org/save/" + url
-		// res, err := http.Get(fmt.Sprintf("https://web.archive.org/save/%s", url))
 		res, err := default_client.HttpDefaultClientDo(http.MethodGet, urlToRequest)
 		if err != nil {
 			logger.Warn.Println("Failed to archive due to error: ", err)

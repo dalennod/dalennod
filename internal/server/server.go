@@ -95,10 +95,10 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 			bookmarks = db.ViewAllWebUI(database, 0)
 		} else {
 			pageNoInt, err := strconv.Atoi(pageNo)
-			pageCount = pageNoInt
 			if err != nil {
 				logger.Error.Printf("error: invalid page no. %v", err)
 			}
+			pageCount = pageNoInt
 			bookmarks = db.ViewAllWebUI(database, pageNoInt)
 		}
 
