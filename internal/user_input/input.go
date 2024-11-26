@@ -2,9 +2,9 @@ package user_input
 
 import (
 	"bufio"
-	"bytes"
 	"dalennod/internal/archive"
 	"dalennod/internal/backup"
+	"dalennod/internal/bookmark_import"
 	"dalennod/internal/db"
 	"dalennod/internal/logger"
 	"dalennod/internal/server"
@@ -13,11 +13,8 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"io"
 	"os"
 	"strconv"
-
-	"golang.org/x/net/html"
 )
 
 var (
@@ -244,91 +241,24 @@ func importDalennodInput(file string) {
 	fmt.Println()
 }
 
-// try to figure out how to import in Group values too at some point
 func importFirefoxInput(file string) {
-	rf, err := os.ReadFile(file)
+	readFile, err := os.Open(file)
 	if err != nil {
-		logger.Error.Printf("couldn't open file: [error: %v]", err)
+		logger.Error.Printf("couldn't open file. ERROR: %v", err)
 	}
 
-	var parsedBookmarks []setup.Bookmark
-	parsedBookmarks, err = parseFfInputFile(bytes.NewReader(rf), parsedBookmarks)
-	if err != nil {
-		logger.Error.Fatalln("parsing error:", err)
-	}
-	var parsedBookmarksCount = len(parsedBookmarks)
+	firefoxBookmarks := &bookmark_import.Item{}
+	jsonDecoder := json.NewDecoder(readFile)
+	jsonDecoder.Decode(firefoxBookmarks)
+
+	parsedBookmarks := bookmark_import.ParseFirefox(firefoxBookmarks, "")
+	parsedBookmarksLength := len(parsedBookmarks)
 
 	for i, parsedBookmark := range parsedBookmarks {
 		db.Add(database, parsedBookmark)
-		fmt.Printf("\rAdded %d / %d", i+1, parsedBookmarksCount)
+		fmt.Printf("\rAdded %d / %d", i+1, parsedBookmarksLength)
 	}
-	fmt.Println()
-}
-
-func parseFfInputFile(htmlImport io.Reader, parsedBookmarks []setup.Bookmark) ([]setup.Bookmark, error) {
-	parseHtmlImport, err := html.Parse(htmlImport)
-	if err != nil {
-		return parsedBookmarks, err
-	}
-	var processHtmlImport func(n *html.Node)
-	processHtmlImport = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "a" {
-			parsedBookmarks = processNode(n, parsedBookmarks)
-		}
-		for childNode := n.FirstChild; childNode != nil; childNode = childNode.NextSibling {
-			processHtmlImport(childNode)
-		}
-	}
-	processHtmlImport(parseHtmlImport)
-
-	return parsedBookmarks, nil
-}
-
-func processNode(n *html.Node, parsedBookmarks []setup.Bookmark) []setup.Bookmark {
-	// var url, thumbUrl, addDate, tags, keywords, title string
-	var url, thumbUrl, tags, keywords, title string
-
-	switch n.Data {
-	case "a":
-		for _, attr := range n.Attr {
-			if attr.Key == "href" {
-				url = attr.Val
-			}
-			if attr.Key == "icon_uri" {
-				thumbUrl = attr.Val
-			}
-			// if attr.Key == "add_date" {
-			// 	addDate = attr.Val
-			// }
-			if attr.Key == "tags" {
-				tags = attr.Val
-			}
-			if attr.Key == "shortcuturl" {
-				keywords = attr.Val
-			}
-		}
-	}
-	for childNode := n.FirstChild; childNode != nil; childNode = childNode.NextSibling {
-		title = childNode.Data
-
-		// addDateInt, err := strconv.ParseInt(addDate, 10, 64)
-		// if err != nil {
-		// 	logger.Error.Println("error:", err)
-		// 	addDateInt = 1
-		// }
-
-		parsedBookmarks = append(parsedBookmarks, setup.Bookmark{
-			URL:      url,
-			ThumbURL: thumbUrl,
-			// Modified: time.Unix(addDateInt, 0).Local().Format("2006-01-02 15:04:05"),
-			Keywords: tags + keywords,
-			Title:    title,
-		})
-
-		processNode(childNode, parsedBookmarks)
-	}
-
-	return parsedBookmarks
+	fmt.Println("")
 }
 
 func whereConfigLog() {

@@ -230,6 +230,32 @@ func ViewAllWhereGroup(database *sql.DB, keyword string) []setup.Bookmark {
 	return results
 }
 
+func ViewAllWhereHostname(database *sql.DB, hostname string) []setup.Bookmark {
+	var results []setup.Bookmark
+	var result setup.Bookmark
+	var modified time.Time
+
+	hostname = "%" + hostname + "%"
+
+	stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC;")
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+
+	execRes, err := stmt.Query(hostname)
+	if err != nil {
+		logger.Error.Fatalln(err)
+	}
+
+	for execRes.Next() {
+		result = setup.Bookmark{}
+		execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
+		results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BmGroup: result.BmGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, ByteThumbURL: result.ByteThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+	}
+
+	return results
+}
+
 func ViewSingleRow(database *sql.DB, id int, serverCall bool) (setup.Bookmark, error) {
 	var rowResult setup.Bookmark
 	var modified time.Time
