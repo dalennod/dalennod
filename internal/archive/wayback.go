@@ -30,7 +30,6 @@ func SendSnapshot(url string) (bool, string) {
 }
 
 func checkURL(url string) bool {
-	// res, err := http.Get(url)
 	res, err := default_client.HttpDefaultClientDo(http.MethodGet, url)
 	if err != nil {
 		logger.Warn.Println("Failed to ping website", err)

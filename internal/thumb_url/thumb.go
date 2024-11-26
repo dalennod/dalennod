@@ -33,12 +33,6 @@ type Images struct {
 }
 
 func GetPageThumb(url string) (string, []byte, error) {
-	// Need to include headers in the request for some sites to not send blank data..
-	// res, err := http.Get(url)
-	// if err != nil {
-	// 	return "", nil, err
-	// }
-
 	res, err := default_client.HttpDefaultClientDo(http.MethodGet, url)
 	if err != nil {
 		return "", nil, err

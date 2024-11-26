@@ -6,6 +6,28 @@ body * {
     box-sizing: border-box;
 }
 
+.container {
+    padding: 20px;
+    width: 50%;
+    text-align: center;
+}
+
+.drop-area {
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    padding: 20px;
+}
+
+#logTextArea {
+    width: 100%;
+    height: 200px;
+    resize: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    outline: none;
+}
+
 input {
     background: none;
     border-width: 0px;
@@ -30,7 +52,14 @@ input:focus {
 .button-text {
     border-radius: 5px;
     cursor: pointer;
-    color: #1f1f1f;
+}
+
+.button-hostname {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    outline: none;
 }
 
 nav {
@@ -114,6 +143,16 @@ main {
     border: dotted 1px #aaa;
     border-radius: 5px;
     padding: 3px;
+}
+
+.grid-child .bm-hostname {
+    font-family: "Courier New", Courier, monospace;
+    font-size: 0.8em;
+    opacity: 0.8;
+}
+
+.pad-like-p {
+    padding: 0.5em 0px;
 }
 
 .bm-keywords {
@@ -247,7 +286,8 @@ body:has(dialog[open]) {
 
 @media (prefers-color-scheme: dark) {
     body,
-    dialog {
+    dialog,
+    #logTextArea {
         background-color: #232323;
         color: #eaeaea;
     }
