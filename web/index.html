@@ -1,442 +1,215 @@
 {{ block "index" . }}
 <!doctype html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <script>
-            let FOUCFix;
-        </script>
-        <link rel="icon" href="static/imgs/favicon.ico" type="image/x-icon" />
-        <link rel="stylesheet" href="static/css/styles.css" />
-        <script
-            src="static/js/htmx.min.js"
-            type="text/javascript"
-            defer
-        ></script>
-        <script src="static/js/main.js" type="text/javascript" defer></script>
-        <title>Dalennod</title>
-    </head>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script> let FOUCFix; </script>
+    <link rel="icon" href="static/imgs/favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" href="static/css/styles.css" />
+    <script src="static/js/htmx.min.js" type="text/javascript" defer></script>
+    <script src="static/js/main.js" type="text/javascript" defer></script>
+    <title>Dalennod</title>
+</head>
 
-    <body>
-        <nav>
-            <form class="search-form" hx-post="/api/search/">
-                <input
-                    autofocus
-                    type="text"
-                    name="searchTerm"
-                    class="input-search"
-                    hx-target="main"
-                    hx-post="/api/search/"
-                    placeholder="Search a keyword..."
-                />
-                <button
-                    class="button-svg"
-                    type="submit"
-                    id="button-search-html"
-                    hx-target="main"
-                    hx-post="/api/search/"
-                    title="Search"
-                >
-                    <img
-                        class="svg-img"
-                        src="static/imgs/search_button.svg"
-                        alt="Search button"
-                    />
-                </button>
-            </form>
-            <button
-                class="button-svg"
-                id="button-add-html"
-                title="Create"
-                onclick="showCreateDialog();"
-                onmouseenter="changeToImport();"
-                onmouseleave="clearImportTimeout();"
-                hx-target="#bmGroups-list"
-                hx-get="/api/groups/"
-            >
-                <img
-                    class="svg-img"
-                    src="static/imgs/create_button.svg"
-                    alt="Create button"
-                />
+<body>
+    <nav>
+        <form class="search-form" hx-post="/api/search/">
+            <input autofocus type="text" name="searchTerm" class="input-search" hx-target="main" hx-post="/api/search/" placeholder="Search a keyword..." />
+            <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search/" title="Search">
+                <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button" />
             </button>
-        </nav>
+        </form>
+        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();" onmouseenter="changeToImport();" onmouseleave="clearImportTimeout();" hx-target="#bmGroups-list" hx-get="/api/groups/">
+            <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button" />
+        </button>
+    </nav>
 
-        <main>
-            {{ block "bm_list" . }}
-            <div class="grid-view-list">
-                {{ range .Bookmarks }}
-                <div class="grid-child" id="{{ .ID }}">
-                    <div id="bm-info">
-                        <div id="id-creation">
-                            <p>
-                                <a href="{{ .URL }}" target="_blank"
-                                    >{{ .ID }}.</a
-                                >
-                            </p>
-                            <span>{{ .Modified }}</span>
-                        </div>
-                        {{ if .ByteThumbURL }}
-                        <div id="thumbURL">
-                            <a href="{{ .URL }}" target="_blank">
-                                <img
-                                    src="data:image/{{ byteConversion .ByteThumbURL }}"
-                                    alt="[couldn't load thumbnail]"
-                                />
-                            </a>
-                        </div>
-                        {{ else }}
-                        <div id="default-thumbURL">
-                            <a href="{{ .URL }}" target="_blank">
-                                <img
-                                    src="static/imgs/41415.png"
-                                    alt="[couldn't load thumbnail]"
-                                />
-                            </a>
-                        </div>
-                        {{ end }}
-                        <div class="center-text pad-like-p">
-                            {{ $hostname := getHostname .URL }}
-                            <form hx-post="/api/search-hostname/">
-                                <input
-                                    hidden
-                                    name="searchTerm"
-                                    value="{{ $hostname }}"
-                                />
-                                <button
-                                    type="submit"
-                                    hx-target="main"
-                                    hx-post="/api/search-hostname/"
-                                    class="button-hostname bm-hostname"
-                                    title="Search for this host"
-                                >
-                                    {{ $hostname }}
-                                </button>
-                            </form>
-                        </div>
-                        {{ if .Title }}
-                        <div class="pad-like-p">
-                            <a href="{{ .URL }}" target="_blank"
-                                >{{ .Title }}</a
-                            >
-                        </div>
-                        {{ else if not .Title }}
-                        <div class="pad-like-p">
-                            <a href="{{ .URL }}" target="_blank">{{ .URL }}</a>
-                        </div>
-                        {{ end }} {{ if .Note }}
-                        <div class="pad-like-p">Notes: {{ .Note }}</div>
-                        {{ end }} {{ if .Archived }}
-                        <div class="pad-like-p">
-                            Archive:
-                            <a href="{{ .SnapshotURL }}" target="_blank"
-                                >[click here]</a
-                            >
-                        </div>
-                        {{ end }} {{ if .Keywords }}
-                        <div class="pad-like-p">
-                            {{ $id := .ID }} {{ $keywords := keywordSplit
-                            .Keywords "," }} {{ range $_, $keyword :=
-                            $keywords}}
-                            <div class="bm-keywords">
-                                <form hx-post="/api/search-keyword/">
-                                    <input
-                                        hidden
-                                        name="searchTerm"
-                                        value="{{ $keyword }}"
-                                    />
-                                    <button
-                                        class="button-svg"
-                                        type="submit"
-                                        id="button-search-html"
-                                        hx-target="main"
-                                        hx-post="/api/search-keyword/"
-                                        title="Search for this keyword"
-                                    >
-                                        <span id="keywords"
-                                            >{{ $keyword }}</span
-                                        >
-                                    </button>
-                                </form>
-                            </div>
-                            {{ end }}
-                        </div>
-                        {{ end }}
-
-                        <div class="pad-like-p">
-                            {{ if .BmGroup }}
-                            <form hx-post="/api/search-group/">
-                                <input
-                                    hidden
-                                    name="searchTerm"
-                                    value="{{ .BmGroup }}"
-                                />
-                                <button
-                                    class="button-svg"
-                                    type="submit"
-                                    id="button-search-html"
-                                    hx-target="main"
-                                    hx-post="/api/search-group/"
-                                    title="Search for this group"
-                                >
-                                    <span id="group">{{ .BmGroup }}</span>
-                                </button>
-                            </form>
-                            {{ end }}
-                        </div>
+    <main>
+        {{ block "bm_list" . }}
+        <div class="grid-view-list">
+            {{ range .Bookmarks }}
+            <div class="grid-child" id="{{ .ID }}">
+                <div id="bm-info">
+                    <div id="id-creation">
+                        <p>
+                            <a href="{{ .URL }}" target="_blank">{{ .ID }}.</a>
+                        </p>
+                        <span>{{ .Modified }}</span>
                     </div>
-
-                    <div id="buttons">
-                        <button
-                            class="button-svg"
-                            id="button-update"
-                            onclick="getOldData(this);"
-                            hx-target="#bmGroups-list"
-                            hx-get="/api/groups/"
-                            title="Update"
-                        >
-                            <img
-                                class="svg-img"
-                                src="static/imgs/update_button.svg"
-                                alt="Update button"
-                            />
-                        </button>
-                        <button
-                            class="button-svg"
-                            id="button-delete"
-                            hx-target="main"
-                            hx-get="/?page={{ pageCountNowDelete }}"
-                            hx-trigger="dblclick"
-                            title="Delete"
-                        >
-                            <img
-                                class="svg-img"
-                                src="static/imgs/delete_button.svg"
-                                hx-get="/api/delete/{{ .ID }}"
-                                hx-trigger="dblclick"
-                                alt="Delete button"
-                            />
-                        </button>
+                    {{ if .ByteThumbURL }}
+                    <div id="thumbURL">
+                        <a href="{{ .URL }}" target="_blank">
+                            <img src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" />
+                        </a>
+                    </div>
+                    {{ else }}
+                    <div id="default-thumbURL">
+                        <a href="{{ .URL }}" target="_blank">
+                            <img src="static/imgs/41415.png" alt="[couldn't load thumbnail]" />
+                        </a>
+                    </div>
+                    {{ end }}
+                    <div class="center-text pad-like-p">
+                        {{ $hostname := getHostname .URL }}
+                        <form hx-post="/api/search-hostname/">
+                            <input hidden name="searchTerm" value="{{ $hostname }}" />
+                            <button type="submit" hx-target="main" hx-post="/api/search-hostname/" class="button-hostname bm-hostname" title="Search for this host">
+                                {{ $hostname }}
+                            </button>
+                        </form>
+                    </div>
+                    {{ if .Title }}
+                    <div class="pad-like-p">
+                        <a href="{{ .URL }}" target="_blank">{{ .Title }}</a>
+                    </div>
+                    {{ else if not .Title }}
+                    <div class="pad-like-p">
+                        <a href="{{ .URL }}" target="_blank">{{ .URL }}</a>
+                    </div>
+                    {{ end }}
+                    {{ if .Note }}
+                    <div class="pad-like-p">Notes: {{ .Note }}</div>
+                    {{ end }}
+                    {{ if .Archived }}
+                    <div class="pad-like-p">
+                        Archive:
+                        <a href="{{ .SnapshotURL }}" target="_blank">[click here]</a>
+                    </div>
+                    {{ end }}
+                    {{ if .Keywords }}
+                    <div class="pad-like-p">
+                        {{ $id := .ID }}
+                        {{ $keywords := keywordSplit .Keywords "," }} 
+                        {{ range $_, $keyword := $keywords}}
+                        <div class="bm-keywords">
+                            <form hx-post="/api/search-keyword/">
+                                <input hidden name="searchTerm" value="{{ $keyword }}" />
+                                <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search-keyword/" title="Search for this keyword">
+                                    <span id="keywords">{{ $keyword }}</span>
+                                </button>
+                            </form>
+                        </div>
+                        {{ end }}
+                    </div>
+                    {{ end }}
+                    <div class="pad-like-p">
+                        {{ if .BmGroup }}
+                        <form hx-post="/api/search-group/">
+                            <input hidden name="searchTerm" value="{{ .BmGroup }}" />
+                            <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search-group/" title="Search for this group">
+                                <span id="group">{{ .BmGroup }}</span>
+                            </button>
+                        </form>
+                        {{ end }}
                     </div>
                 </div>
-                {{ end }}
+                <div id="buttons">
+                    <button class="button-svg" id="button-update" onclick="getOldData(this);" hx-target="#bmGroups-list" hx-get="/api/groups/" title="Update">
+                        <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
+                    </button>
+                    <button class="button-svg" id="button-delete" hx-target="main" hx-get="/?page={{ pageCountNowDelete }}" hx-trigger="dblclick" title="Delete">
+                        <img class="svg-img" src="static/imgs/delete_button.svg" hx-get="/api/delete/{{ .ID }}" hx-trigger="dblclick" alt="Delete button" />
+                    </button>
+                </div>
             </div>
             {{ end }}
-            <br />
-            <div class="pagination center-text">
-                <a href="/?page={{ pageCountDown }}">&laquo;</a>
-                <a href="/?page={{ pageCountUp }}">&raquo;</a>
-            </div>
-            <br />
-        </main>
+        </div>
+        {{ end }}
+        <br />
+        <div class="pagination center-text">
+            <a href="/?page={{ pageCountDown }}">&laquo;</a>
+            <a href="/?page={{ pageCountUp }}">&raquo;</a>
+        </div>
+        <br />
+    </main>
 
-        <dialog class="dialog-create">
-            <div class="dialog-top">
-                <span class="dialog-type">Create a new bookmark</span>
-                <button
-                    onclick="closeCreateDialog();"
-                    hx-target="index"
-                    hx-get="/"
-                    class="button-svg"
-                    id="button-close"
-                    title="Close modal"
-                >
-                    <img
-                        class="svg-img"
-                        src="static/imgs/close_button.svg"
-                        alt="Close button"
-                    />
-                </button>
+    <dialog class="dialog-create">
+        <div class="dialog-top">
+            <span class="dialog-type">Create a new bookmark</span>
+            <button onclick="closeCreateDialog();" hx-target="index" hx-get="/" class="button-svg" id="button-close" title="Close modal">
+                <img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" />
+            </button>
+        </div>
+        <div class="dialog-inputs">
+            <div class="pad-like-p">
+                URL<span class="red-text">*</span>:<br /><input autofocus type="text" class="uac-input" id="create-url" placeholder="URL to save" required />
             </div>
-            <div class="dialog-inputs">
-                <div class="pad-like-p">
-                    URL<span class="red-text">*</span>:<br /><input
-                        autofocus
-                        type="text"
-                        class="uac-input"
-                        id="create-url"
-                        placeholder="URL to save"
-                        required
-                    />
-                </div>
-                <div class="pad-like-p">
-                    Title:<br /><input
-                        type="text"
-                        class="uac-input"
-                        id="create-title"
-                        placeholder="Title for the bookmark"
-                    />
-                </div>
-                <div class="pad-like-p">
-                    Notes:<br /><input
-                        type="text"
-                        class="uac-input"
-                        id="create-note"
-                        placeholder="Log notes for bookmark"
-                    />
-                </div>
-                <div class="pad-like-p">
-                    Keywords:<br /><input
-                        type="text"
-                        class="uac-input"
-                        id="create-keywords"
-                        placeholder="Keywords, to, search, bookmark"
-                    />
-                </div>
-                <div class="pad-like-p">
-                    Group:<br /><input
-                        type="text"
-                        class="uac-input"
-                        id="create-bmGroup"
-                        placeholder="Group to store bookmark into"
-                        list="bmGroups-list"
-                    />
-                    <datalist id="bmGroups-list">
-                        {{ template "curr_groups" . }}
-                    </datalist>
-                </div>
-                <div class="pad-like-p">
-                    Archive?:
-                    <input
-                        type="radio"
-                        name="create-radio-yes"
-                        id="create-radio-yes"
-                        value="1"
-                    />
-                    <label for="create-radio-yes">Yes</label>
-                    <input
-                        type="radio"
-                        name="create-radio-yes"
-                        id="create-radio-no"
-                        value="0"
-                        checked
-                    />
-                    <label for="create-radio-yes">No</label>
-                </div>
-                <p class="red-text">* required</p>
-                <div class="center-text pad-like-p">
-                    <button
-                        class="button-text"
-                        id="button-add-req"
-                        onclick="addEntry();"
-                        title="Create"
-                    >
-                        Create
-                    </button>
-                    <span id="create-checkmark" hidden>&check;</span>
-                    <span id="create-archive-warn" class="red-text" hidden
-                        >WARN: Archiving may take few seconds to minutes. It's
-                        safe to navigate away in the meantime.</span
-                    >
-                </div>
+            <div class="pad-like-p">
+                Title:<br /><input type="text" class="uac-input" id="create-title" placeholder="Title for the bookmark" />
             </div>
-        </dialog>
+            <div class="pad-like-p">
+                Notes:<br /><input type="text" class="uac-input" id="create-note" placeholder="Log notes for bookmark" />
+            </div>
+            <div class="pad-like-p">
+                Keywords:<br /><input type="text" class="uac-input" id="create-keywords" placeholder="Keywords, to, search, bookmark" />
+            </div>
+            <div class="pad-like-p">
+                Group:<br /><input type="text" class="uac-input" id="create-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list" />
+                <datalist id="bmGroups-list">{{ template "curr_groups" . }}</datalist>
+            </div>
+            <div class="pad-like-p">
+                Archive?:
+                <input type="radio" name="create-radio-yes" id="create-radio-yes" value="1" />
+                <label for="create-radio-yes">Yes</label>
+                <input type="radio" name="create-radio-yes" id="create-radio-no" value="0" checked />
+                <label for="create-radio-yes">No</label>
+            </div>
+            <p class="red-text">* required</p>
+            <div class="center-text pad-like-p">
+                <button class="button-text" id="button-add-req" onclick="addEntry();" title="Create">Create</button>
+                <span id="create-checkmark" hidden>&check;</span>
+                <span id="create-archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
+            </div>
+        </div>
+    </dialog>
 
-        <dialog class="dialog-update">
-            <div class="dialog-top">
-                <span class="dialog-type">Update a bookmark</span>
-                <button
-                    onclick="closeUpdateDialog();"
-                    hx-target="main"
-                    hx-get="/?page={{ pageCountNowUpdate }}"
-                    class="button-svg"
-                    id="button-close"
-                    title="Close modal"
-                >
-                    <img
-                        class="svg-img"
-                        src="static/imgs/close_button.svg"
-                        alt="Close button"
-                    />
-                </button>
+    <dialog class="dialog-update">
+        <div class="dialog-top">
+            <span class="dialog-type">Update a bookmark</span>
+            <button onclick="closeUpdateDialog();" hx-target="main" hx-get="/?page={{ pageCountNowUpdate }}" class="button-svg" id="button-close" title="Close modal">
+                <img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" />
+            </button>
+        </div>
+        <div class="dialog-inputs">
+            <span id="bm-id" hidden></span>
+            <div class="pad-like-p">
+                URL<span class="red-text">*</span>:<br /><input type="text" class="uac-input" id="update-url" placeholder="URL to save" required />
             </div>
-            <div class="dialog-inputs">
-                <span id="bm-id" hidden></span>
-                <div class="pad-like-p">
-                    URL<span class="red-text">*</span>:<br /><input
-                        type="text"
-                        class="uac-input"
-                        id="update-url"
-                        placeholder="URL to save"
-                        required
-                    />
-                </div>
-                <div class="pad-like-p">
-                    Title:<br /><input
-                        type="text"
-                        class="uac-input"
-                        id="update-title"
-                        placeholder="Title for the bookmark"
-                    />
-                </div>
-                <div class="pad-like-p">
-                    Notes:<br /><input
-                        type="text"
-                        class="uac-input"
-                        id="update-note"
-                        autofocus
-                        placeholder="Log notes for bookmark"
-                    />
-                </div>
-                <div class="pad-like-p">
-                    Keywords:<br /><input
-                        type="text"
-                        class="uac-input"
-                        id="update-keywords"
-                        placeholder="Keywords, to, search, bookmark"
-                    />
-                </div>
-                <div class="pad-like-p">
-                    Group:<br /><input
-                        type="text"
-                        class="uac-input"
-                        id="update-bmGroup"
-                        placeholder="Group to store bookmark into"
-                        list="bmGroups-list"
-                    />
-                    <datalist id="bmGroups-list">
-                        {{ template "curr_groups" . }}
-                    </datalist>
-                </div>
-                <div class="pad-like-p" id="update-archive">
-                    Archive?:
-                    <input
-                        type="radio"
-                        name="update-radio-yes"
-                        id="update-radio-yes"
-                        value="1"
-                    />
-                    <label for="update-radio-yes">Yes</label>
-                    <input
-                        type="radio"
-                        name="update-radio-yes"
-                        id="update-radio-no"
-                        value="0"
-                        checked
-                    />
-                    <label for="update-radio-yes">No</label>
-                </div>
-                <p class="red-text">* required</p>
-                <div class="center-text pad-like-p">
-                    <button
-                        class="button-text"
-                        id="button-update-req"
-                        onclick="updateEntry();"
-                        title="Create"
-                    >
-                        Update
-                    </button>
-                    <span id="update-checkmark" hidden>&check;</span>
-                    <span id="update-archive-warn" class="red-text" hidden
-                        >WARN: Archiving may take few seconds to minutes. It's
-                        safe to navigate away in the meantime.</span
-                    >
-                </div>
+            <div class="pad-like-p">
+                Title:<br /><input type="text" class="uac-input" id="update-title" placeholder="Title for the bookmark" />
             </div>
-        </dialog>
-    </body>
+            <div class="pad-like-p">
+                Notes:<br /><input type="text" class="uac-input" id="update-note" autofocus placeholder="Log notes for bookmark" />
+            </div>
+            <div class="pad-like-p">
+                Keywords:<br /><input type="text" class="uac-input" id="update-keywords" placeholder="Keywords, to, search, bookmark" />
+            </div>
+            <div class="pad-like-p">
+                Group:<br /><input type="text" class="uac-input" id="update-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list" />
+                <datalist id="bmGroups-list">{{ template "curr_groups" . }}</datalist>
+            </div>
+            <div class="pad-like-p" id="update-archive">
+                Archive?:
+                <input type="radio" name="update-radio-yes" id="update-radio-yes" value="1" />
+                <label for="update-radio-yes">Yes</label>
+                <input type="radio" name="update-radio-yes" id="update-radio-no" value="0" checked />
+                <label for="update-radio-yes">No</label>
+            </div>
+            <p class="red-text">* required</p>
+            <div class="center-text pad-like-p">
+                <button class="button-text" id="button-update-req" onclick="updateEntry();" title="Create">Update</button>
+                <span id="update-checkmark" hidden>&check;</span>
+                <span id="update-archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
+            </div>
+        </div>
+    </dialog>
+</body>
 </html>
-{{ end }} {{ define "curr_groups" }} {{ range .AllGroups }}
+{{ end }} 
+
+{{ define "curr_groups" }} 
+{{ range .AllGroups }}
 <option value="{{ . }}"></option>
-{{ end }} {{ end }}
+{{ end }} 
+{{ end }}

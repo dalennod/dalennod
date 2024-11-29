@@ -64,6 +64,7 @@ func Start(data *sql.DB) {
 	mux.HandleFunc("/api/search-group/", searchGroupHandler)
 	mux.HandleFunc("/api/search-hostname/", searchHostnameHandler)
 	mux.HandleFunc("/api/check-url/", checkUrlHandler)
+	mux.HandleFunc("/api/refetch-thumbnail/", refetchThumbnailHandler)
 
 	logger.Info.Printf("Web-server starting on http://localhost%s/\n", PORT)
 	fmt.Printf("Web-server starting on http://localhost%s/\n", PORT)
@@ -396,6 +397,31 @@ func checkUrlHandler(w http.ResponseWriter, r *http.Request) {
 			logger.Error.Println(err)
 		}
 		w.Write([]byte(writeData))
+	} else {
+		internalServerErrorHandler(w, r)
+	}
+}
+
+func refetchThumbnailHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+	if r.Method == http.MethodGet {
+		refetchId := regexp.MustCompile("^/api/refetch-thumbnail/([0-9]+)$")
+		match := refetchId.FindStringSubmatch(r.URL.Path)
+		if len(match) < 2 {
+			internalServerErrorHandler(w, r)
+			return
+		}
+
+		matchInt, err := strconv.Atoi(match[1])
+		if err != nil {
+			fmt.Println(err)
+			logger.Error.Println(err)
+			return
+		}
+
+		db.RefetchThumbnail(database, matchInt)
+		w.Write([]byte("Thumbnail updated"))
 	} else {
 		internalServerErrorHandler(w, r)
 	}

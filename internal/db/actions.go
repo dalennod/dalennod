@@ -36,12 +36,12 @@ func Update(database *sql.DB, bmStruct setup.Bookmark, serverCall bool) {
 		bmStruct = updateCheck(database, bmStruct)
 	}
 
-	stmt, err := database.Prepare("UPDATE bookmarks SET url=(?), title=(?), note=(?), keywords=(?), bmGroup=(?), archived=(?), snapshotURL=(?) WHERE id=(?);")
+	stmt, err := database.Prepare("UPDATE bookmarks SET url=(?), title=(?), note=(?), keywords=(?), bmGroup=(?), archived=(?), snapshotURL=(?), thumbURL=(?), byteThumbURL=(?) WHERE id=(?);")
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
 
-	_, err = stmt.Exec(bmStruct.URL, bmStruct.Title, bmStruct.Note, bmStruct.Keywords, bmStruct.BmGroup, bmStruct.Archived, bmStruct.SnapshotURL, bmStruct.ID)
+	_, err = stmt.Exec(bmStruct.URL, bmStruct.Title, bmStruct.Note, bmStruct.Keywords, bmStruct.BmGroup, bmStruct.Archived, bmStruct.SnapshotURL, bmStruct.ThumbURL, bmStruct.ByteThumbURL, bmStruct.ID)
 	if err != nil {
 		logger.Error.Fatalln(err)
 	}
@@ -70,6 +70,20 @@ func updateCheck(database *sql.DB, bmStruct setup.Bookmark) setup.Bookmark {
 	}
 
 	return bmStruct
+}
+
+func RefetchThumbnail(database *sql.DB, id int) {
+	bmStruct, err := ViewSingleRow(database, id, true)
+	if err != nil {
+		logger.Error.Println("error getting single row. ERROR:", err)
+	}
+
+	bmStruct.ThumbURL, bmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
+	if err != nil {
+		logger.Error.Println("error getting thumbnail. ERROR:", err)
+	}
+
+	Update(database, bmStruct, true)
 }
 
 func Remove(database *sql.DB, id int) {
