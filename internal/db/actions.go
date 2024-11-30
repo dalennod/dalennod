@@ -72,18 +72,21 @@ func updateCheck(database *sql.DB, bmStruct setup.Bookmark) setup.Bookmark {
 	return bmStruct
 }
 
-func RefetchThumbnail(database *sql.DB, id int) {
+func RefetchThumbnail(database *sql.DB, id int) error {
 	bmStruct, err := ViewSingleRow(database, id, true)
 	if err != nil {
 		logger.Error.Println("error getting single row. ERROR:", err)
+		return err
 	}
 
 	bmStruct.ThumbURL, bmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
 	if err != nil {
 		logger.Error.Println("error getting thumbnail. ERROR:", err)
+		return err
 	}
 
 	Update(database, bmStruct, true)
+	return nil
 }
 
 func Remove(database *sql.DB, id int) {

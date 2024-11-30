@@ -6,8 +6,8 @@ import (
 	"dalennod/internal/user_input"
 	"embed"
 
-	// _ "github.com/mattn/go-sqlite3"
-	_ "modernc.org/sqlite"
+	_ "github.com/mattn/go-sqlite3" // CGO driver
+	// _ "modernc.org/sqlite" // CGO-free driver
 )
 
 var (

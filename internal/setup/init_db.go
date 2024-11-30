@@ -22,8 +22,8 @@ type Bookmark struct {
 const DB_FILENAME string = "dalennod.db"
 
 func CreateDB(dbSavePath string) *sql.DB {
-	// db, err := sql.Open("sqlite3", dbSavePath+DB_FILENAME) // For CGo driver
-	db, err := sql.Open("sqlite", dbSavePath+DB_FILENAME) // For CGo-free driver
+	db, err := sql.Open("sqlite3", dbSavePath+DB_FILENAME) // For CGo driver
+	// db, err := sql.Open("sqlite", dbSavePath+DB_FILENAME) // For CGo-free driver
 	if err != nil {
 		log.Fatalln("error opening database. ERROR:", err)
 	}
