@@ -331,19 +331,19 @@ func SearchByUrl(database *sql.DB, searchUrl string) (setup.Bookmark, error) {
 func GetAllGroups(database *sql.DB) ([]string, error) {
 	var allGroups []string
 
-	rows, err := database.Query("SELECT * FROM bookmarks GROUP BY bmGroup ORDER BY id DESC;")
+	rows, err := database.Query("SELECT DISTINCT bmGroup FROM bookmarks ORDER BY id DESC;")
 	if err != nil {
 		return allGroups, err
 	}
 
-	var bm setup.Bookmark
+	var bmGroup string
 	for rows.Next() {
-		var err error = rows.Scan(&bm.ID, &bm.URL, &bm.Title, &bm.Note, &bm.Keywords, &bm.BmGroup, &bm.Archived, &bm.SnapshotURL, &bm.ThumbURL, &bm.ByteThumbURL, &bm.Modified)
+		var err error = rows.Scan(&bmGroup)
 		if err != nil {
-			logger.Error.Printf("ERRRO when scanning row: %v", err)
+			logger.Error.Printf("error when scanning row. ERROR: %v", err)
 		}
-		if bm.BmGroup != "" {
-			allGroups = append(allGroups, bm.BmGroup)
+		if bmGroup != "" {
+			allGroups = append(allGroups, bmGroup)
 		}
 	}
 
