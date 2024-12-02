@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script> let FOUCFix; </script>
+    <script>let FOUCFix;</script>
     <link rel="icon" href="static/imgs/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="static/css/styles.css" />
     <script src="static/js/htmx.min.js" type="text/javascript" defer></script>
@@ -30,21 +30,19 @@
         <div class="grid-view-list">
             {{ range .Bookmarks }}
             <div class="grid-child" id="{{ .ID }}">
-                <div id="bm-info">
-                    <div id="id-creation">
-                        <p>
-                            <a href="{{ .URL }}" target="_blank">{{ .ID }}.</a>
-                        </p>
+                <div class="bm-info">
+                    <div class="id-creation">
+                        <p>{{ .ID }}.</p>
                         <span>{{ .Modified }}</span>
                     </div>
                     {{ if .ByteThumbURL }}
-                    <div id="thumbURL">
+                    <div class="thumburl">
                         <a href="{{ .URL }}" target="_blank">
                             <img src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" />
                         </a>
                     </div>
                     {{ else }}
-                    <div id="default-thumbURL">
+                    <div class="default-thumburl">
                         <a href="{{ .URL }}" target="_blank">
                             <img src="static/imgs/41415.png" alt="[couldn't load thumbnail]" />
                         </a>
@@ -54,7 +52,7 @@
                         {{ $hostname := getHostname .URL }}
                         <form hx-post="/api/search-hostname/">
                             <input hidden name="searchTerm" value="{{ $hostname }}" />
-                            <button type="submit" hx-target="main" hx-post="/api/search-hostname/" class="button-hostname bm-hostname" title="Search for this host">
+                            <button type="submit" hx-target="main" hx-post="/api/search-hostname/" class="button-hostname bm-hostname" title="Search for this host" tabindex="-1">
                                 {{ $hostname }}
                             </button>
                         </form>
@@ -86,7 +84,7 @@
                             <form hx-post="/api/search-keyword/">
                                 <input hidden name="searchTerm" value="{{ $keyword }}" />
                                 <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search-keyword/" title="Search for this keyword">
-                                    <span id="keywords">{{ $keyword }}</span>
+                                    <span id="keywords" class="keywords">{{ $keyword }}</span>
                                 </button>
                             </form>
                         </div>
@@ -98,13 +96,13 @@
                         <form hx-post="/api/search-group/">
                             <input hidden name="searchTerm" value="{{ .BmGroup }}" />
                             <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search-group/" title="Search for this group">
-                                <span id="group">{{ .BmGroup }}</span>
+                                <span id="group" class="group">{{ .BmGroup }}</span>
                             </button>
                         </form>
                         {{ end }}
                     </div>
                 </div>
-                <div id="buttons">
+                <div id="buttons" class="buttons">
                     <button class="button-svg" id="button-update" onclick="getOldData(this);" hx-target="#bmGroups-list" hx-get="/api/groups/" title="Update">
                         <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
                     </button>

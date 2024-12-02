@@ -1,9 +1,29 @@
+:root {
+    --light-mode-foreground: #ccc;
+    --light-mode-background: #ddd;
+    --light-mode-text: #000;
+    --dark-mode-foreground: #232323;
+    --dark-mode-background: #131313;
+    --dark-mode-text: #eaeaea;
+    --global-border-color: #aaa;
+    --accent-color: #2f9df7;
+    --red-text: #ff3535;
+}
+
 body {
-    font-family: "Roboto", Arial, Helvetica, sans-serif;
+    font-family: system-ui, Arial, sans-serif;
 }
 
 body * {
     box-sizing: border-box;
+    /* outline: 1px solid red !important; */
+}
+
+body,
+dialog,
+.logTextArea {
+    background-color: var(--light-mode-background);
+    color: var(--light-mode-text);
 }
 
 .container {
@@ -13,16 +33,16 @@ body * {
 }
 
 .drop-area {
-    border: 2px dashed #ccc;
+    border: 2px dashed var(--global-border-color);
     border-radius: 8px;
     padding: 20px;
 }
 
-#logTextArea {
+.logTextArea {
     width: 100%;
     height: 200px;
     resize: none;
-    border: 1px solid #ccc;
+    border: 1px solid var(--global-border-color);
     border-radius: 4px;
     padding: 10px;
     outline: none;
@@ -39,7 +59,7 @@ input:focus {
 }
 
 .red-text {
-    color: #ff3535;
+    color: var(--red-text);
     text-align: right;
 }
 
@@ -52,6 +72,7 @@ input:focus {
 .button-text {
     border-radius: 5px;
     cursor: pointer;
+    color: var(--light-mode-text);
 }
 
 .button-hostname {
@@ -68,7 +89,7 @@ nav {
     width: 99%;
     padding: 10px;
     height: 50px;
-    background-color: #f9f9f9;
+    background-color: var(--light-mode-foreground);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -96,7 +117,7 @@ main {
 
 .grid-child,
 .dialog-inputs {
-    background-color: #f1f1f1;
+    background-color: var(--light-mode-foreground);
 }
 
 .grid-child {
@@ -112,10 +133,10 @@ main {
 
 .grid-child a:hover {
     text-decoration: underline;
-    color: #2f9df7;
+    color: var(--accent-color);
 }
 
-.grid-child #thumbURL img {
+.grid-child .thumburl img {
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -124,7 +145,7 @@ main {
     object-fit: cover;
 }
 
-.grid-child #default-thumbURL img {
+.grid-child .default-thumburl img {
     display: block;
     margin-left: auto;
     margin-right: auto;
@@ -133,22 +154,18 @@ main {
     object-fit: cover;
 }
 
-.grid-child #group,
-.grid-child #keywords,
-#id-creation {
-    font-size: 13px;
-}
-
-.grid-child #group {
-    border: dotted 1px #aaa;
+.grid-child .group {
+    border: 1px solid var(--global-border-color);
     border-radius: 5px;
     padding: 3px;
 }
 
-.grid-child .bm-hostname {
+.bm-hostname,
+.id-creation {
     font-family: "Courier New", Courier, monospace;
     font-size: 0.8em;
-    opacity: 0.8;
+    opacity: 0.5;
+    font-weight: bold;
 }
 
 .pad-like-p {
@@ -159,16 +176,16 @@ main {
     display: inline-block;
 }
 
-.grid-child #keywords {
-    border-bottom: dotted 1px #aaa;
+.grid-child .keywords {
+    border-bottom: 1px solid var(--global-border-color);
 }
 
-.grid-child #id-creation {
+.grid-child .id-creation {
     display: flex;
     justify-content: space-between;
 }
 
-.grid-child #buttons {
+.grid-child .buttons {
     position: absolute;
     bottom: 0;
     right: 2%;
@@ -194,11 +211,11 @@ main {
 
 .dialog-inputs input[type="text"] {
     width: 50vw;
-    border-bottom: 1px dotted #aaa;
+    border-bottom: 1px dotted var(--global-border-color);
 }
 
 dialog {
-    border: 0.5px solid #2875b5;
+    border: 0.5px solid var(--accent-color);
     border-radius: 5px;
     padding: 20px;
     min-width: 50%;
@@ -246,7 +263,7 @@ body:has(dialog[open]) {
 }
 
 .pagination a:hover:not(.active) {
-    background-color: #eee;
+    background-color: var(--light-mode-foreground);
 }
 
 @keyframes fade-in {
@@ -287,36 +304,36 @@ body:has(dialog[open]) {
 @media (prefers-color-scheme: dark) {
     body,
     dialog,
-    #logTextArea {
-        background-color: #232323;
-        color: #eaeaea;
+    .logTextArea {
+        background-color: var(--dark-mode-background);
+        color: var(--dark-mode-text);
     }
 
     input,
-    .grid-child #group,
-    .grid-child #keywords,
+    .grid-child .group,
+    .grid-child .keywords,
     .grid-child a,
     .pagination a {
-        color: #eaeaea;
+        color: var(--dark-mode-text);
     }
 
     .pagination a:hover:not(.active) {
-        background-color: #303030;
+        background-color: var(--dark-mode-foreground);
     }
 
     .button-text {
-        background-color: #2875b5;
-        border-color: #2875b5;
+        background-color: var(--accent-color);
+        border-color: var(--accent-color);
     }
 
     nav {
-        background-color: #2d2d2d;
+        background-color: var(--dark-mode-foreground);
     }
 
     .grid-child,
     .dialog-inputs,
     .update-main div {
-        background-color: #303030;
+        background-color: var(--dark-mode-foreground);
     }
 
     .svg-img {
