@@ -14,7 +14,6 @@ import (
 	"io/fs"
 	"net/http"
 	"net/url"
-	"regexp"
 	"strconv"
 )
 
@@ -49,25 +48,25 @@ func Start(data *sql.DB) {
 	tmplFuncMap["pageCountNowUpdate"] = pageCountNowUpdate
 	tmplFuncMap["pageCountNowDelete"] = pageCountNowDelete
 
-	mux.HandleFunc("/", rootHandler)
+	mux.HandleFunc("/{$}", rootHandler)
 	mux.HandleFunc("/import/", importHandler)
 	mux.HandleFunc("/api/import-bookmark/", importBookmarkHandler)
-	mux.HandleFunc("/api/delete/", deleteHandler)
 	mux.HandleFunc("/api/add/", addHandler)
-	mux.HandleFunc("/api/row/", rowHandler)
+	mux.HandleFunc("/api/row/{id}", rowHandler)
+	mux.HandleFunc("/api/update/{id}", updateHandler)
+	mux.HandleFunc("/api/delete/{id}", deleteHandler)
 	mux.HandleFunc("/api/groups/", groupsHandler)
-	mux.HandleFunc("/api/update/", updateHandler)
 	mux.HandleFunc("/api/search/", searchHandler)
 	mux.HandleFunc("/api/search-keyword/", searchKeywordHandler)
 	mux.HandleFunc("/api/search-group/", searchGroupHandler)
 	mux.HandleFunc("/api/search-hostname/", searchHostnameHandler)
 	mux.HandleFunc("/api/check-url/", checkUrlHandler)
-	mux.HandleFunc("/api/refetch-thumbnail/", refetchThumbnailHandler)
+	mux.HandleFunc("/api/refetch-thumbnail/{id}", refetchThumbnailHandler)
 
 	logger.Info.Printf("Web-server starting on http://localhost%s/\n", PORT)
 	fmt.Printf("Web-server starting on http://localhost%s/\n", PORT)
 
-	if err = http.ListenAndServe(PORT, mux); err != nil {
+	if err := http.ListenAndServe(PORT, mux); err != nil {
 		fmt.Printf("Stopping (error: %v)\n", err)
 		logger.Error.Printf("Stopping (error: %v)\n", err)
 	}
@@ -77,11 +76,6 @@ func internalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
 	w.Write([]byte("500 Internal Server Error"))
 	logger.Warn.Printf("status 500 at '%s%s'\n", r.Host, r.URL)
-}
-
-func notFoundHandler(w http.ResponseWriter, _ *http.Request) {
-	w.WriteHeader(http.StatusNotFound)
-	w.Write([]byte("404 Not Found"))
 }
 
 func importHandler(w http.ResponseWriter, r *http.Request) {
@@ -166,20 +160,13 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == http.MethodGet {
-		var (
-			deleteID *regexp.Regexp = regexp.MustCompile("^/api/delete/([0-9]+)$")
-			match    []string       = deleteID.FindStringSubmatch(r.URL.Path)
-		)
-		if len(match) < 2 {
-			internalServerErrorHandler(w, r)
+		matchId, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil || matchId < 1 {
+			http.NotFound(w, r)
 			return
 		}
-		matchInt, err := strconv.Atoi(match[1])
-		if err != nil {
-			logger.Error.Println(err)
-		}
 
-		db.Remove(database, matchInt)
+		db.Remove(database, matchId)
 	} else {
 		internalServerErrorHandler(w, r)
 	}
@@ -190,8 +177,7 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == http.MethodPost {
 		var insData setup.Bookmark
-		var err error = json.NewDecoder(r.Body).Decode(&insData)
-		if err != nil {
+		if err := json.NewDecoder(r.Body).Decode(&insData); err != nil {
 			logger.Error.Println(err)
 		}
 
@@ -217,23 +203,13 @@ func addHandler(w http.ResponseWriter, r *http.Request) {
 
 func rowHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		var (
-			oldData setup.Bookmark
-			rowID   *regexp.Regexp = regexp.MustCompile("^/api/row/([0-9]+)$")
-			match   []string       = rowID.FindStringSubmatch(r.URL.Path)
-		)
-
-		if len(match) < 2 {
-			internalServerErrorHandler(w, r)
-			return
-		}
-		matchInt, err := strconv.Atoi(match[1])
-		if err != nil {
-			logger.Error.Println(err)
+		matchId, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil || matchId < 1 {
+			http.NotFound(w, r)
 			return
 		}
 
-		oldData, err = db.ViewSingleRow(database, matchInt, true)
+		oldData, err := db.ViewSingleRow(database, matchId, true)
 		if err != nil {
 			logger.Error.Println(err)
 		}
@@ -254,26 +230,18 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == http.MethodPost {
-		var (
-			newData  setup.Bookmark
-			updateID *regexp.Regexp = regexp.MustCompile("^/api/update/([0-9]+)$")
-
-			match []string = updateID.FindStringSubmatch(r.URL.Path)
-		)
-		if len(match) < 2 {
-			internalServerErrorHandler(w, r)
+		matchId, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil || matchId < 1 {
+			http.NotFound(w, r)
 			return
 		}
-		matchInt, err := strconv.Atoi(match[1])
-		if err != nil {
-			logger.Error.Println(err)
-		}
 
+		var newData setup.Bookmark
 		err = json.NewDecoder(r.Body).Decode(&newData)
 		if err != nil {
 			logger.Error.Println(err)
 		}
-		newData.ID = matchInt
+		newData.ID = matchId
 
 		if !newData.Archived {
 			db.Update(database, newData, true)
@@ -293,12 +261,22 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func findSearchTerm(r *http.Request) (string, error) {
+	if err := r.ParseForm(); err != nil {
+		return "", err
+	}
+	searchTerm := r.FormValue("searchTerm")
+	return searchTerm, nil
+}
+
 func searchHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == http.MethodPost {
-		r.ParseForm()
-		var searchTerm string = r.FormValue("searchTerm")
+		searchTerm, err := findSearchTerm(r)
+		if err != nil {
+			logger.Error.Println("error getting search term. ERROR:", err)
+		}
 
 		if searchTerm == "" {
 			rootHandler(w, &http.Request{
@@ -322,8 +300,10 @@ func searchKeywordHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == http.MethodPost {
-		r.ParseForm()
-		var searchTerm string = r.FormValue("searchTerm")
+		searchTerm, err := findSearchTerm(r)
+		if err != nil {
+			logger.Error.Println("error getting search term. ERROR:", err)
+		}
 
 		var bookmarks []setup.Bookmark = db.ViewAllWhereKeyword(database, searchTerm)
 		allBookmarks["Bookmarks"] = bookmarks
@@ -339,8 +319,10 @@ func searchGroupHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == http.MethodPost {
-		r.ParseForm()
-		var searchTerm string = r.FormValue("searchTerm")
+		searchTerm, err := findSearchTerm(r)
+		if err != nil {
+			logger.Error.Println("error getting search term. ERROR:", err)
+		}
 
 		var bookmarks []setup.Bookmark = db.ViewAllWhereGroup(database, searchTerm)
 		allBookmarks["Bookmarks"] = bookmarks
@@ -354,10 +336,10 @@ func searchGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 func searchHostnameHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-		if err := r.ParseForm(); err != nil {
-			logger.Error.Printf("error parsing form for searching hostname. ERROR:%v\n", err)
+		searchTerm, err := findSearchTerm(r)
+		if err != nil {
+			logger.Error.Println("error getting search term. ERROR:", err)
 		}
-		searchTerm := r.FormValue("searchTerm")
 
 		bookmarks := db.ViewAllWhereHostname(database, searchTerm)
 		allBookmarks["Bookmarks"] = bookmarks
@@ -386,7 +368,7 @@ func checkUrlHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if getData.ID == 0 {
-			notFoundHandler(w, r)
+			http.NotFound(w, r)
 			return
 		}
 
@@ -404,21 +386,13 @@ func refetchThumbnailHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == http.MethodGet {
-		refetchId := regexp.MustCompile("^/api/refetch-thumbnail/([0-9]+)$")
-		match := refetchId.FindStringSubmatch(r.URL.Path)
-		if len(match) < 2 {
-			internalServerErrorHandler(w, r)
+		matchId, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil || matchId < 1 {
+			http.NotFound(w, r)
 			return
 		}
 
-		matchInt, err := strconv.Atoi(match[1])
-		if err != nil {
-			fmt.Println(err)
-			logger.Error.Println(err)
-			return
-		}
-
-		if err := db.RefetchThumbnail(database, matchInt); err != nil {
+		if err := db.RefetchThumbnail(database, matchId); err != nil {
 			w.WriteHeader(http.StatusBadGateway)
 			w.Write([]byte(err.Error()))
 			return
