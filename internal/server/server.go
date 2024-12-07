@@ -11,6 +11,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html/template"
+	"io"
 	"io/fs"
 	"net/http"
 	"net/url"
@@ -392,7 +393,43 @@ func refetchThumbnailHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if err := db.RefetchThumbnail(database, matchId); err != nil {
+		if err := db.RefetchThumbnail(database, matchId, nil); err != nil {
+			w.WriteHeader(http.StatusBadGateway)
+			w.Write([]byte(err.Error()))
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Thumbnail updated"))
+	} else if r.Method == http.MethodPost {
+		matchId, err := strconv.Atoi(r.PathValue("id"))
+		if err != nil || matchId < 1 {
+			http.NotFound(w, r)
+			logger.Error.Println("incorrect bookmark id. ERROR:", err)
+			return
+		}
+
+		if err := r.ParseMultipartForm(10 << 19); err != nil { // ~5,23MB limit for thumbnail file
+			http.Error(w, "error parsing data", http.StatusBadRequest)
+			logger.Error.Println("error parsing thumbnail data. ERROR:", err)
+			return
+		}
+
+		thumbnailFile, _, err := r.FormFile("thumbnail")
+		if err != nil {
+			http.Error(w, "error getting thumbnail field", http.StatusBadRequest)
+			logger.Error.Println("error getting thumbnail field. ERROR:", err)
+			return
+		}
+		defer thumbnailFile.Close()
+
+		thumbnailFileBytes, err := io.ReadAll(thumbnailFile)
+		if err != nil {
+			http.Error(w, "error converting thumbnail file to bytes.", http.StatusInternalServerError)
+			logger.Error.Println("error converting thumbnail file to bytes. ERROR:", err)
+			return
+		}
+
+		if err := db.RefetchThumbnail(database, matchId, thumbnailFileBytes); err != nil {
 			w.WriteHeader(http.StatusBadGateway)
 			w.Write([]byte(err.Error()))
 			return
