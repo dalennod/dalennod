@@ -110,10 +110,31 @@ func importBookmarkHandler(w http.ResponseWriter, r *http.Request) {
 
 		if selectedBrowser == "Firefox" {
 			firefoxBookmarks := &bookmark_import.Item{}
-			jsonDecoder := json.NewDecoder(importFile)
-			jsonDecoder.Decode(firefoxBookmarks)
+			if err := json.NewDecoder(importFile).Decode(firefoxBookmarks); err != nil {
+				logger.Error.Println(err)
+				fmt.Println(err)
+				return
+			}
 
 			parsedBookmarks := bookmark_import.ParseFirefox(firefoxBookmarks, "")
+			parsedBookmarksLength := strconv.Itoa(len(parsedBookmarks))
+
+			for _, parsedBookmark := range parsedBookmarks {
+				db.Add(database, parsedBookmark)
+				output := "Added || { TITLE: " + parsedBookmark.Title + ", URL: " + parsedBookmark.URL + "GROUP: " + parsedBookmark.BmGroup + ", KEYWORDS: " + parsedBookmark.Keywords + "}\n"
+				w.Write([]byte(output))
+			}
+			w.Write([]byte("Added " + parsedBookmarksLength + " bookmarks to database."))
+			return
+		} else if selectedBrowser == "Chromium" {
+			var chromiumBookmarks bookmark_import.ChromiumItem
+			if err := json.NewDecoder(importFile).Decode(&chromiumBookmarks); err != nil {
+				logger.Error.Println(err)
+				fmt.Println(err)
+				return
+			}
+
+			parsedBookmarks := bookmark_import.ParseChromium(chromiumBookmarks)
 			parsedBookmarksLength := strconv.Itoa(len(parsedBookmarks))
 
 			for _, parsedBookmark := range parsedBookmarks {

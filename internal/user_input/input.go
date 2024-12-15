@@ -48,6 +48,8 @@ func UserInput(data *sql.DB) {
 		viewInput(flagVals.ViewID)
 	} else if flagVals.Import != "" && flagVals.Firefox {
 		importFirefoxInput(flagVals.Import)
+	} else if flagVals.Import != "" && flagVals.Chromium {
+		importChromiumInput(flagVals.Import)
 	} else if flagVals.Import != "" && flagVals.Dalennod {
 		importDalennodInput(flagVals.Import)
 	}
@@ -248,10 +250,36 @@ func importFirefoxInput(file string) {
 	}
 
 	firefoxBookmarks := &bookmark_import.Item{}
-	jsonDecoder := json.NewDecoder(readFile)
-	jsonDecoder.Decode(firefoxBookmarks)
+	if err := json.NewDecoder(readFile).Decode(firefoxBookmarks); err != nil {
+		logger.Error.Println(err)
+		fmt.Println(err)
+		return
+	}
 
 	parsedBookmarks := bookmark_import.ParseFirefox(firefoxBookmarks, "")
+	parsedBookmarksLength := len(parsedBookmarks)
+
+	for i, parsedBookmark := range parsedBookmarks {
+		db.Add(database, parsedBookmark)
+		fmt.Printf("\rAdded %d / %d", i+1, parsedBookmarksLength)
+	}
+	fmt.Println("")
+}
+
+func importChromiumInput(file string) {
+	readFile, err := os.Open(file)
+	if err != nil {
+		logger.Error.Printf("couldn't open file. ERROR: %v", err)
+	}
+
+	var chromiumBookmarks bookmark_import.ChromiumItem
+	if err := json.NewDecoder(readFile).Decode(&chromiumBookmarks); err != nil {
+		logger.Error.Println(err)
+		fmt.Println(err)
+		return
+	}
+
+	parsedBookmarks := bookmark_import.ParseChromium(chromiumBookmarks)
 	parsedBookmarksLength := len(parsedBookmarks)
 
 	for i, parsedBookmark := range parsedBookmarks {

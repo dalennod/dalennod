@@ -17,6 +17,7 @@ type FlagValues struct {
 	JSONOut     bool
 	Import      string
 	Firefox     bool
+	Chromium    bool
 	Dalennod    bool
 	Where       bool
 }
@@ -36,6 +37,7 @@ func cliFlags() {
 		fmt.Fprintln(w, "  -va, --view-all\tView all bookmarks")
 		fmt.Fprintln(w, "  -i, --import [file]\tImport bookmarks from a browser")
 		fmt.Fprintln(w, "  -ff, --firefox\tImport bookmarks from Firefox \n\t\t\t  Must use alongside -i, --import option")
+		fmt.Fprintln(w, "  --chromium\t\tImport bookmarks from Chromium \n\t\t\t  Must use alongside -i, --import option")
 		fmt.Fprintln(w, "  -41, --dalennod\tImport bookmarks from exported Dalennod JSON \n\t\t\t  Must use alongside -i, --import option")
 		fmt.Fprintln(w, "  -b, --backup\t\tStart backup process")
 		fmt.Fprintln(w, "  --json\t\tPrint entire DB in JSON \n\t\t\t  Use alongside -b, --backup flag")
@@ -69,6 +71,7 @@ func cliFlags() {
 	flag.StringVar(&flagValues.Import, "import", "", "Import bookmarks from a browser")
 	flag.BoolVar(&flagValues.Firefox, "ff", false, "Import bookmarks from Firefox. Use alongside -i flag")
 	flag.BoolVar(&flagValues.Firefox, "firefox", false, "Import bookmarks from Firefox. Use alongside -i flag")
+	flag.BoolVar(&flagValues.Chromium, "chromium", false, "Import bookmarks from Chromium. Use alongside -i flag")
 	flag.BoolVar(&flagValues.Dalennod, "41", false, "Import bookmarks exported Dalennod JSON. Use alongside -i flag")
 	flag.BoolVar(&flagValues.Dalennod, "dalennod", false, "Import bookmarks exported Dalennod JSON. Use alongside -i flag")
 
