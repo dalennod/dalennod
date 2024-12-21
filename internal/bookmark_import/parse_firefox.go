@@ -32,6 +32,44 @@ const (
 // Firefox's bookmark properties
 // https://github.com/mozilla/gecko-dev/blob/599a15d3547d862764048ff62b74252dd41a56d3/toolkit/components/places/PlacesBackups.jsm#L398-L421
 // https://github.com/mozilla/gecko-dev/blob/599a15d3547d862764048ff62b74252dd41a56d3/toolkit/components/places/Bookmarks.jsm#L7
+// type Item struct {
+// 	// The globally unique identifier of the item.
+// 	GUID string `json:"guid"`
+
+// 	// The globally unique identifier of the folder containing the item.
+// 	// This will be an empty string for the Places root folder.
+// 	ParentGUID string `json:"parentGuid"`
+
+// 	Title string `json:"title"`
+
+// 	// The 0-based position of the item in the parent folder.
+// 	Index int `json:"index"`
+
+// 	// The time at which the item was added.
+// 	DateAdded time.Time `json:"dateAdded"`
+// 	// The time at which the item was last modified.
+// 	LastModified time.Time `json:"lastModified"`
+
+// 	ID int `json:"id"`
+
+// 	// TypeCode designates the type of item i.e. bookmark, folder or separator
+// 	TypeCode int `json:"typeCode"`
+
+// 	Type string `json:"type"`
+// 	Root string `json:"root"`
+
+// 	// Children are the items within a TypeFolder.
+// 	Children []*Item `json:"children"`
+
+// 	// The following fields only apply to a subset of items.
+// 	Annos   []Anno `json:"annos"`
+// 	URI     string `json:"uri"`
+// 	IconURI string `json:"iconuri"`
+// 	Keyword string `json:"keyword"`
+// 	Charset string `json:"charset"`
+// 	Tags    string `json:"tags"`
+// }
+
 type Item struct {
 	// The globally unique identifier of the item.
 	GUID string `json:"guid"`
@@ -44,11 +82,6 @@ type Item struct {
 
 	// The 0-based position of the item in the parent folder.
 	Index int `json:"index"`
-
-	// The time at which the item was added.
-	// DateAdded time.Time `json:"dateAdded"`
-	// The time at which the item was last modified.
-	// LastModified time.Time `json:"lastModified"`
 
 	ID int `json:"id"`
 
