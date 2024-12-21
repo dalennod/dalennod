@@ -2,9 +2,15 @@ package bookmark_import
 
 import "dalennod/internal/setup"
 
+// type BookmarkNode struct {
+// 	Name         string         `json:"name"`
+// 	URL          string         `json:"url,omitempty"`
+// 	DateAdded    string         `json:"date_added"`
+// 	DateModified string         `json:"date_modified"`
+// 	Children     []BookmarkNode `json:"children,omitempty"`
+// }
+
 type BookmarkNode struct {
-	// DateAdded    string         `json:"date_added"`
-	// DateModified string         `json:"date_modified"`
 	Name     string         `json:"name"`
 	URL      string         `json:"url,omitempty"`
 	Children []BookmarkNode `json:"children,omitempty"`
