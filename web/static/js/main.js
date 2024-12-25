@@ -26,22 +26,17 @@ const getOldData = async (ele) => {
     setOldData();
 };
 
+let oldData = "";
 const setOldData = () => {
     if (typeof Storage !== "undefined") {
-        const oldData = JSON.parse(localStorage.getItem("oldData"));
+        oldData = JSON.parse(localStorage.getItem("oldData"));
         document.querySelector("#bm-id").innerText = oldData.id;
         document.querySelector("#update-url").value = oldData.url;
         document.querySelector("#update-title").value = oldData.title;
         document.querySelector("#update-note").value = oldData.note;
         document.querySelector("#update-keywords").value = oldData.keywords;
         document.querySelector("#update-bmGroup").value = oldData.bmGroup;
-        oldData.archive
-            ? document
-                  .querySelector("#update-archive")
-                  .setAttribute("hidden", "")
-            : document
-                  .querySelector("#update-archive")
-                  .removeAttribute("hidden");
+        oldData.archive ? document.querySelector("#update-archive-div").setAttribute("hidden", "") : document.querySelector("#update-archive-div").removeAttribute("hidden");
     }
     showUpdateDialog();
 };
@@ -53,16 +48,18 @@ const updateEntry = async () => {
         note: document.querySelector("#update-note").value,
         keywords: document.querySelector("#update-keywords").value,
         bmGroup: document.querySelector("#update-bmGroup").value,
-        archive: document.querySelector("#update-radio-no").checked
-            ? false
-            : true,
+        archive: document.getElementById("update-archive").checked ? true : false
     };
 
     if (newDataJSON.archive) {
-        document
-            .querySelector("#update-archive-warn")
-            .removeAttribute("hidden");
+        document.querySelector("#update-archive-warn").removeAttribute("hidden");
+    } else if (!newDataJSON.archive && oldData.archive) {
+        newDataJSON.archive = true;
+        newDataJSON.snapshotURL = oldData.snapshotURL;
     }
+    
+    const updateButton = document.getElementById("button-update-req");
+    updateButton.disabled = true;
 
     const dataID = document.querySelector("#bm-id").innerText;
     const fetchURL = API_ENDPOINT + "update/" + dataID;
@@ -75,23 +72,16 @@ const updateEntry = async () => {
     });
 
     if (res.ok) {
-        document
-            .querySelector("#update-archive-warn")
-            .setAttribute("hidden", "");
+        updateButton.disabled = false;
+        document.querySelector("#update-archive-warn").setAttribute("hidden", "");
         document.querySelector("#update-checkmark").removeAttribute("hidden");
-        setTimeout(
-            () =>
-                document
-                    .querySelector("#update-checkmark")
-                    .setAttribute("hidden", ""),
-            2000,
-        );
+        setTimeout(() => document.querySelector("#update-checkmark").setAttribute("hidden", ""), 1000);
     }
 };
 
 const addEntry = async () => {
     if (document.querySelector("#create-url").value === "") {
-        alert("URL is required");
+        alert("ERROR: an URL is required");
         return;
     }
 
@@ -101,16 +91,15 @@ const addEntry = async () => {
         note: document.querySelector("#create-note").value,
         keywords: document.querySelector("#create-keywords").value,
         bmGroup: document.querySelector("#create-bmGroup").value,
-        archive: document.querySelector("#create-radio-no").checked
-            ? false
-            : true,
+        archive: document.getElementById("create-archive").checked ? true : false,
     };
 
     if (dataJSON.archive) {
-        document
-            .querySelector("#create-archive-warn")
-            .removeAttribute("hidden");
+        document.getElementById("create-archive-warn").removeAttribute("hidden");
     }
+    
+    const addButton = document.getElementById("button-add-req");
+    addButton.disabled = true;
 
     const fetchURL = API_ENDPOINT + "add/";
     const res = await fetch(fetchURL, {
@@ -123,17 +112,11 @@ const addEntry = async () => {
 
     if (res.ok) {
         clearInputs();
+        addButton.disabled = false;
+        document.querySelector("#create-archive-warn").setAttribute("hidden", "");
+        document.querySelector("#create-checkmark").removeAttribute("hidden");
+        setTimeout(() => document.querySelector("#create-checkmark").setAttribute("hidden", ""), 1000);
     }
-
-    document.querySelector("#create-archive-warn").setAttribute("hidden", "");
-    document.querySelector("#create-checkmark").removeAttribute("hidden");
-    setTimeout(
-        () =>
-            document
-                .querySelector("#create-checkmark")
-                .setAttribute("hidden", ""),
-        2000,
-    );
 };
 
 let changeToImportTimeout = "";
@@ -151,6 +134,16 @@ const clearImportTimeout = () => {
     clearTimeout(changeToImportTimeout);
     return;
 };
+
+const archiveCheckbox = () => {
+    const createArchive = document.getElementById("create-archive");
+    const createArchiveLabel = document.querySelector(".create-archive-label");
+    const updateArchive = document.getElementById("update-archive");
+    const updateArchiveLabel = document.querySelector(".update-archive-label");
+    createArchive.checked ? createArchiveLabel.innerText = "Yes" : createArchiveLabel.innerText = "No";
+    updateArchive.checked ? updateArchiveLabel.innerText = "Yes" : updateArchiveLabel.innerText = "No";
+    return;
+}
 
 const clearInputs = () => {
     const input = document.querySelectorAll(".uac-input");

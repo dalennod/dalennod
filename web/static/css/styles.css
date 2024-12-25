@@ -54,7 +54,7 @@ input {
     text-decoration: none;
 }
 
-input:focus {
+input[type="text"]:focus {
     outline: none;
 }
 
@@ -81,6 +81,22 @@ input:focus {
     cursor: pointer;
     color: inherit;
     outline: none;
+}
+
+button:disabled {
+    background-color: grey;
+    border-color: grey;
+    cursor: not-allowed;
+}
+
+@keyframes pop {
+    0% { opacity: 0; }
+    75% { opacity: 1; }
+    100% { transform: scale(1.2); }
+}
+
+input[type="checkbox"]:checked {
+    animation: pop 0.3s ease;
 }
 
 nav {
@@ -195,8 +211,7 @@ main {
 .svg-img {
     width: 1.5em;
     height: 1.5em;
-    filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg)
-        brightness(104%) contrast(89%);
+    filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
 }
 
 .svg-img:hover {
@@ -337,7 +352,6 @@ body:has(dialog[open]) {
     }
 
     .svg-img {
-        filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg)
-            brightness(112%) contrast(84%);
+        filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
     }
 }

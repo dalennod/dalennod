@@ -103,6 +103,8 @@ func updateHandler(w http.ResponseWriter, r *http.Request) {
 
 		if !newData.Archived {
 			db.Update(database, newData, true)
+		} else if newData.Archived && newData.SnapshotURL != "" {
+			db.Update(database, newData, true)
 		} else {
 			newData.Archived, newData.SnapshotURL = archive.SendSnapshot(newData.URL)
 			if newData.Archived {
