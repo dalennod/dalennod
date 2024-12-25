@@ -102,7 +102,7 @@
                     <button class="button-svg" id="button-update" onclick="getOldData(this);" hx-target="#bmGroups-list" hx-get="/api/groups/" title="Update">
                         <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
                     </button>
-                    <button class="button-svg" id="button-delete" hx-target="main" hx-get="/?page={{ pageCountNowDelete }}" hx-trigger="dblclick" title="Delete">
+                    <button class="button-svg" id="button-delete" hx-target="body" hx-get="/?page={{ pageCountNowDelete }}" hx-trigger="dblclick" title="Delete">
                         <img class="svg-img" src="static/imgs/delete_button.svg" hx-get="/api/delete/{{ .ID }}" hx-trigger="dblclick" alt="Delete button" />
                     </button>
                 </div>
@@ -121,7 +121,7 @@
     <dialog class="dialog-create">
         <div class="dialog-top">
             <span class="dialog-type">Create a new bookmark</span>
-            <button onclick="closeCreateDialog();" hx-target="main" hx-get="/" class="button-svg" id="button-close" title="Close modal">
+            <button onclick="closeCreateDialog();" hx-target="body" hx-get="/" class="button-svg" id="button-close" title="Close modal">
                 <img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" />
             </button>
         </div>
@@ -159,7 +159,7 @@
     <dialog class="dialog-update">
         <div class="dialog-top">
             <span class="dialog-type">Update a bookmark</span>
-            <button onclick="closeUpdateDialog();" hx-target="main" hx-get="/?page={{ pageCountNowUpdate }}" class="button-svg" id="button-close" title="Close modal">
+            <button onclick="closeUpdateDialog();" hx-target="body" hx-get="/?page={{ pageCountNowUpdate }}" class="button-svg" id="button-close" title="Close modal">
                 <img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" />
             </button>
         </div>
