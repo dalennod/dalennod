@@ -63,21 +63,19 @@ func whereConfigLog() {
 	fmt.Printf("Error logs directory: %s\n", logDir)
 }
 
-func enableLogs() (string, string, error) {
+func enableLogs() {
 	logger.Enable()
 
 	cfgDir, err := setup.ConfigDir()
 	if err != nil {
-		return "", "", err
+		logger.Warn.Println("error getting config directory. ERROR:", err)
 	}
 
 	logDir, err := setup.CacheDir()
 	if err != nil {
-		return "", "", err
+		logger.Info.Println("error getting cache directory. ERROR:", err)
 	}
 
 	logger.Info.Printf("Database and config directory: %s\n", cfgDir)
 	logger.Info.Printf("Error logs directory: %s\n", logDir)
-
-	return cfgDir, logDir, nil
 }
