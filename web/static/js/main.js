@@ -20,9 +20,7 @@ const getOldData = async (ele) => {
 
     const res = await fetch(fetchURL);
     const oldData = await res.json();
-    if (typeof Storage !== "undefined") {
-        localStorage.setItem("oldData", JSON.stringify(oldData));
-    }
+    if (typeof Storage !== "undefined") localStorage.setItem("oldData", JSON.stringify(oldData));
     setOldData();
 };
 
@@ -57,7 +55,7 @@ const updateEntry = async () => {
         newDataJSON.archive = true;
         newDataJSON.snapshotURL = oldData.snapshotURL;
     }
-    
+
     const updateButton = document.getElementById("button-update-req");
     updateButton.disabled = true;
 
@@ -94,10 +92,8 @@ const addEntry = async () => {
         archive: document.getElementById("create-archive").checked ? true : false,
     };
 
-    if (dataJSON.archive) {
-        document.getElementById("create-archive-warn").removeAttribute("hidden");
-    }
-    
+    if (dataJSON.archive) document.getElementById("create-archive-warn").removeAttribute("hidden");
+
     const addButton = document.getElementById("button-add-req");
     addButton.disabled = true;
 
@@ -120,20 +116,9 @@ const addEntry = async () => {
 };
 
 let changeToImportTimeout = "";
-const changeToImport = () => {
-    changeToImportTimeout = setTimeout(() => showImportPage(), 5000);
-    return;
-};
-
-const showImportPage = () => {
-    document.location.href = ROOT_ENDPOINT + "import/";
-    return;
-};
-
-const clearImportTimeout = () => {
-    clearTimeout(changeToImportTimeout);
-    return;
-};
+const changeToImport = () => changeToImportTimeout = setTimeout(() => showImportPage(), 5000);
+const showImportPage = () => document.location.href = ROOT_ENDPOINT + "import/";
+const clearImportTimeout = () => clearTimeout(changeToImportTimeout);
 
 const archiveCheckbox = () => {
     const createArchive = document.getElementById("create-archive");

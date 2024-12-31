@@ -5,7 +5,6 @@ import (
 	"dalennod/internal/logger"
 	"dalennod/internal/setup"
 	"net/http"
-	"net/url"
 )
 
 func findSearchTerm(r *http.Request) (string, error) {
@@ -23,14 +22,6 @@ func searchHandler(w http.ResponseWriter, r *http.Request) {
 		searchTerm, err := findSearchTerm(r)
 		if err != nil {
 			logger.Error.Println("error getting search term. ERROR:", err)
-		}
-
-		if searchTerm == "" {
-			rootHandler(w, &http.Request{
-				Method: http.MethodGet,
-				Form:   make(url.Values),
-			})
-			return
 		}
 
 		var bookmarks []setup.Bookmark = db.ViewAllWhere(database, searchTerm)

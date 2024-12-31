@@ -15,7 +15,7 @@
 <body>
     <nav>
         <form class="search-form" hx-post="/api/search/">
-            <input autofocus type="text" name="searchTerm" class="input-search" hx-target="main" hx-post="/api/search/" placeholder="Search a keyword..." />
+            <input autofocus type="text" name="searchTerm" class="input-search" placeholder="Search a keyword..." />
             <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search/" title="Search">
                 <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button" />
             </button>
@@ -52,7 +52,7 @@
                         {{ $hostname := getHostname .URL }}
                         <form hx-post="/api/search-hostname/">
                             <input hidden name="searchTerm" value="{{ $hostname }}" />
-                            <button type="submit" hx-target="main" hx-post="/api/search-hostname/" class="button-hostname bm-hostname" title="Search for this host" tabindex="-1"> {{ $hostname }} </button>
+                            <button type="submit" hx-target="main" hx-post="/api/search-hostname/" class="button-hostname bm-hostname" title="Search for this host" tabindex="-1">{{ $hostname }}</button>
                         </form>
                     </div>
                     {{ if .Title }}
@@ -74,7 +74,7 @@
                     {{ end }}
                     {{ if .Keywords }}
                     <div class="pad-like-p">
-                        {{ $keywords := keywordSplit .Keywords "," }} 
+                        {{ $keywords := keywordSplit .Keywords "," }}
                         {{ range $_, $keyword := $keywords}}
                         <div class="bm-keywords">
                             <form hx-post="/api/search-keyword/">
@@ -196,10 +196,10 @@
     </dialog>
 </body>
 </html>
-{{ end }} 
+{{ end }}
 
-{{ define "curr_groups" }} 
+{{ define "curr_groups" }}
 {{ range .AllGroups }}
 <option value="{{ . }}"></option>
-{{ end }} 
+{{ end }}
 {{ end }}
