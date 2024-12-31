@@ -11,7 +11,6 @@ const handleFileSelect = async (event) => {
     const formData = new FormData();
     formData.append("importFile", file);
     formData.append("selectedBrowser", selectedBrowser.value);
-    console.log(formData);
     try {
         const response = await fetch(url, {
             method: "POST",
@@ -19,9 +18,7 @@ const handleFileSelect = async (event) => {
         });
         const result = await response.text();
         if (!response.ok) {
-            updateLog(
-                `http error. Status: ${response.status}. HTTP reply: ${result}`,
-            );
+            updateLog(`http error. Status: ${response.status}. HTTP reply: ${result}`);
             return;
         }
         updateLog("File uploaded successfully.");
@@ -50,9 +47,7 @@ const updateLog = (message) => {
 let selectedBrowser = document.querySelector("input[name='browser']:checked");
 document.getElementById("browserForm").addEventListener("change", () => {
     selectedBrowser = document.querySelector("input[name='browser']:checked");
-    if (selectedBrowser) {
-        updateLog(`Selected Browser: ${selectedBrowser.value}`);
-    }
+    if (selectedBrowser) updateLog(`Selected Browser: ${selectedBrowser.value}`);
 });
 
 const fileInput = document.getElementById("fileInput");
