@@ -110,13 +110,12 @@
             {{ end }}
         </div>
         {{ end }}
-        <br />
-        <div class="pagination center-text">
-            <a href="/?page={{ pageCountDown }}">&laquo;</a>
-            <a href="/?page={{ pageCountUp }}">&raquo;</a>
-        </div>
-        <br />
     </main>
+    <div class="pagination center-text">
+        <a href="/" title="First page">&uuarr;</a>
+        <a href="/?page={{ pageCountDown }}" title="Previous page">&llarr;</a>
+        <a href="/?page={{ pageCountUp }}" title="Next page">&rrarr;</a>
+    </div>
 
     <dialog class="dialog-create">
         <div class="dialog-top">

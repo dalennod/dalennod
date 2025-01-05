@@ -1,6 +1,6 @@
 :root {
-    --light-mode-foreground: #ccc;
-    --light-mode-background: #ddd;
+    --light-mode-foreground: #ddd;
+    --light-mode-background: #eee;
     --light-mode-text: #000;
     --dark-mode-foreground: #232323;
     --dark-mode-background: #131313;
@@ -122,9 +122,8 @@ main {
 
 .grid-view-list {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     grid-gap: 10px;
-    margin-bottom: 0;
 }
 
 .grid-child,
@@ -261,6 +260,10 @@ body:has(dialog[open]) {
     text-align: center;
 }
 
+.pagination {
+    margin: 15px;
+}
+
 .pagination a {
     color: black;
     padding: 8px 16px;
@@ -345,5 +348,11 @@ body:has(dialog[open]) {
 
     .svg-img {
         filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
+    }
+}
+
+@media only screen and (max-width: 1920px) {
+    .grid-view-list {
+        grid-template-columns: repeat(5, 1fr);
     }
 }
