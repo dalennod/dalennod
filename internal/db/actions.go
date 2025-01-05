@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-const PAGE_UPDATE_LIMIT = 50
+const PAGE_UPDATE_LIMIT = 60
 
 func Add(database *sql.DB, bmStruct setup.Bookmark) {
 	if bmStruct.ThumbURL == "" || len(bmStruct.ByteThumbURL) == 0 {
