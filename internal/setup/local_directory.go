@@ -2,7 +2,6 @@ package setup
 
 import (
 	"log"
-
 	"os"
 	"runtime"
 )
@@ -34,8 +33,7 @@ func GetOS() string {
 	switch goos {
 	case "linux", "darwin":
 		createDir(cfgDir, dbDir, cacheDir)
-		// TODO: fish (& bash) completion did not work. generated completion using .fish file did not work properly. also, was not able to run individual complete commands using exec() because 'complete' was not recognized. try again later
-		// defer SetCompletion()
+		defer setCompletion()
 	case "windows":
 		createDir(cfgDir, dbDir, cacheDir)
 	default:
