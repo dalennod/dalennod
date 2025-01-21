@@ -31,8 +31,8 @@
             {{ range .Bookmarks }}
             <div class="grid-child" id="{{ .ID }}">
                 <div class="bm-info">
-                    <div class="id-creation">
-                        <p>{{ .ID }}.</p>
+                    <div class="id-creation pad-like-p">
+                        <span>{{ .ID }}.</span>
                         <span>{{ .Modified }}</span>
                     </div>
                     {{ if .ByteThumbURL }}

@@ -88,10 +88,12 @@ func ParseFlags() FlagValues {
 
 func setCompletion() {
 	shell := os.Getenv("SHELL")
-	if !strings.Contains(shell, "fish") {
-		return
+	if strings.Contains(shell, "fish") {
+		fishCompletion()
 	}
+}
 
+func fishCompletion() {
 	homePath, err := os.UserHomeDir()
 	if err != nil {
 		log.Println("error finding home directory. ERROR:", err)
@@ -109,7 +111,6 @@ func setCompletion() {
 
 	fishCompletionPath := filepath.Join(fishLocalPath, "dalennod.fish")
 	if _, err := os.Stat(fishCompletionPath); !os.IsNotExist(err) {
-		fmt.Println("already exists")
 		return
 	}
 
@@ -142,5 +143,4 @@ complete -c dalennod -l dalennod -d "Import bookmarks from exported Dalennod JSO
 	if err != nil {
 		log.Println("error writing to fish completion file. ERROR:", err)
 	}
-
 }

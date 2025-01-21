@@ -34,7 +34,7 @@ dialog,
 
 .drop-area {
     border: 2px dashed var(--global-border-color);
-    border-radius: 8px;
+    border-radius: 2px;
     padding: 20px;
 }
 
@@ -43,7 +43,7 @@ dialog,
     height: 200px;
     resize: none;
     border: 1px solid var(--global-border-color);
-    border-radius: 4px;
+    border-radius: 2px;
     padding: 10px;
     outline: none;
 }
@@ -70,7 +70,7 @@ input[type="text"]:focus {
 }
 
 .button-text {
-    border-radius: 5px;
+    border-radius: 2px;
     cursor: pointer;
     color: var(--light-mode-text);
 }
@@ -107,7 +107,7 @@ nav {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    border-radius: 5px;
+    border-radius: 2px;
 }
 
 .search-form {
@@ -134,7 +134,7 @@ main {
 .grid-child {
     position: relative;
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 2px;
 }
 
 .grid-child a {
@@ -167,7 +167,7 @@ main {
 
 .grid-child .group {
     border: 1px solid var(--global-border-color);
-    border-radius: 5px;
+    border-radius: 2px;
     padding: 3px;
 }
 
@@ -216,7 +216,7 @@ main {
 
 .dialog-inputs {
     padding: 10px;
-    border-radius: 5px;
+    border-radius: 2px;
 }
 
 .dialog-inputs input[type="text"] {
@@ -226,7 +226,7 @@ main {
 
 dialog {
     border: 0.5px solid var(--accent-color);
-    border-radius: 5px;
+    border-radius: 2px;
     padding: 20px;
     min-width: 50%;
     animation: fade-out 0.5s ease-out;
