@@ -17,7 +17,6 @@ const closeUpdateDialog = () => updateDialog.close();
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.id;
     const fetchURL = API_ENDPOINT + "row/" + entryID;
-
     const res = await fetch(fetchURL);
     const oldData = await res.json();
     if (typeof Storage !== "undefined") localStorage.setItem("oldData", JSON.stringify(oldData));
@@ -128,10 +127,48 @@ const archiveCheckbox = () => {
     createArchive.checked ? createArchiveLabel.innerText = "Yes" : createArchiveLabel.innerText = "No";
     updateArchive.checked ? updateArchiveLabel.innerText = "Yes" : updateArchiveLabel.innerText = "No";
     return;
-}
+};
 
 const clearInputs = () => {
     const input = document.querySelectorAll(".uac-input");
     if (input.length === 0) return;
     for (let i = 0; i < input.length; i++) input[i].value = "";
 };
+
+const updatePagination = async () => {
+    const fetchUrl = API_ENDPOINT + "pages/";
+    const res = await fetch(fetchUrl);
+    if (!res.ok) {
+        console.error(res.status);
+        return;
+    }
+    const totalPages = Number(await res.text());
+    const pagesToShow = 5;
+    let currentPage = 0;
+    try { currentPage = Number(window.location.href.split("?")[1].split("=")[1]); } catch (err) { currentPage = 0; }
+    if (currentPage <= 0) document.getElementById("prev-page").style.pointerEvents = "none";
+    if (currentPage === totalPages) document.getElementById("next-page").style.pointerEvents = "none";
+    document.getElementById("last-page").href = `/?page=${totalPages}`
+
+    const paginationNumbers = document.getElementById("pagination-numbers");
+    paginationNumbers.innerHTML = "";
+    if (totalPages <= pagesToShow) {
+        for (let index = 0; index <= totalPages; index++) createPaginationLink(index, currentPage);
+    } else {
+        if (currentPage >= totalPages - 3) {
+            for (let index = totalPages - pagesToShow; index <= totalPages; index++) createPaginationLink(index, currentPage);
+        } else {
+            for (let index = currentPage; index <= currentPage + pagesToShow; index++) createPaginationLink(index, currentPage);
+        }
+    }
+
+    function createPaginationLink(pageNumber, current) {
+        const pageNumberLink = document.createElement("a");
+        pageNumberLink.innerHTML = pageNumber;
+        pageNumberLink.href = `/?page=${pageNumber}`;
+        pageNumberLink.title = `Page ${pageNumber}`;
+        if (pageNumber === current) pageNumberLink.classList.add("active");
+        paginationNumbers.appendChild(pageNumberLink);
+    };
+};
+updatePagination();

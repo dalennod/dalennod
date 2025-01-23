@@ -149,3 +149,12 @@ func groupsHandler(w http.ResponseWriter, r *http.Request) {
 		internalServerErrorHandler(w, r)
 	}
 }
+
+func pagesHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		pageCount := db.TotalPageCount(database)
+		fmt.Fprintln(w, pageCount)
+	} else {
+		internalServerErrorHandler(w, r)
+	}
+}

@@ -55,6 +55,7 @@ func Start(data *sql.DB) {
 	mux.HandleFunc("/api/search-hostname/", searchHostnameHandler)
 	mux.HandleFunc("/api/check-url/", checkUrlHandler)
 	mux.HandleFunc("/api/refetch-thumbnail/{id}", refetchThumbnailHandler)
+	mux.HandleFunc("/api/pages/", pagesHandler)
 
 	logger.Info.Printf("Web-server starting on http://localhost%s/\n", PORT)
 	fmt.Printf("Web-server starting on http://localhost%s/\n", PORT)

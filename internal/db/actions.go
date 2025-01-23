@@ -105,6 +105,20 @@ func Remove(database *sql.DB, id int) {
 	}
 }
 
+func TotalPageCount(database *sql.DB) int {
+	rows, err := database.Query("SELECT COUNT(*) FROM bookmarks;")
+	if err != nil {
+		logger.Error.Println("error getting total page count from database. ERROR:", err)
+	}
+
+	var pageCount int
+	for rows.Next() {
+		rows.Scan(&pageCount)
+	}
+	pageCount = pageCount / PAGE_UPDATE_LIMIT
+	return pageCount
+}
+
 func ViewAllWebUI(database *sql.DB, pageNo int) []setup.Bookmark {
 	var results []setup.Bookmark
 	var result setup.Bookmark

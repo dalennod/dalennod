@@ -95,7 +95,8 @@ button:disabled {
     100% { transform: scale(1.2); }
 }
 
-input[type="checkbox"]:checked {
+input[type="checkbox"]:checked,
+button:active {
     animation: pop 0.3s ease;
 }
 
@@ -274,10 +275,12 @@ body:has(dialog[open]) {
 .pagination a.active {
     background-color: dodgerblue;
     color: black;
+    border-radius: 2px;
 }
 
 .pagination a:hover:not(.active) {
     background-color: var(--light-mode-foreground);
+    border-radius: 2px;
 }
 
 @keyframes fade-in {
