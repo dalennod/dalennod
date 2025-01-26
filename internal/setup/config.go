@@ -14,9 +14,11 @@ const (
 	CFG_FILE string = "config.json"
 )
 
-func CfgSetup(cfgDir string) {
-	if _, err := ReadCfg(); err == nil {
-		return
+// Return first run or not
+func CfgSetup(cfgDir string) bool {
+	readConfig, err := ReadCfg()
+	if !readConfig.FirstRun && err == nil {
+		return false
 	}
 
 	var config CFG = CFG{
@@ -36,6 +38,7 @@ func CfgSetup(cfgDir string) {
 	if _, err = cfgFile.Write(cfgJson); err != nil {
 		log.Println(err)
 	}
+	return true
 }
 
 func ReadCfg() (CFG, error) {

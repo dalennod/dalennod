@@ -18,12 +18,16 @@ func GetOS() string {
 		log.Fatalln(err)
 	}
 
-	cacheDir, err := CacheDir()
+	dbDir, err := DatabaseDir()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	dbDir, err := DatabaseDir()
+	if !CfgSetup(cfgDir) {
+		return dbDir
+	}
+
+	cacheDir, err := CacheDir()
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -40,8 +44,6 @@ func GetOS() string {
 		log.Fatalln("unrecognized OS:", err)
 	}
 
-	CfgSetup(cfgDir)
-
 	return dbDir
 }
 
@@ -50,7 +52,7 @@ func ConfigDir() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return cfgDir + NAME, nil
+	return cfgDir + NAME, nil // start to use filepath.Join
 }
 
 func CacheDir() (string, error) {
