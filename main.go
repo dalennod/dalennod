@@ -20,5 +20,5 @@ func init() {
 }
 
 func main() {
-	user_input.UserInput(setup.CreateDB(setup.GetOS()))
+	user_input.UserInput(setup.CreateDB(setup.InitLocalDirs()))
 }

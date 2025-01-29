@@ -12,7 +12,7 @@ const (
 	DB   string = "db/"
 )
 
-func GetOS() string {
+func setupDirectories() string {
 	cfgDir, err := ConfigDir()
 	if err != nil {
 		log.Fatalln(err)
@@ -23,17 +23,12 @@ func GetOS() string {
 		log.Fatalln(err)
 	}
 
-	if !CfgSetup(cfgDir) {
-		return dbDir
-	}
-
 	cacheDir, err := CacheDir()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	var goos string = runtime.GOOS
-
+	goos := runtime.GOOS
 	switch goos {
 	case "linux", "darwin":
 		createDir(cfgDir, dbDir, cacheDir)
@@ -41,10 +36,32 @@ func GetOS() string {
 	case "windows":
 		createDir(cfgDir, dbDir, cacheDir)
 	default:
-		log.Fatalln("unrecognized OS:", err)
+		log.Fatalln("unrecognized OS:", goos)
 	}
 
+	configSetup(cfgDir)
+
 	return dbDir
+}
+
+func InitLocalDirs() string {
+	databaseDir, err := DatabaseDir()
+	if err != nil {
+		log.Fatalln("error getting database directory. ERROR:", err)
+	}
+	if _, err := os.Stat(databaseDir); os.IsNotExist(err) {
+		databaseDir = setupDirectories()
+	}
+
+	cacheDir, err := CacheDir()
+	if err != nil {
+		log.Fatalln("error getting cache directory. ERROR:", err)
+	}
+	if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
+		setupDirectories()
+	}
+
+	return databaseDir
 }
 
 func ConfigDir() (string, error) {
