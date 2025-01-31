@@ -19,11 +19,13 @@ type FlagValues struct {
 	StartServer bool
 	Backup      bool
 	JSONOut     bool
-	Import      string
-	Firefox     bool
-	Chromium    bool
-	Dalennod    bool
+	Import      bool
+	Firefox     string
+	Chromium    string
+	Dalennod    string
 	Where       bool
+	Profile     bool
+	Switch      string
 }
 
 var flagValues FlagValues
@@ -46,7 +48,9 @@ func cliFlags() {
 		fmt.Fprintln(w, "  -b, --backup\t\tStart backup process")
 		fmt.Fprintln(w, "  --json\t\tPrint entire DB in JSON \n\t\t\t  Use alongside -b, --backup flag")
 		fmt.Fprintln(w, "  --where\t\tPrint config and logs directory path")
-		fmt.Fprintln(w, "  -h, --help\t\tShows this message")
+		fmt.Fprintln(w, "  --profile\t\tShow profile names found in local directory")
+		fmt.Fprintln(w, "  --switch\t\tSwitch profiles \n\t\t\t Must use alongside --profile flag")
+		fmt.Fprintln(w, "  -h, --help\t\tShows help message")
 	}
 
 	flag.BoolVar(&flagValues.StartServer, "s", false, "Start webserver locally for Web UI & Extension")
@@ -71,13 +75,16 @@ func cliFlags() {
 	flag.BoolVar(&flagValues.Backup, "backup", false, "Start backup process")
 	flag.BoolVar(&flagValues.JSONOut, "json", false, "Print entire DB in JSON. Use alongside --backup flag")
 
-	flag.StringVar(&flagValues.Import, "i", "", "Import bookmarks from a browser")
-	flag.StringVar(&flagValues.Import, "import", "", "Import bookmarks from a browser")
-	flag.BoolVar(&flagValues.Firefox, "firefox", false, "Import bookmarks from Firefox. Use alongside -i flag")
-	flag.BoolVar(&flagValues.Chromium, "chromium", false, "Import bookmarks from Chromium. Use alongside -i flag")
-	flag.BoolVar(&flagValues.Dalennod, "dalennod", false, "Import bookmarks exported Dalennod JSON. Use alongside -i flag")
+	flag.BoolVar(&flagValues.Import, "i", false, "Import bookmarks from a browser")
+	flag.BoolVar(&flagValues.Import, "import", false, "Import bookmarks from a browser")
+	flag.StringVar(&flagValues.Firefox, "firefox", "", "Import bookmarks from Firefox. Use alongside -i flag")
+	flag.StringVar(&flagValues.Chromium, "chromium", "", "Import bookmarks from Chromium. Use alongside -i flag")
+	flag.StringVar(&flagValues.Dalennod, "dalennod", "", "Import bookmarks exported Dalennod JSON. Use alongside -i flag")
 
 	flag.BoolVar(&flagValues.Where, "where", false, "Print config and logs directory path")
+
+	flag.BoolVar(&flagValues.Profile, "profile", false, "Show profile names found in local directory")
+	flag.StringVar(&flagValues.Switch, "switch", "", "Switch profiles. Must use alongside --profile flag")
 }
 
 func ParseFlags() FlagValues {
@@ -102,12 +109,14 @@ func fishCompletion() {
 	homePath, err := os.UserHomeDir()
 	if err != nil {
 		log.Println("error finding home directory. ERROR:", err)
+		return
 	}
 
 	fishLocalPath := filepath.Join(homePath, ".local", "share", "fish", "generated_completions")
 	fishLocalStat, err := os.Stat(fishLocalPath)
 	if err != nil {
 		log.Println("error getting fish shell local directory info. ERROR", err)
+		return
 	}
 
 	if !fishLocalStat.IsDir() {
@@ -115,7 +124,7 @@ func fishCompletion() {
 	}
 
 	fishCompletionPath := filepath.Join(fishLocalPath, "dalennod.fish")
-	if _, err := os.Stat(fishCompletionPath); !os.IsNotExist(err) {
+	if _, err := os.Stat(fishCompletionPath); os.IsExist(err) {
 		return
 	}
 
@@ -138,6 +147,8 @@ complete -c dalennod -s s -l serve -d "Start webserver locally for Web UI & Exte
 complete -c dalennod -s h -l help -d "Shows help message"
 complete -c dalennod -l json -d "Print entire DB in JSON. Use alongside -b, --backup flag"
 complete -c dalennod -l where -d "Print config and logs directory path"
+complete -c dalennod -l profile -d "Show profile names found in local directory"
+complete -c dalennod -l switch -d "Switch profiles. Must use alongside --profile flag"
 
 # import options
 complete -c dalennod -s i -l import -d "Import bookmarks from a browser"
@@ -170,7 +181,7 @@ _dalennod() {
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-s --serve -a --add -r --remove -u --update -v --view -V --view-all -i --import --firefox --chromium --dalennod -b --backup --json --where"
+    opts="-s --serve -a --add -r --remove -u --update -v --view -V --view-all -i --import --firefox --chromium --dalennod -b --backup --json --where --profile --switch"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -222,12 +233,15 @@ _arguments -s \
     '(-v,--view)'{-v,--view}'[View specific bookmark using its ID]' \
     '(-V,--view-all)'{-V,--view-all}'[View all bookmarks]' \
     '(-i,--import)'{-i,--import}'[Import bookmarks from a browser]' \
-    '--firefox[Import bookmarks from Firefox. Must use alongside -i option]' \
-    '--chromium[Import bookmarks from Chromium. Must use alongside -i option]' \
-    '--dalennod[Import bookmarks exported Dalennod JSON. Must use alongside -i option]' \
+    '(-h,--help)'{-h,--help}'[Shows help message]' \
+    '--firefox[Import bookmarks from Firefox. Must use alongside -i, --import option]' \
+    '--chromium[Import bookmarks from Chromium. Must use alongside -i, --import option]' \
+    '--dalennod[Import bookmarks exported Dalennod JSON. Must use alongside -i, --import option]' \
     '(-b,--backup)'{-b,--backup}'[Start backup process]' \
-    '--json[Print entire DB in JSON. Use alongside --backup flag]' \
+    '--json[Print entire DB in JSON. Use alongside -b, --backup flag]' \
     '--where[Print config and logs directory path]'
+    '--profile[Show profile names found in local directory]' \
+    '--switch[Switch profiles. Must use alongside --profile flag]'
 `))
 	if err != nil {
 		log.Println("error writing to compdef _dalennod file. ERROR:", err)
