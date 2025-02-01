@@ -1,6 +1,9 @@
 package user_input
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"dalennod/internal/backup"
 	"dalennod/internal/bookmark_import"
 	"dalennod/internal/db"
 	"dalennod/internal/logger"
@@ -11,22 +14,56 @@ import (
 )
 
 func importDalennodInput(file string) {
-	fContent, err := os.ReadFile(file)
-	if err != nil {
-		logger.Error.Fatalln(err)
+	var fContent []byte
+	var err error
+	if setup.FlagVals.Crypt {
+		fContent, err = os.ReadFile(file)
+		if err != nil {
+			fmt.Println("error reading file. ERROR:", err)
+			logger.Error.Fatalln("error reading file. ERROR:", err)
+		}
+		key := backup.GetKey()
+		fContent = decryptAES(fContent, key)
+	} else {
+		fContent, err = os.ReadFile(file)
+		if err != nil {
+			fmt.Println("error reading file. ERROR:", err)
+			logger.Error.Fatalln("error reading file. ERROR:", err)
+		}
 	}
 
 	var importedBookmarks []setup.Bookmark
 	err = json.Unmarshal(fContent, &importedBookmarks)
 	if err != nil {
-		logger.Error.Fatalln(err)
+		fmt.Println("error with json unmarshal. ERROR:", err)
+		logger.Error.Fatalln("error with json unmarshal. ERROR:", err)
 	}
-	var importedBookmarksCount = len(importedBookmarks)
+	importedBookmarksCount := len(importedBookmarks)
 	for i, importedData := range importedBookmarks {
 		db.Add(database, importedData)
 		fmt.Printf("\rAdded %d / %d", i+1, importedBookmarksCount)
 	}
 	fmt.Println()
+}
+
+func decryptAES(data, key []byte) []byte {
+	cipherBlock, err := aes.NewCipher(key)
+	if err != nil {
+		fmt.Println("error getting cipher block. ERROR:", err)
+		logger.Error.Fatalln("error getting cipher block. ERROR:", err)
+	}
+
+	if len(data) < aes.BlockSize {
+		fmt.Println("ERROR: cipher text too short")
+		logger.Error.Fatalln("cipher text too short to import")
+	}
+
+	iv := data[:aes.BlockSize]
+	stream := cipher.NewCFBDecrypter(cipherBlock, iv)
+	plaintext := make([]byte, len(data)-aes.BlockSize)
+	stream.XORKeyStream(plaintext, data[aes.BlockSize:])
+
+	return plaintext
 }
 
 func importFirefoxInput(file string) {
@@ -49,7 +86,7 @@ func importFirefoxInput(file string) {
 		db.Add(database, parsedBookmark)
 		fmt.Printf("\rAdded %d / %d", i+1, parsedBookmarksLength)
 	}
-	fmt.Println("")
+	fmt.Println()
 }
 
 func importChromiumInput(file string) {
@@ -72,5 +109,5 @@ func importChromiumInput(file string) {
 		db.Add(database, parsedBookmark)
 		fmt.Printf("\rAdded %d / %d", i+1, parsedBookmarksLength)
 	}
-	fmt.Println("")
+	fmt.Println()
 }

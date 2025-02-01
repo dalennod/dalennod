@@ -3,7 +3,6 @@ package setup
 import (
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -19,6 +18,7 @@ type FlagValues struct {
 	StartServer bool
 	Backup      bool
 	JSONOut     bool
+	Crypt       bool
 	Import      bool
 	Firefox     string
 	Chromium    string
@@ -28,11 +28,11 @@ type FlagValues struct {
 	Switch      string
 }
 
-var flagValues FlagValues
+var FlagVals FlagValues
 
 func cliFlags() {
 	flag.Usage = func() {
-		var w io.Writer = flag.CommandLine.Output()
+		w := flag.CommandLine.Output()
 		fmt.Fprintln(w, "Usage of dalennod: dalennod [OPTION] ...")
 		fmt.Fprintln(w, "\nOptions:")
 		fmt.Fprintln(w, "  -s, --serve\t\tStart webserver locally for Web UI & Extension")
@@ -47,50 +47,52 @@ func cliFlags() {
 		fmt.Fprintln(w, "  --dalennod\t\tImport bookmarks from exported Dalennod JSON \n\t\t\t  Must use alongside -i, --import option")
 		fmt.Fprintln(w, "  -b, --backup\t\tStart backup process")
 		fmt.Fprintln(w, "  --json\t\tPrint entire DB in JSON \n\t\t\t  Use alongside -b, --backup flag")
+		fmt.Fprintln(w, "  --crypt\t\tEncrypt/decrypt the JSON backup \n\t\t\t  Use alongside --json flag to encrypt \n\t\t\t  Use alongside --import --dalennod to decrypt")
 		fmt.Fprintln(w, "  --where\t\tPrint config and logs directory path")
 		fmt.Fprintln(w, "  --profile\t\tShow profile names found in local directory")
-		fmt.Fprintln(w, "  --switch\t\tSwitch profiles \n\t\t\t Must use alongside --profile flag")
+		fmt.Fprintln(w, "  --switch\t\tSwitch profiles \n\t\t\t  Must use alongside --profile flag")
 		fmt.Fprintln(w, "  -h, --help\t\tShows help message")
 	}
 
-	flag.BoolVar(&flagValues.StartServer, "s", false, "Start webserver locally for Web UI & Extension")
-	flag.BoolVar(&flagValues.StartServer, "serve", false, "Start webserver locally for Web UI & Extension")
+	flag.BoolVar(&FlagVals.StartServer, "s", false, "Start webserver locally for Web UI & Extension")
+	flag.BoolVar(&FlagVals.StartServer, "serve", false, "Start webserver locally for Web UI & Extension")
 
-	flag.StringVar(&flagValues.RemoveID, "r", "", "Remove specific bookmark using its ID")
-	flag.StringVar(&flagValues.RemoveID, "remove", "", "Remove specific bookmark using its ID")
+	flag.StringVar(&FlagVals.RemoveID, "r", "", "Remove specific bookmark using its ID")
+	flag.StringVar(&FlagVals.RemoveID, "remove", "", "Remove specific bookmark using its ID")
 
-	flag.StringVar(&flagValues.UpdateID, "u", "", "Update specific bookmark using its ID")
-	flag.StringVar(&flagValues.UpdateID, "update", "", "Update specific bookmark using its ID")
+	flag.StringVar(&FlagVals.UpdateID, "u", "", "Update specific bookmark using its ID")
+	flag.StringVar(&FlagVals.UpdateID, "update", "", "Update specific bookmark using its ID")
 
-	flag.StringVar(&flagValues.ViewID, "v", "", "View specific bookmark using its ID")
-	flag.StringVar(&flagValues.ViewID, "view", "", "View specific bookmark using its ID")
+	flag.StringVar(&FlagVals.ViewID, "v", "", "View specific bookmark using its ID")
+	flag.StringVar(&FlagVals.ViewID, "view", "", "View specific bookmark using its ID")
 
-	flag.BoolVar(&flagValues.ViewAll, "V", false, "View all bookmarks")
-	flag.BoolVar(&flagValues.ViewAll, "view-all", false, "View all bookmarks")
+	flag.BoolVar(&FlagVals.ViewAll, "V", false, "View all bookmarks")
+	flag.BoolVar(&FlagVals.ViewAll, "view-all", false, "View all bookmarks")
 
-	flag.BoolVar(&flagValues.AddEntry, "a", false, "Add a bookmark entry to the database")
-	flag.BoolVar(&flagValues.AddEntry, "add", false, "Add a bookmark entry to the database")
+	flag.BoolVar(&FlagVals.AddEntry, "a", false, "Add a bookmark entry to the database")
+	flag.BoolVar(&FlagVals.AddEntry, "add", false, "Add a bookmark entry to the database")
 
-	flag.BoolVar(&flagValues.Backup, "b", false, "Start backup process")
-	flag.BoolVar(&flagValues.Backup, "backup", false, "Start backup process")
-	flag.BoolVar(&flagValues.JSONOut, "json", false, "Print entire DB in JSON. Use alongside --backup flag")
+	flag.BoolVar(&FlagVals.Backup, "b", false, "Start backup process")
+	flag.BoolVar(&FlagVals.Backup, "backup", false, "Start backup process")
+	flag.BoolVar(&FlagVals.JSONOut, "json", false, "Print entire DB in JSON. Use alongside --backup flag")
+	flag.BoolVar(&FlagVals.Crypt, "crypt", false, "Encrypt/decrypt the JSON backup. Use alongside --json flag to encrypt or alongside --import --dalennod to decrypt")
 
-	flag.BoolVar(&flagValues.Import, "i", false, "Import bookmarks from a browser")
-	flag.BoolVar(&flagValues.Import, "import", false, "Import bookmarks from a browser")
-	flag.StringVar(&flagValues.Firefox, "firefox", "", "Import bookmarks from Firefox. Use alongside -i flag")
-	flag.StringVar(&flagValues.Chromium, "chromium", "", "Import bookmarks from Chromium. Use alongside -i flag")
-	flag.StringVar(&flagValues.Dalennod, "dalennod", "", "Import bookmarks exported Dalennod JSON. Use alongside -i flag")
+	flag.BoolVar(&FlagVals.Import, "i", false, "Import bookmarks from a browser")
+	flag.BoolVar(&FlagVals.Import, "import", false, "Import bookmarks from a browser")
+	flag.StringVar(&FlagVals.Firefox, "firefox", "", "Import bookmarks from Firefox. Use alongside -i flag")
+	flag.StringVar(&FlagVals.Chromium, "chromium", "", "Import bookmarks from Chromium. Use alongside -i flag")
+	flag.StringVar(&FlagVals.Dalennod, "dalennod", "", "Import bookmarks exported Dalennod JSON. Use alongside -i flag")
 
-	flag.BoolVar(&flagValues.Where, "where", false, "Print config and logs directory path")
+	flag.BoolVar(&FlagVals.Where, "where", false, "Print config and logs directory path")
 
-	flag.BoolVar(&flagValues.Profile, "profile", false, "Show profile names found in local directory")
-	flag.StringVar(&flagValues.Switch, "switch", "", "Switch profiles. Must use alongside --profile flag")
+	flag.BoolVar(&FlagVals.Profile, "profile", false, "Show profile names found in local directory")
+	flag.StringVar(&FlagVals.Switch, "switch", "", "Switch profiles. Must use alongside --profile flag")
 }
 
 func ParseFlags() FlagValues {
 	cliFlags()
 	flag.Parse()
-	return flagValues
+	return FlagVals
 }
 
 func setCompletion() {
@@ -124,10 +126,6 @@ func fishCompletion() {
 	}
 
 	fishCompletionPath := filepath.Join(fishLocalPath, "dalennod.fish")
-	if _, err := os.Stat(fishCompletionPath); os.IsExist(err) {
-		return
-	}
-
 	fishCompletionFile, err := os.Create(fishCompletionPath)
 	if err != nil {
 		log.Println("error creating fish completion file. ERROR:", err)
@@ -146,6 +144,7 @@ complete -c dalennod -s b -l backup -d "Start backup process"
 complete -c dalennod -s s -l serve -d "Start webserver locally for Web UI & Extension"
 complete -c dalennod -s h -l help -d "Shows help message"
 complete -c dalennod -l json -d "Print entire DB in JSON. Use alongside -b, --backup flag"
+complete -c dalennod -l crypt -d "Encrypt/decrypt the JSON backup"
 complete -c dalennod -l where -d "Print config and logs directory path"
 complete -c dalennod -l profile -d "Show profile names found in local directory"
 complete -c dalennod -l switch -d "Switch profiles. Must use alongside --profile flag"
@@ -181,7 +180,7 @@ _dalennod() {
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
     prev="${COMP_WORDS[COMP_CWORD-1]}"
-    opts="-s --serve -a --add -r --remove -u --update -v --view -V --view-all -i --import --firefox --chromium --dalennod -b --backup --json --where --profile --switch"
+    opts="-s --serve -a --add -r --remove -u --update -v --view -V --view-all -i --import --firefox --chromium --dalennod -b --backup --json --crypt --where --profile --switch"
 
     if [[ ${cur} == -* ]] ; then
         COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
@@ -239,6 +238,7 @@ _arguments -s \
     '--dalennod[Import bookmarks exported Dalennod JSON. Must use alongside -i, --import option]' \
     '(-b,--backup)'{-b,--backup}'[Start backup process]' \
     '--json[Print entire DB in JSON. Use alongside -b, --backup flag]' \
+    '--crypt[Encrypt/decrypt the JSON backup]' \
     '--where[Print config and logs directory path]'
     '--profile[Show profile names found in local directory]' \
     '--switch[Switch profiles. Must use alongside --profile flag]'
