@@ -18,20 +18,25 @@ import (
 
 func JSONOut(database *sql.DB) {
 	bookmarkData := db.BackupViewAll(database)
+	if len(bookmarkData) == 0 {
+		fmt.Println("database is empty")
+		logger.Warn.Println("database is empty. exiting to prevent panic")
+		return
+	}
 
 	var jsonData []byte
 	var err error
 	if setup.FlagVals.Crypt {
 		jsonData, err = json.Marshal(bookmarkData)
 		if err != nil {
-			logger.Error.Println("error with json marshal. ERROR:", err)
+			logger.Error.Fatalln("error with json marshal. ERROR:", err)
 		}
 		key := GetKey()
 		jsonData = encryptAES(jsonData, key)
 	} else {
 		jsonData, err = json.MarshalIndent(bookmarkData, "", "\t")
 		if err != nil {
-			logger.Error.Println("error with json marshal & indent. ERROR:", err)
+			logger.Error.Fatalln("error with json marshal & indent. ERROR:", err)
 		}
 	}
 
@@ -75,6 +80,5 @@ func encryptAES(plaintext, key []byte) []byte {
 	stream := cipher.NewCFBEncrypter(cipherBlock, iv)
 	stream.XORKeyStream(out[aes.BlockSize:], plaintext)
 
-	// cipherBlock.Encrypt(out, plaintext)
 	return out
 }
