@@ -30,6 +30,18 @@ type FlagValues struct {
 
 var FlagVals FlagValues
 
+func ParseFlags() FlagValues {
+	cliFlags()
+	flag.Parse()
+
+	if len(os.Args) <= 1 {
+		flag.Usage()
+		os.Exit(0)
+	}
+
+	return FlagVals
+}
+
 func cliFlags() {
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
@@ -41,17 +53,17 @@ func cliFlags() {
 		fmt.Fprintln(w, "  -u, --update [id]\tUpdate specific bookmark using its ID")
 		fmt.Fprintln(w, "  -v, --view [id]\tView specific bookmark using its ID")
 		fmt.Fprintln(w, "  -V, --view-all\tView all bookmarks")
-		fmt.Fprintln(w, "  -i, --import [file]\tImport bookmarks from a browser")
-		fmt.Fprintln(w, "  --firefox\t\tImport bookmarks from Firefox \n\t\t\t  Must use alongside -i, --import option")
-		fmt.Fprintln(w, "  --chromium\t\tImport bookmarks from Chromium \n\t\t\t  Must use alongside -i, --import option")
-		fmt.Fprintln(w, "  --dalennod\t\tImport bookmarks from exported Dalennod JSON \n\t\t\t  Must use alongside -i, --import option")
+		fmt.Fprintln(w, "  -i, --import\t\tImport bookmarks from a browser")
+		fmt.Fprintln(w, "  --firefox [file]\tImport bookmarks from Firefox \n\t\t\t  Must use alongside -i, --import option")
+		fmt.Fprintln(w, "  --chromium [file]\tImport bookmarks from Chromium \n\t\t\t  Must use alongside -i, --import option")
+		fmt.Fprintln(w, "  --dalennod [file]\tImport bookmarks from exported Dalennod JSON \n\t\t\t  Must use alongside -i, --import option")
 		fmt.Fprintln(w, "  -b, --backup\t\tStart backup process")
 		fmt.Fprintln(w, "  --json\t\tPrint entire DB in JSON \n\t\t\t  Use alongside -b, --backup flag")
 		fmt.Fprintln(w, "  --crypt\t\tEncrypt/decrypt the JSON backup \n\t\t\t  Use alongside --json flag to encrypt \n\t\t\t  Use alongside --import --dalennod to decrypt")
 		fmt.Fprintln(w, "  --where\t\tPrint config and logs directory path")
 		fmt.Fprintln(w, "  --profile\t\tShow profile names found in local directory")
 		fmt.Fprintln(w, "  --switch\t\tSwitch profiles \n\t\t\t  Must use alongside --profile flag")
-		fmt.Fprintln(w, "  -h, --help\t\tShows help message")
+		fmt.Fprintln(w, "  -h, --help\t\tShows this help message")
 	}
 
 	flag.BoolVar(&FlagVals.StartServer, "s", false, "Start webserver locally for Web UI & Extension")
@@ -87,12 +99,6 @@ func cliFlags() {
 
 	flag.BoolVar(&FlagVals.Profile, "profile", false, "Show profile names found in local directory")
 	flag.StringVar(&FlagVals.Switch, "switch", "", "Switch profiles. Must use alongside --profile flag")
-}
-
-func ParseFlags() FlagValues {
-	cliFlags()
-	flag.Parse()
-	return FlagVals
 }
 
 func setCompletion() {
