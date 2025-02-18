@@ -13,43 +13,39 @@ import (
 	"strings"
 )
 
-var (
-	database *sql.DB
-	flagVals setup.FlagValues
-)
+var database *sql.DB
 
-func UserInput(data *sql.DB) {
+func UserInput(bookmark_database *sql.DB) {
 	enableLogs()
-	database = data
+	database = bookmark_database
 
-	flagVals = setup.ParseFlags()
 	switch {
-	case flagVals.StartServer:
+	case setup.FlagVals.StartServer:
 		server.Start(database)
-	case flagVals.Where:
+	case setup.FlagVals.Where:
 		whereConfigLog()
-	case flagVals.ViewAll:
+	case setup.FlagVals.ViewAll:
 		db.ViewAll(database, false)
-	case flagVals.ViewID != "":
-		viewInput(flagVals.ViewID)
-	case flagVals.RemoveID != "":
-		removeInput(flagVals.RemoveID)
-	case flagVals.AddEntry:
+	case setup.FlagVals.ViewID != "":
+		viewInput(setup.FlagVals.ViewID)
+	case setup.FlagVals.RemoveID != "":
+		removeInput(setup.FlagVals.RemoveID)
+	case setup.FlagVals.AddEntry:
 		addInput(setup.Bookmark{}, false)
-	case flagVals.UpdateID != "":
-		updateInput(flagVals.UpdateID)
-	case flagVals.Profile && flagVals.Switch == "":
+	case setup.FlagVals.UpdateID != "":
+		updateInput(setup.FlagVals.UpdateID)
+	case setup.FlagVals.Profile && setup.FlagVals.Switch == "":
 		showProfiles()
-	case flagVals.Profile && flagVals.Switch != "":
-		switchProfile(flagVals.Switch)
-	case flagVals.Backup && flagVals.JSONOut:
+	case setup.FlagVals.Profile && setup.FlagVals.Switch != "":
+		switchProfile(setup.FlagVals.Switch)
+	case setup.FlagVals.Backup && setup.FlagVals.JSONOut:
 		backup.JSONOut(database)
-	case flagVals.Import && flagVals.Firefox != "":
-		importFirefoxInput(flagVals.Firefox)
-	case flagVals.Import && flagVals.Chromium != "":
-		importChromiumInput(flagVals.Chromium)
-	case flagVals.Import && flagVals.Dalennod != "":
-		importDalennodInput(flagVals.Dalennod)
+	case setup.FlagVals.Import && setup.FlagVals.Firefox != "":
+		importFirefoxInput(setup.FlagVals.Firefox)
+	case setup.FlagVals.Import && setup.FlagVals.Chromium != "":
+		importChromiumInput(setup.FlagVals.Chromium)
+	case setup.FlagVals.Import && setup.FlagVals.Dalennod != "":
+		importDalennodInput(setup.FlagVals.Dalennod)
 	}
 }
 
