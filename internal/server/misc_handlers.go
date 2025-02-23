@@ -36,6 +36,7 @@ func rowHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		w.Write([]byte(writeData))
 	} else {
 		internalServerErrorHandler(w, r)
@@ -135,12 +136,11 @@ func groupsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "*")
 	if r.Method == http.MethodGet {
-		var currGroups map[string]interface{} = make(map[string]interface{})
 		listCurrGroups, err := db.GetAllGroups(database)
 		if err != nil {
-			logger.Error.Println(err)
+			logger.Error.Println("error getting groups. ERROR:", err)
+			return
 		}
-		currGroups["AllGroups"] = listCurrGroups
 
 		for _, group := range listCurrGroups {
 			fmt.Fprintf(w, "<option value=\"%s\"></option>", group)

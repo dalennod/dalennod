@@ -15,15 +15,5 @@ Dalennod is a bookmark manager written using Go. It allows users to save notes a
 - Easy on system resources and very distributable as the entire application is a singular binary.
 
 ### Screenshots:
-
-<details>
-<summary>Web UI:</summary>
-
-![Web UI](/screenshots/web-ui.png)
-</details>
-
-<details>
-<summary>Browser Extension:</summary>
-
-![Browser extension](/screenshots/ff-ext.png)
-</details>
+- [Web UI](screenshots/web-ui.png)
+- [Browser extension](screenshots/ff-ext.png)

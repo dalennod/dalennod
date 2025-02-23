@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <script>let FOUCFix;</script>
     <link rel="icon" href="static/imgs/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="static/css/styles.css" />
     <script src="static/js/htmx.min.js" type="text/javascript" defer></script>
@@ -20,7 +19,7 @@
                 <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button" />
             </button>
         </form>
-        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();" onmouseenter="changeToImport();" onmouseleave="clearImportTimeout();" hx-target="#bmGroups-list" hx-get="/api/groups/">
+        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();" onmouseenter="changeToImport();" onmouseleave="clearImportTimeout();" hx-target="#bmGroups-list-create" hx-get="/api/groups/">
             <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button" />
         </button>
     </nav>
@@ -32,7 +31,7 @@
             <div class="grid-child" id="{{ .ID }}">
                 <div class="bm-info">
                     <div class="id-creation pad-like-p">
-                        <span>{{ .ID }}.</span>
+                        <a href="/api/row/{{ .ID }}" target="_blank">{{ .ID }}.</a>
                         <span>{{ .Modified }}</span>
                     </div>
                     {{ if .ByteThumbURL }}
@@ -99,7 +98,7 @@
                     </div>
                 </div>
                 <div id="buttons" class="buttons">
-                    <button class="button-svg" id="button-update" onclick="getOldData(this);" hx-target="#bmGroups-list" hx-get="/api/groups/" title="Update">
+                    <button class="button-svg" id="button-update" onclick="getOldData(this);" hx-target="#bmGroups-list-update" hx-get="/api/groups/" title="Update">
                         <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
                     </button>
                     <button class="button-svg" id="button-delete" hx-target="body" hx-get="/?page={{ pageCountNowDelete }}" hx-trigger="dblclick" title="Delete">
@@ -136,8 +135,8 @@
                 Keywords:<br /><input type="text" class="uac-input" id="create-keywords" placeholder="Keywords, to, search, bookmark" />
             </div>
             <div class="pad-like-p">
-                Group:<br /><input type="text" class="uac-input" id="create-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list" />
-                <datalist id="bmGroups-list">{{ template "curr_groups" . }}</datalist>
+                Group:<br /><input type="text" class="uac-input" id="create-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list-create" />
+                <datalist id="bmGroups-list-create"></datalist>
             </div>
             <div class="pad-like-p">
                 Archive?:
@@ -175,8 +174,8 @@
                 Keywords:<br /><input type="text" class="uac-input" id="update-keywords" placeholder="Keywords, to, search, bookmark" />
             </div>
             <div class="pad-like-p">
-                Group:<br /><input type="text" class="uac-input" id="update-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list" />
-                <datalist id="bmGroups-list">{{ template "curr_groups" . }}</datalist>
+                Group:<br /><input type="text" class="uac-input" id="update-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list-update" />
+                <datalist id="bmGroups-list-update"></datalist>
             </div>
             <div class="pad-like-p" id="update-archive-div">
                 Archive?:
@@ -193,10 +192,4 @@
     </dialog>
 </body>
 </html>
-{{ end }}
-
-{{ define "curr_groups" }}
-{{ range .AllGroups }}
-<option value="{{ . }}"></option>
-{{ end }}
 {{ end }}
