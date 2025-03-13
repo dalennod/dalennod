@@ -192,16 +192,6 @@ func viewAllInput(bookmarks []setup.Bookmark) {
     }
 
     for _, bookmark := range bookmarks {
-        // fmt.Printf("    #%d -- %s\nTitle:\t\t%s\nURL:\t\t%s\nNote:\t\t%s\nKeywords:\t%s\nGroup:\t\t%s\nArchived?:\t%t\nArchive URL:\t%s\n\n",
-        //     bookmark.ID,
-        //     bookmark.Modified,
-        //     bookmark.Title,
-        //     bookmark.URL,
-        //     bookmark.Note,
-        //     bookmark.Keywords,
-        //     bookmark.BmGroup,
-        //     bookmark.Archived,
-        //     bookmark.SnapshotURL)
         db.PrintRow(bookmark)
     }
 }

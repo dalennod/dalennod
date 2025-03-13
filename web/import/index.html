@@ -1,36 +1,36 @@
 {{ block "import" . }}
 <!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" href="../static/imgs/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="../static/css/styles.css" />
     <script src="../static/js/import-script.js" type="text/javascript" defer></script>
     <title>Import // Dalennod</title>
-</head>
+  </head>
 
-<body>
+  <body>
     <div style="padding: 20px">
-        <a href="../"><button class="button-text">Back</button></a>
-        <h2>Browser the bookmarks are being imported from:</h2>
-        <form id="browserForm">
-            <input type="radio" id="firefox" name="browser" value="Firefox" checked />
-            <label for="firefox">Firefox</label><br />
-            <input type="radio" id="chromium" name="browser" value="Chromium" />
-            <label for="chromium">Chromium</label><br />
-        </form>
+      <a href="../"><button class="button-text">Back</button></a>
+      <h2>Browser the bookmarks are being imported from:</h2>
+      <form id="browserForm">
+        <input type="radio" id="firefox" name="browser" value="Firefox" checked />
+        <label for="firefox">Firefox</label><br />
+        <input type="radio" id="chromium" name="browser" value="Chromium" />
+        <label for="chromium">Chromium</label><br />
+      </form>
     </div>
 
     <div class="container">
-        <form method="post" enctype="multipart/form-data">
-            <div id="dropArea" class="drop-area">
-                <input type="file" id="fileInput" name="fileInput" accept=".json" />
-            </div>
-        </form>
-        <h2>Import log:</h2>
-        <textarea id="logTextArea" class="logTextArea" readonly></textarea>
+      <form method="post" enctype="multipart/form-data">
+        <div id="dropArea" class="drop-area">
+          <input type="file" id="fileInput" name="fileInput" accept=".json" />
+        </div>
+      </form>
+      <h2>Import log:</h2>
+      <textarea id="logTextArea" class="logTextArea" readonly></textarea>
     </div>
-</body>
+  </body>
 </html>
 {{ end }}
