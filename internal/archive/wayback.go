@@ -37,7 +37,6 @@ func checkURL(url string) bool {
     defer res.Body.Close()
 
     if res != nil {
-        defer res.Body.Close()
         return true
     } else {
         return false

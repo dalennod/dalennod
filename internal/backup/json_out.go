@@ -54,13 +54,25 @@ func JSONOut(database *sql.DB) {
 }
 
 func GetKey() []byte {
-    fmt.Print("Enter lock/unlock key (min 16 chars): ")
+    fmt.Print("Enter lock/unlock key: ")
     key, err := term.ReadPassword(0)
     if err != nil {
         fmt.Println("error reading key. ERROR:", err)
         logger.Error.Fatalln("error reading key. ERROR:", err)
     }
     fmt.Println()
+
+    var (
+        keyLength int = len(key)
+        maxBytes int = 32
+        zeroDecimal byte = 48
+    )
+    if keyLength < maxBytes && keyLength != 0 {
+        for i := keyLength; i < maxBytes; i++ {
+            key = append(key, zeroDecimal)
+        }
+    }
+
     return key
 }
 
