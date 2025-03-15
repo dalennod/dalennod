@@ -29,7 +29,8 @@ func Start(data *sql.DB) {
     var fsopen fs.FS = fs.FS(Web)
     webStatic, err := fs.Sub(fsopen, "web/static")
     if err != nil {
-        logger.Error.Fatalln(err)
+        fmt.Println("error when opening embedded 'web' directory. ERROR:", err)
+        logger.Error.Fatalln("error when opening embedded 'web' directory. ERROR:", err)
     }
     mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webStatic))))
 
@@ -61,7 +62,7 @@ func Start(data *sql.DB) {
     fmt.Printf("Web-server starting on http://localhost%s/\n", PORT)
 
     if err := http.ListenAndServe(PORT, mux); err != nil {
-        fmt.Printf("Stopping (error: %v)\n", err)
-        logger.Error.Printf("Stopping (error: %v)\n", err)
+        fmt.Println("Stopping. ERROR:", err)
+        logger.Error.Fatalln("Stopping. ERROR:", err)
     }
 }

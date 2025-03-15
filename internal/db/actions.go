@@ -9,14 +9,17 @@ import (
     "time"
 )
 
-const PAGE_UPDATE_LIMIT = 60
+const (
+    PAGE_UPDATE_LIMIT int    = 60
+    TIME_FORMAT       string = "2006-01-02 15:04:05"
+)
 
 func Add(database *sql.DB, bmStruct setup.Bookmark) {
     if bmStruct.ThumbURL == "" || len(bmStruct.ByteThumbURL) == 0 {
         var err error
         bmStruct.ThumbURL, bmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
         if err != nil {
-            logger.Error.Println("error getting page thumbnail. ERROR:", err)
+            logger.Error.Println("error getting webpage thumbnail. ERROR:", err)
         }
     }
 
@@ -40,19 +43,22 @@ func Update(database *sql.DB, bmStruct setup.Bookmark, serverCall bool) {
 
     stmt, err := database.Prepare("UPDATE bookmarks SET url=(?), title=(?), note=(?), keywords=(?), bmGroup=(?), archived=(?), snapshotURL=(?), thumbURL=(?), byteThumbURL=(?) WHERE id=(?);")
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error preparing database statement. ERROR:", err)
+        return
     }
 
     _, err = stmt.Exec(bmStruct.URL, bmStruct.Title, bmStruct.Note, bmStruct.Keywords, bmStruct.BmGroup, bmStruct.Archived, bmStruct.SnapshotURL, bmStruct.ThumbURL, bmStruct.ByteThumbURL, bmStruct.ID)
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error executing database statement. ERROR:", err)
+        return
     }
 }
 
 func updateCheck(database *sql.DB, bmStruct setup.Bookmark) setup.Bookmark {
     oldBmData, err := ViewSingleRow(database, bmStruct.ID)
     if err != nil {
-        logger.Error.Println(err)
+        logger.Error.Printf("error getting bookmark row data at ID %d. ERROR: %v\n", bmStruct.ID, err)
+        return bmStruct
     }
 
     if bmStruct.URL == "" {
@@ -77,14 +83,14 @@ func updateCheck(database *sql.DB, bmStruct setup.Bookmark) setup.Bookmark {
 func RefetchThumbnail(database *sql.DB, id int, thumbnail []byte) error {
     bmStruct, err := ViewSingleRow(database, id)
     if err != nil {
-        logger.Error.Println("error getting single row. ERROR:", err)
+        logger.Error.Printf("error getting bookmark row data at ID %d. ERROR: %v\n", id, err)
         return err
     }
 
     if thumbnail == nil {
         bmStruct.ThumbURL, bmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
         if err != nil {
-            logger.Error.Println("error getting thumbnail. ERROR:", err)
+            logger.Error.Println("error getting webpage thumbnail. ERROR:", err)
             return err
         }
     } else {
@@ -98,20 +104,22 @@ func RefetchThumbnail(database *sql.DB, id int, thumbnail []byte) error {
 func Remove(database *sql.DB, id int) {
     stmt, err := database.Prepare("DELETE FROM bookmarks WHERE id=(?);")
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error preparing database statement. ERROR:", err)
+        return
     }
 
     _, err = stmt.Exec(id)
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error executing database statement. ERROR:", err)
+        return
     }
 }
 
 func TotalPageCount(database *sql.DB) int {
     rows, err := database.Query("SELECT COUNT(*) FROM bookmarks;")
     if err != nil {
-        logger.Error.Println("error getting total page count from database. ERROR:", err)
-        return 0
+        logger.Error.Println("error getting total count from database. ERROR:", err)
+        return -1
     }
 
     var pageCount int
@@ -129,32 +137,22 @@ func ViewAllWebUI(database *sql.DB, pageNo int) []setup.Bookmark {
 
     stmt, err := database.Prepare("SELECT * FROM bookmarks ORDER BY id DESC LIMIT (?) OFFSET (?);")
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error preparing database statement. ERROR:", err)
+        return results
     }
 
     pageOffset := pageNo * PAGE_UPDATE_LIMIT
 
     rows, err := stmt.Query(PAGE_UPDATE_LIMIT, pageOffset)
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error executing database statement. ERROR:", err)
+        return results
     }
 
     for rows.Next() {
         result = setup.Bookmark{}
         rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        results = append(results, setup.Bookmark{
-            ID:           result.ID,
-            URL:          result.URL,
-            Title:        result.Title,
-            Note:         result.Note,
-            Keywords:     result.Keywords,
-            BmGroup:      result.BmGroup,
-            Archived:     result.Archived,
-            SnapshotURL:  result.SnapshotURL,
-            ThumbURL:     result.ThumbURL,
-            ByteThumbURL: result.ByteThumbURL,
-            Modified:     modified.Local().Format("2006-01-02 15:04:05"),
-        })
+        appendBookmarks(&results, result, modified)
     }
     return results
 }
@@ -166,25 +164,14 @@ func ViewAll(database *sql.DB) []setup.Bookmark {
 
     rows, err := database.Query("SELECT * FROM bookmarks ORDER BY id DESC;")
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error executing database statement. ERROR:", err)
+        return results
     }
 
     for rows.Next() {
         result = setup.Bookmark{}
         rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        results = append(results, setup.Bookmark{
-            ID:           result.ID,
-            URL:          result.URL,
-            Title:        result.Title,
-            Note:         result.Note,
-            Keywords:     result.Keywords,
-            BmGroup:      result.BmGroup,
-            Archived:     result.Archived,
-            SnapshotURL:  result.SnapshotURL,
-            ThumbURL:     result.ThumbURL,
-            ByteThumbURL: result.ByteThumbURL,
-            Modified:     modified.Local().Format("2006-01-02 15:04:05"),
-        })
+        appendBookmarks(&results, result, modified)
     }
     return results
 }
@@ -196,13 +183,14 @@ func BackupViewAll(database *sql.DB) []setup.Bookmark {
 
     rows, err := database.Query("SELECT * FROM bookmarks ORDER BY id;")
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error executing database statement. ERROR:", err)
+        return results
     }
 
     for rows.Next() {
         result = setup.Bookmark{}
         rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BmGroup: result.BmGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, ByteThumbURL: result.ByteThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+        appendBookmarks(&results, result, modified)
     }
     return results
 }
@@ -219,18 +207,20 @@ func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
 
     stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) or bmGroup LIKE (?) or note LIKE (?) or title LIKE (?) or url LIKE (?) ORDER BY id DESC;")
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error preparing database statement. ERROR:", err)
+        return results
     }
 
     execRes, err := stmt.Query(keyword, keyword, keyword, keyword, keyword)
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error executing database statement. ERROR:", err)
+        return results
     }
 
     for execRes.Next() {
         result = setup.Bookmark{}
         execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BmGroup: result.BmGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, ByteThumbURL: result.ByteThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+        appendBookmarks(&results, result, modified)
     }
 
     return results
@@ -245,18 +235,20 @@ func ViewAllWhereKeyword(database *sql.DB, keyword string) []setup.Bookmark {
 
     stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) ORDER BY id DESC;")
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error preparing database statement. ERROR:", err)
+        return results
     }
 
     execRes, err := stmt.Query(keyword)
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error executing database statement. ERROR:", err)
+        return results
     }
 
     for execRes.Next() {
         result = setup.Bookmark{}
         execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BmGroup: result.BmGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, ByteThumbURL: result.ByteThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+        appendBookmarks(&results, result, modified)
     }
 
     return results
@@ -271,18 +263,20 @@ func ViewAllWhereGroup(database *sql.DB, keyword string) []setup.Bookmark {
 
     stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE bmGroup LIKE (?) ORDER BY id DESC;")
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error preparing database statement. ERROR:", err)
+        return results
     }
 
     execRes, err := stmt.Query(keyword)
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error executing database statement. ERROR:", err)
+        return results
     }
 
     for execRes.Next() {
         result = setup.Bookmark{}
         execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BmGroup: result.BmGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, ByteThumbURL: result.ByteThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+        appendBookmarks(&results, result, modified)
     }
 
     return results
@@ -297,18 +291,20 @@ func ViewAllWhereHostname(database *sql.DB, hostname string) []setup.Bookmark {
 
     stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC;")
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error preparing database statement. ERROR:", err)
+        return results
     }
 
     execRes, err := stmt.Query(hostname)
     if err != nil {
-        logger.Error.Fatalln(err)
+        logger.Error.Println("error executing database statement. ERROR:", err)
+        return results
     }
 
     for execRes.Next() {
         result = setup.Bookmark{}
         execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        results = append(results, setup.Bookmark{ID: result.ID, URL: result.URL, Title: result.Title, Note: result.Note, Keywords: result.Keywords, BmGroup: result.BmGroup, Archived: result.Archived, SnapshotURL: result.SnapshotURL, ThumbURL: result.ThumbURL, ByteThumbURL: result.ByteThumbURL, Modified: modified.Local().Format("2006-01-02 15:04:05")})
+        appendBookmarks(&results, result, modified)
     }
 
     return results
@@ -329,7 +325,8 @@ func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
     }
 
     for execRes.Next() {
-        err = execRes.Scan(&rowResult.ID,
+        if err = execRes.Scan(
+            &rowResult.ID,
             &rowResult.URL,
             &rowResult.Title,
             &rowResult.Note,
@@ -340,11 +337,10 @@ func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
             &rowResult.ThumbURL,
             &rowResult.ByteThumbURL,
             &modified,
-        )
-        if err != nil {
+        ); err != nil {
             return rowResult, err
         }
-        rowResult.Modified = modified.Local().Format("2006-01-02 15:04:05")
+        rowResult.Modified = modified.Local().Format(TIME_FORMAT)
     }
 
     if rowResult.URL == "" {
@@ -355,25 +351,37 @@ func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
 }
 
 func SearchByUrl(database *sql.DB, searchUrl string) (setup.Bookmark, error) {
-    var foundBookmark setup.Bookmark
+    var urlResult setup.Bookmark
 
     stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE url=(?);")
     if err != nil {
-        return foundBookmark, err
+        return urlResult, err
     }
+
     execRes, err := stmt.Query(searchUrl)
     if err != nil {
-        return foundBookmark, err
+        return urlResult, err
     }
 
     for execRes.Next() {
-        var err error = execRes.Scan(&foundBookmark.ID, &foundBookmark.URL, &foundBookmark.Title, &foundBookmark.Note, &foundBookmark.Keywords, &foundBookmark.BmGroup, &foundBookmark.Archived, &foundBookmark.SnapshotURL, &foundBookmark.ThumbURL, &foundBookmark.ByteThumbURL, &foundBookmark.Modified)
-        if err != nil {
-            return foundBookmark, err
+        if err = execRes.Scan(
+            &urlResult.ID,
+            &urlResult.URL,
+            &urlResult.Title,
+            &urlResult.Note,
+            &urlResult.Keywords,
+            &urlResult.BmGroup,
+            &urlResult.Archived,
+            &urlResult.SnapshotURL,
+            &urlResult.ThumbURL,
+            &urlResult.ByteThumbURL,
+            &urlResult.Modified,
+        ); err != nil {
+            return urlResult, err;
         }
     }
 
-    return foundBookmark, nil
+    return urlResult, nil
 }
 
 func GetAllGroups(database *sql.DB) ([]string, error) {
@@ -386,27 +394,12 @@ func GetAllGroups(database *sql.DB) ([]string, error) {
 
     var bmGroup string
     for rows.Next() {
-        var err error = rows.Scan(&bmGroup)
-        if err != nil {
-            logger.Error.Printf("error when scanning row. ERROR: %v", err)
-        }
+        rows.Scan(&bmGroup)
+
         if bmGroup != "" {
             allGroups = append(allGroups, bmGroup)
         }
     }
 
     return allGroups, nil
-}
-
-func PrintRow(bookmarkRow setup.Bookmark) {
-    fmt.Printf("    #%d -- %s\nTitle:\t\t%s\nURL:\t\t%s\nNote:\t\t%s\nKeywords:\t%s\nGroup:\t\t%s\nArchived?:\t%t\nArchive URL:\t%s\n\n",
-        bookmarkRow.ID,
-        bookmarkRow.Modified,
-        bookmarkRow.Title,
-        bookmarkRow.URL,
-        bookmarkRow.Note,
-        bookmarkRow.Keywords,
-        bookmarkRow.BmGroup,
-        bookmarkRow.Archived,
-        bookmarkRow.SnapshotURL)
 }
