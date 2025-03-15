@@ -6,6 +6,7 @@ import (
     "io"
     "log"
     "os"
+    "path/filepath"
 )
 
 var (
@@ -23,7 +24,7 @@ func Enable() {
     if err != nil {
         log.Fatalln(err)
     }
-    fullLogPath := logPath + logFileName
+    fullLogPath := filepath.Join(logPath, logFileName)
 
     if _, err := os.Stat(fullLogPath); errors.Is(err, os.ErrNotExist) {
         logFile = createLogFile(fullLogPath)

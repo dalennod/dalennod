@@ -153,6 +153,13 @@ func enableLogs() {
         logger.Info.Println("error getting cache directory. ERROR:", err)
     }
 
-    logger.Info.Printf("Database and config directory: %s\n", cfgDir)
-    logger.Info.Printf("Error logs directory: %s\n", logDir)
+    readConfig, err := setup.ReadCfg()
+    if err != nil {
+        fmt.Println("error reading config. ERROR:", err)
+    }
+
+    if readConfig.FirstRun {
+        logger.Info.Printf("Database and config directory: %s\n", cfgDir)
+        logger.Info.Printf("Error logs directory: %s\n", logDir)
+    }
 }

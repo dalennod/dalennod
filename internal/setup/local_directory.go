@@ -4,12 +4,13 @@ import (
     "log"
     "os"
     "runtime"
+    "path/filepath"
 )
 
 const (
-    NAME string = "/dalennod/"
-    LOGS string = "logs/"
-    DB   string = "db/"
+    NAME string = "dalennod"
+    LOGS string = "logs"
+    DB   string = "db"
 )
 
 func setupDirectories() string {
@@ -36,7 +37,7 @@ func setupDirectories() string {
     case "windows":
         createDir(cfgDir, dbDir, cacheDir)
     default:
-        log.Fatalln("unrecognized OS:", goos)
+        log.Fatalln("ERROR: unrecognized OS:", goos)
     }
 
     configSetup(cfgDir)
@@ -51,6 +52,14 @@ func InitLocalDirs() string {
     }
     if _, err := os.Stat(databaseDir); os.IsNotExist(err) {
         databaseDir = setupDirectories()
+    } else {
+        readConfig, err := ReadCfg()
+        if err != nil {
+            log.Fatalln("error reading config. ERROR:", err)
+        }
+        if readConfig.FirstRun {
+            WriteCfg(false)
+        }
     }
 
     cacheDir, err := CacheDir()
@@ -69,7 +78,7 @@ func ConfigDir() (string, error) {
     if err != nil {
         return "", err
     }
-    return cfgDir + NAME, nil // start to use filepath.Join
+    return filepath.Join(cfgDir, NAME), nil
 }
 
 func CacheDir() (string, error) {
@@ -77,7 +86,7 @@ func CacheDir() (string, error) {
     if err != nil {
         return "", err
     }
-    return cacheDir + NAME + LOGS, nil
+    return filepath.Join(cacheDir, NAME, LOGS), nil
 }
 
 func DatabaseDir() (string, error) {
@@ -85,7 +94,7 @@ func DatabaseDir() (string, error) {
     if err != nil {
         return "", err
     }
-    return dbDir + DB, nil
+    return filepath.Join(dbDir, DB), nil
 }
 
 func createDir(args ...string) {

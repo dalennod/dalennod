@@ -4,6 +4,7 @@ import (
     "encoding/json"
     "log"
     "os"
+    "path/filepath"
 )
 
 type CFG struct {
@@ -15,15 +16,15 @@ const (
 )
 
 func configSetup(cfgDir string) {
-    var config CFG = CFG{
-        FirstRun: false,
+    config := CFG{
+        FirstRun: true,
     }
     cfgJson, err := json.MarshalIndent(config, "", "\t")
     if err != nil {
         log.Fatalln(err)
     }
 
-    cfgFile, err := os.Create(cfgDir + CFG_FILE)
+    cfgFile, err := os.Create(filepath.Join(cfgDir, CFG_FILE))
     if err != nil {
         log.Fatalln(err)
     }
@@ -42,7 +43,7 @@ func ReadCfg() (CFG, error) {
         return conf, err
     }
 
-    cfgContent, err := os.ReadFile(cfgDir + CFG_FILE)
+    cfgContent, err := os.ReadFile(filepath.Join(cfgDir, CFG_FILE))
     if err != nil {
         return conf, err
     }
@@ -55,9 +56,9 @@ func ReadCfg() (CFG, error) {
     return conf, nil
 }
 
-func WriteCfg(fr bool) error {
-    var config CFG = CFG{
-        FirstRun: fr,
+func WriteCfg(firstRun bool) error {
+    config := CFG{
+        FirstRun: firstRun,
     }
     cfgJson, err := json.MarshalIndent(config, "", "\t")
     if err != nil {
@@ -69,7 +70,7 @@ func WriteCfg(fr bool) error {
         return err
     }
 
-    cfgFile, err := os.Create(cfgDir + CFG_FILE)
+    cfgFile, err := os.Create(filepath.Join(cfgDir, CFG_FILE))
     if err != nil {
         return err
     }

@@ -62,11 +62,11 @@ func GetKey() []byte {
     }
     fmt.Println()
 
-    var (
-        keyLength int = len(key)
+    const (
         maxBytes int = 32
         zeroDecimal byte = 48
     )
+    keyLength := len(key)
     if keyLength < maxBytes && keyLength != 0 {
         for i := keyLength; i < maxBytes; i++ {
             key = append(key, zeroDecimal)
