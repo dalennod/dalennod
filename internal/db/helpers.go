@@ -2,6 +2,7 @@ package db
 
 import (
     "dalennod/internal/setup"
+    "dalennod/internal/constants"
     "fmt"
     "time"
 )
@@ -31,6 +32,6 @@ func appendBookmarks(b *[]setup.Bookmark, info setup.Bookmark, modified time.Tim
         SnapshotURL:  info.SnapshotURL,
         ThumbURL:     info.ThumbURL,
         ByteThumbURL: info.ByteThumbURL,
-        Modified:     modified.Local().Format(TIME_FORMAT),
+        Modified:     modified.Local().Format(constants.TIME_FORMAT),
     })
 }

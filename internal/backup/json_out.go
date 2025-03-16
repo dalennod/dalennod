@@ -64,7 +64,7 @@ func GetKey() []byte {
 
     const (
         maxBytes int = 32
-        zeroDecimal byte = 48
+        zeroDecimal byte = 0x30
     )
     keyLength := len(key)
     if keyLength < maxBytes && keyLength != 0 {

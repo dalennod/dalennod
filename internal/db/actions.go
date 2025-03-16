@@ -4,14 +4,10 @@ import (
     "dalennod/internal/logger"
     "dalennod/internal/setup"
     "dalennod/internal/thumb_url"
+    "dalennod/internal/constants"
     "database/sql"
     "fmt"
     "time"
-)
-
-const (
-    PAGE_UPDATE_LIMIT int    = 60
-    TIME_FORMAT       string = "2006-01-02 15:04:05"
 )
 
 func Add(database *sql.DB, bmStruct setup.Bookmark) {
@@ -126,7 +122,7 @@ func TotalPageCount(database *sql.DB) int {
     for rows.Next() {
         rows.Scan(&pageCount)
     }
-    pageCount = pageCount / PAGE_UPDATE_LIMIT
+    pageCount = pageCount / constants.PAGE_UPDATE_LIMIT
     return pageCount
 }
 
@@ -141,9 +137,9 @@ func ViewAllWebUI(database *sql.DB, pageNo int) []setup.Bookmark {
         return results
     }
 
-    pageOffset := pageNo * PAGE_UPDATE_LIMIT
+    pageOffset := pageNo * constants.PAGE_UPDATE_LIMIT
 
-    rows, err := stmt.Query(PAGE_UPDATE_LIMIT, pageOffset)
+    rows, err := stmt.Query(constants.PAGE_UPDATE_LIMIT, pageOffset)
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return results
@@ -340,7 +336,7 @@ func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
         ); err != nil {
             return rowResult, err
         }
-        rowResult.Modified = modified.Local().Format(TIME_FORMAT)
+        rowResult.Modified = modified.Local().Format(constants.TIME_FORMAT)
     }
 
     if rowResult.URL == "" {

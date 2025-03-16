@@ -2,6 +2,7 @@ package server
 
 import (
     "dalennod/internal/bookmark_import"
+    "dalennod/internal/constants"
     "dalennod/internal/db"
     "dalennod/internal/logger"
     "encoding/json"
@@ -24,7 +25,7 @@ func importHandler(w http.ResponseWriter, r *http.Request) {
 
 func importBookmarkHandler(w http.ResponseWriter, r *http.Request) {
     if r.Method == http.MethodPost {
-        if err := r.ParseMultipartForm(10 << 20); err != nil { // 10 << 20 = 10 * (2^20) = 10.485.760 = ~10,48MB file size limit
+        if err := r.ParseMultipartForm(constants.IMPORT_FILE_SIZE); err != nil {
             logger.Error.Println("error parsing form while importing bookmark. ERROR:", err)
             w.WriteHeader(http.StatusBadRequest)
             return

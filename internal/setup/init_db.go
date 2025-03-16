@@ -1,6 +1,7 @@
 package setup
 
 import (
+    "dalennod/internal/constants"
     "database/sql"
     "log"
     "path/filepath"
@@ -20,11 +21,9 @@ type Bookmark struct {
     Modified     string `json:"modified"`
 }
 
-const DB_FILENAME string = "dalennod.db"
-
 func CreateDB(dbSavePath string) *sql.DB {
-    db, err := sql.Open("sqlite3", filepath.Join(dbSavePath, DB_FILENAME)) // For CGo driver
-    // db, err := sql.Open("sqlite", filepath.Join(dbSavePath, DB_FILENAME)) // For CGo-free driver
+    db, err := sql.Open("sqlite3", filepath.Join(dbSavePath, constants.DB_FILENAME)) // For CGo driver
+    // db, err := sql.Open("sqlite", filepath.Join(dbSavePath, constants.DB_FILENAME)) // For CGo-free driver
     if err != nil {
         log.Fatalln("error opening database. ERROR:", err)
     }

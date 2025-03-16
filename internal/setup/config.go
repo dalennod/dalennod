@@ -1,6 +1,7 @@
 package setup
 
 import (
+    "dalennod/internal/constants"
     "encoding/json"
     "log"
     "os"
@@ -11,10 +12,6 @@ type CFG struct {
     FirstRun bool `json:"firstRun"`
 }
 
-const (
-    CFG_FILE string = "config.json"
-)
-
 func configSetup(cfgDir string) {
     config := CFG{
         FirstRun: true,
@@ -24,7 +21,7 @@ func configSetup(cfgDir string) {
         log.Fatalln(err)
     }
 
-    cfgFile, err := os.Create(filepath.Join(cfgDir, CFG_FILE))
+    cfgFile, err := os.Create(filepath.Join(cfgDir, constants.CONFIG_FILENAME))
     if err != nil {
         log.Fatalln(err)
     }
@@ -43,7 +40,7 @@ func ReadCfg() (CFG, error) {
         return conf, err
     }
 
-    cfgContent, err := os.ReadFile(filepath.Join(cfgDir, CFG_FILE))
+    cfgContent, err := os.ReadFile(filepath.Join(cfgDir, constants.CONFIG_FILENAME))
     if err != nil {
         return conf, err
     }
@@ -70,7 +67,7 @@ func WriteCfg(firstRun bool) error {
         return err
     }
 
-    cfgFile, err := os.Create(filepath.Join(cfgDir, CFG_FILE))
+    cfgFile, err := os.Create(filepath.Join(cfgDir, constants.CONFIG_FILENAME))
     if err != nil {
         return err
     }

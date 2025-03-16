@@ -1,16 +1,11 @@
 package setup
 
 import (
+    "dalennod/internal/constants"
     "log"
     "os"
     "runtime"
     "path/filepath"
-)
-
-const (
-    NAME string = "dalennod"
-    LOGS string = "logs"
-    DB   string = "db"
 )
 
 func setupDirectories() string {
@@ -78,7 +73,7 @@ func ConfigDir() (string, error) {
     if err != nil {
         return "", err
     }
-    return filepath.Join(cfgDir, NAME), nil
+    return filepath.Join(cfgDir, constants.NAME), nil
 }
 
 func CacheDir() (string, error) {
@@ -86,7 +81,7 @@ func CacheDir() (string, error) {
     if err != nil {
         return "", err
     }
-    return filepath.Join(cacheDir, NAME, LOGS), nil
+    return filepath.Join(cacheDir, constants.NAME, constants.LOGS_DIRNAME), nil
 }
 
 func DatabaseDir() (string, error) {
@@ -94,7 +89,7 @@ func DatabaseDir() (string, error) {
     if err != nil {
         return "", err
     }
-    return filepath.Join(dbDir, DB), nil
+    return filepath.Join(dbDir, constants.DB_DIRNAME), nil
 }
 
 func createDir(args ...string) {

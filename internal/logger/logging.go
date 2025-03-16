@@ -2,6 +2,7 @@ package logger
 
 import (
     "dalennod/internal/setup"
+    "dalennod/internal/constants"
     "errors"
     "io"
     "log"
@@ -19,12 +20,11 @@ func Enable() {
     var logFile *os.File
     defer logFile.Close()
 
-    logFileName := "dalennod.log"
     logPath, err := setup.CacheDir()
     if err != nil {
         log.Fatalln(err)
     }
-    fullLogPath := filepath.Join(logPath, logFileName)
+    fullLogPath := filepath.Join(logPath, constants.LOGS_FILENAME)
 
     if _, err := os.Stat(fullLogPath); errors.Is(err, os.ErrNotExist) {
         logFile = createLogFile(fullLogPath)
@@ -54,7 +54,7 @@ func checkLogSize(fullLogPath string) bool {
         log.Fatalln("error opening log file. ERROR:", err)
     }
 
-    if fileStat.Size() >= 10<<21 { // 10 << 21 = 10 * (2^21) = 20.971.520 = ~20.9MB file size limit
+    if fileStat.Size() >= constants.LOG_FILE_SIZE {
         os.Remove(fullLogPath)
         return true
     }

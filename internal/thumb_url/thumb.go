@@ -6,9 +6,9 @@ package thumb_url
 import (
     "dalennod/internal/default_client"
     "dalennod/internal/logger"
-    "net/http"
 
     "io"
+    "net/http"
     "strings"
 
     "golang.org/x/net/html"
@@ -65,7 +65,6 @@ func GetPageThumb(url string) (string, []byte, error) {
 
 func getBase64(thumbURL string) []byte {
     var thumbUrlBytes []byte
-    // resp, err := http.Get(thumbURL)
     resp, err := default_client.HttpDefaultClientDo(http.MethodGet, thumbURL)
     if err != nil {
         logger.Warn.Println("could not request thumburl")

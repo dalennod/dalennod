@@ -2,6 +2,7 @@ package user_input
 
 import (
     "dalennod/internal/backup"
+    "dalennod/internal/constants"
     "dalennod/internal/db"
     "dalennod/internal/logger"
     "dalennod/internal/server"
@@ -69,7 +70,7 @@ func showProfiles() {
     }
 
     for _, entry := range dirEntries {
-        if entry.IsDir() && strings.Contains(entry.Name(), "dalennod") {
+        if entry.IsDir() && strings.Contains(entry.Name(), constants.NAME) {
             profileName := strings.SplitN(entry.Name(), ".", 2)
             fmt.Println(printProfileNames(profileName))
         }
@@ -91,7 +92,7 @@ func switchProfile(profileName string) {
         return
     }
 
-    switchProfilePath := filepath.Join(osConfigDir, "dalennod."+profileName)
+    switchProfilePath := filepath.Join(osConfigDir, constants.NAME+"."+profileName)
     if _, err := os.Stat(switchProfilePath); os.IsNotExist(err) {
         fmt.Printf("profile \"%s\" does not exist. ERROR: %v\n", profileName, err)
         return
@@ -104,14 +105,14 @@ func switchProfile(profileName string) {
     }
 
     var userInput string
-    fmt.Print("Final rename will be \"dalennod.{your_input}\"\nRename current profile to: ")
+    fmt.Printf("Final rename will be \"%s.{your_input}\"\nRename current profile to: ", constants.NAME)
     _, err = fmt.Scanln(&userInput)
     if err != nil {
         fmt.Println("error reading input. ERROR:", err)
         return
     }
 
-    currentRename := filepath.Join(osConfigDir, "dalennod."+userInput)
+    currentRename := filepath.Join(osConfigDir, constants.NAME+"."+userInput)
     if err := os.Rename(currentProfileDir, currentRename); err != nil {
         fmt.Println("error renaming current profile. ERROR:", err)
         return
@@ -128,12 +129,12 @@ func switchProfile(profileName string) {
 func whereConfigLog() {
     cfgDir, err := setup.ConfigDir()
     if err != nil {
-        fmt.Println(err)
+        fmt.Println("error getting config directory. ERROR:", err)
     }
 
     logDir, err := setup.CacheDir()
     if err != nil {
-        fmt.Println(err)
+        fmt.Println("error getting cache directory. ERROR:", err)
     }
 
     fmt.Printf("Database and config directory: %s\n", cfgDir)

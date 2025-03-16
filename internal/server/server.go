@@ -2,6 +2,7 @@ package server
 
 import (
     "dalennod/internal/logger"
+    "dalennod/internal/constants"
     "database/sql"
     "embed"
     "fmt"
@@ -9,8 +10,6 @@ import (
     "io/fs"
     "net/http"
 )
-
-const PORT string = ":41415"
 
 var (
     pageCount    int                    = 0
@@ -58,10 +57,10 @@ func Start(data *sql.DB) {
     mux.HandleFunc("/api/refetch-thumbnail/{id}", refetchThumbnailHandler)
     mux.HandleFunc("/api/pages/", pagesHandler)
 
-    logger.Info.Printf("Web-server starting on http://localhost%s/\n", PORT)
-    fmt.Printf("Web-server starting on http://localhost%s/\n", PORT)
+    logger.Info.Printf("Web-server starting on http://localhost%s/\n", constants.WEBUI_PORT)
+    fmt.Printf("Web-server starting on http://localhost%s/\n", constants.WEBUI_PORT)
 
-    if err := http.ListenAndServe(PORT, mux); err != nil {
+    if err := http.ListenAndServe(constants.WEBUI_PORT, mux); err != nil {
         fmt.Println("Stopping. ERROR:", err)
         logger.Error.Fatalln("Stopping. ERROR:", err)
     }

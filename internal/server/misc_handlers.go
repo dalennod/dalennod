@@ -1,6 +1,7 @@
 package server
 
 import (
+    "dalennod/internal/constants"
     "dalennod/internal/db"
     "dalennod/internal/logger"
     "dalennod/internal/setup"
@@ -99,7 +100,7 @@ func refetchThumbnailHandler(w http.ResponseWriter, r *http.Request) {
             return
         }
 
-        if err := r.ParseMultipartForm(10 << 19); err != nil { // ~5,23MB limit for thumbnail file
+        if err := r.ParseMultipartForm(constants.THUMBNAIL_FILE_SIZE); err != nil {
             http.Error(w, "error parsing data", http.StatusBadRequest)
             logger.Error.Println("error parsing thumbnail data. ERROR:", err)
             return
