@@ -2,6 +2,7 @@ package setup
 
 import (
     "dalennod/internal/constants"
+    "dalennod/internal/logger"
     "log"
     "os"
     "runtime"
@@ -9,94 +10,108 @@ import (
 )
 
 func setupDirectories() string {
-    cfgDir, err := ConfigDir()
-    if err != nil {
-        log.Fatalln(err)
+    if _, err := configDir(); err != nil {
+        log.Fatalln("error getting config directory. ERROR:", err)
     }
 
-    dbDir, err := DatabaseDir()
-    if err != nil {
-        log.Fatalln(err)
+    if _, err := databaseDir(); err != nil {
+        log.Fatalln("error getting database directory. ERROR:", err)
     }
 
-    cacheDir, err := CacheDir()
-    if err != nil {
-        log.Fatalln(err)
+    if _, err := cacheDir(); err != nil {
+        log.Fatalln("error getting logs directory. ERROR:", err)
     }
 
     goos := runtime.GOOS
     switch goos {
     case "linux", "darwin":
-        createDir(cfgDir, dbDir, cacheDir)
+        createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH)
         defer setCompletion()
     case "windows":
-        createDir(cfgDir, dbDir, cacheDir)
+        createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH)
     default:
         log.Fatalln("ERROR: unrecognized OS:", goos)
     }
 
-    configSetup(cfgDir)
+    configSetup(constants.CONFIG_PATH)
 
-    return dbDir
+    return constants.DB_PATH
 }
 
 func InitLocalDirs() string {
-    databaseDir, err := DatabaseDir()
-    if err != nil {
+    if _, err := configDir(); err != nil {
+        log.Fatalln("error getting config directory. ERROR:", err)
+    }
+
+    if _, err := databaseDir(); err != nil {
         log.Fatalln("error getting database directory. ERROR:", err)
     }
-    if _, err := os.Stat(databaseDir); os.IsNotExist(err) {
-        databaseDir = setupDirectories()
+    if _, err := os.Stat(constants.DB_PATH); os.IsNotExist(err) {
+        constants.DB_PATH = setupDirectories()
     } else {
         readConfig, err := ReadCfg()
         if err != nil {
             log.Fatalln("error reading config. ERROR:", err)
         }
         if readConfig.FirstRun {
-            WriteCfg(false)
+            writeCfg(false)
         }
     }
 
-    cacheDir, err := CacheDir()
-    if err != nil {
+    if _, err := cacheDir(); err != nil {
         log.Fatalln("error getting cache directory. ERROR:", err)
     }
-    if _, err := os.Stat(cacheDir); os.IsNotExist(err) {
+    if _, err := os.Stat(constants.LOGS_PATH); os.IsNotExist(err) {
         setupDirectories()
     }
 
-    return databaseDir
+    enableLogs()
+
+    return constants.DB_PATH
 }
 
-func ConfigDir() (string, error) {
+func enableLogs() {
+    logger.Enable()
+
+    readConfig, err := ReadCfg()
+    if err != nil {
+        log.Fatalln("error reading config. ERROR:", err)
+    }
+
+    if readConfig.FirstRun {
+        logger.Info.Printf("Database and config directory: %s\n", constants.CONFIG_PATH)
+        logger.Info.Printf("Error logs directory: %s\n", constants.LOGS_PATH)
+    }
+}
+
+func configDir() (string, error) {
     cfgDir, err := os.UserConfigDir()
     if err != nil {
         return "", err
     }
-    return filepath.Join(cfgDir, constants.NAME), nil
+    constants.CONFIG_PATH = filepath.Join(cfgDir, constants.NAME)
+    return constants.CONFIG_PATH, nil
 }
 
-func CacheDir() (string, error) {
+func cacheDir() (string, error) {
     cacheDir, err := os.UserCacheDir()
     if err != nil {
         return "", err
     }
-    return filepath.Join(cacheDir, constants.NAME, constants.LOGS_DIRNAME), nil
+    constants.LOGS_PATH = filepath.Join(cacheDir, constants.NAME, constants.LOGS_DIRNAME)
+    return constants.LOGS_PATH, nil
 }
 
-func DatabaseDir() (string, error) {
-    dbDir, err := ConfigDir()
-    if err != nil {
-        return "", err
-    }
-    return filepath.Join(dbDir, constants.DB_DIRNAME), nil
+func databaseDir() (string, error) {
+    constants.DB_PATH = filepath.Join(constants.CONFIG_PATH, constants.DB_DIRNAME)
+    return constants.DB_PATH, nil
 }
 
 func createDir(args ...string) {
     for _, path := range args {
         err := os.MkdirAll(path, 0755)
         if err != nil {
-            log.Fatalln(err)
+            log.Fatalln("error creating directories. ERROR:", err)
         }
     }
 }

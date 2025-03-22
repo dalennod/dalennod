@@ -1,6 +1,7 @@
 package setup
 
 import (
+    "dalennod/internal/constants"
     "bufio"
     "flag"
     "fmt"
@@ -206,12 +207,7 @@ func zshCompletion() {
         log.Println("error finding home directory. ERROR:", err)
     }
 
-    configDir, err := ConfigDir()
-    if err != nil {
-        log.Println("error getting config directory. ERROR:", err)
-    }
-
-    compdefPath := filepath.Join(configDir, "zsh-completion")
+    compdefPath := filepath.Join(constants.CONFIG_PATH, "zsh-completion")
     err = os.MkdirAll(compdefPath, 0755)
     if err != nil {
         log.Println("error creating zsh-completion directory inside config dir. ERROR:", err)

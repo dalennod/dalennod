@@ -35,12 +35,7 @@ func configSetup(cfgDir string) {
 func ReadCfg() (CFG, error) {
     var conf CFG
 
-    cfgDir, err := ConfigDir()
-    if err != nil {
-        return conf, err
-    }
-
-    cfgContent, err := os.ReadFile(filepath.Join(cfgDir, constants.CONFIG_FILENAME))
+    cfgContent, err := os.ReadFile(filepath.Join(constants.CONFIG_PATH, constants.CONFIG_FILENAME))
     if err != nil {
         return conf, err
     }
@@ -53,7 +48,7 @@ func ReadCfg() (CFG, error) {
     return conf, nil
 }
 
-func WriteCfg(firstRun bool) error {
+func writeCfg(firstRun bool) error {
     config := CFG{
         FirstRun: firstRun,
     }
@@ -62,12 +57,7 @@ func WriteCfg(firstRun bool) error {
         return err
     }
 
-    cfgDir, err := ConfigDir()
-    if err != nil {
-        return err
-    }
-
-    cfgFile, err := os.Create(filepath.Join(cfgDir, constants.CONFIG_FILENAME))
+    cfgFile, err := os.Create(filepath.Join(constants.CONFIG_PATH, constants.CONFIG_FILENAME))
     if err != nil {
         return err
     }

@@ -1,7 +1,6 @@
 package logger
 
 import (
-    "dalennod/internal/setup"
     "dalennod/internal/constants"
     "errors"
     "io"
@@ -20,11 +19,7 @@ func Enable() {
     var logFile *os.File
     defer logFile.Close()
 
-    logPath, err := setup.CacheDir()
-    if err != nil {
-        log.Fatalln(err)
-    }
-    fullLogPath := filepath.Join(logPath, constants.LOGS_FILENAME)
+    fullLogPath := filepath.Join(constants.LOGS_PATH, constants.LOGS_FILENAME)
 
     if _, err := os.Stat(fullLogPath); errors.Is(err, os.ErrNotExist) {
         logFile = createLogFile(fullLogPath)

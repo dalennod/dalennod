@@ -4,7 +4,6 @@ import (
     "dalennod/internal/backup"
     "dalennod/internal/constants"
     "dalennod/internal/db"
-    "dalennod/internal/logger"
     "dalennod/internal/server"
     "dalennod/internal/setup"
     "database/sql"
@@ -17,7 +16,6 @@ import (
 var database *sql.DB
 
 func UserInput(bookmark_database *sql.DB) {
-    enableLogs()
     database = bookmark_database
 
     switch {
@@ -67,6 +65,7 @@ func showProfiles() {
     dirEntries, err := openConfigDir.Readdir(-1)
     if err != nil {
         fmt.Println("error reading directory entries. ERROR:", err)
+        return
     }
 
     for _, entry := range dirEntries {
@@ -98,7 +97,7 @@ func switchProfile(profileName string) {
         return
     }
 
-    currentProfileDir, err := setup.ConfigDir()
+    currentProfileDir := constants.CONFIG_PATH
     if err != nil {
         fmt.Println("error getting current profile directory. ERROR:", err)
         return
@@ -127,40 +126,6 @@ func switchProfile(profileName string) {
 }
 
 func whereConfigLog() {
-    cfgDir, err := setup.ConfigDir()
-    if err != nil {
-        fmt.Println("error getting config directory. ERROR:", err)
-    }
-
-    logDir, err := setup.CacheDir()
-    if err != nil {
-        fmt.Println("error getting cache directory. ERROR:", err)
-    }
-
-    fmt.Printf("Database and config directory: %s\n", cfgDir)
-    fmt.Printf("Error logs directory: %s\n", logDir)
-}
-
-func enableLogs() {
-    logger.Enable()
-
-    cfgDir, err := setup.ConfigDir()
-    if err != nil {
-        logger.Warn.Println("error getting config directory. ERROR:", err)
-    }
-
-    logDir, err := setup.CacheDir()
-    if err != nil {
-        logger.Info.Println("error getting cache directory. ERROR:", err)
-    }
-
-    readConfig, err := setup.ReadCfg()
-    if err != nil {
-        fmt.Println("error reading config. ERROR:", err)
-    }
-
-    if readConfig.FirstRun {
-        logger.Info.Printf("Database and config directory: %s\n", cfgDir)
-        logger.Info.Printf("Error logs directory: %s\n", logDir)
-    }
+    fmt.Printf("Database and config directory: %s\n", constants.CONFIG_PATH)
+    fmt.Printf("Error logs directory: %s\n", constants.LOGS_PATH)
 }
