@@ -85,7 +85,7 @@ func RefetchThumbnail(database *sql.DB, id int, thumbnail []byte) error {
 
     if thumbnail == nil {
         bmStruct.ThumbURL, bmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
-        if err != nil {
+        if err != nil || bmStruct.ByteThumbURL == nil {
             logger.Error.Println("error getting webpage thumbnail. ERROR:", err)
             return err
         }

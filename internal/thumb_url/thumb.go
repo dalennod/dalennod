@@ -58,26 +58,30 @@ func GetPageThumb(url string) (string, []byte, error) {
     if thumbURL == "" {
         return thumbURL, nil, nil
     } else {
-        var byteThumbURL []byte = getBase64(thumbURL)
+        byteThumbURL, err := getBase64(thumbURL)
+        if err != nil || byteThumbURL == nil {
+            logger.Error.Println("could not get thumbnail. ERROR:", err)
+            return thumbURL, nil, err
+        }
         return thumbURL, byteThumbURL, nil
     }
 }
 
-func getBase64(thumbURL string) []byte {
-    var thumbUrlBytes []byte
+func getBase64(thumbURL string) ([]byte, error) {
     resp, err := default_client.HttpDefaultClientDo(http.MethodGet, thumbURL)
     if err != nil {
         logger.Warn.Println("could not request thumburl")
-        return thumbUrlBytes
+        return nil, err
     }
     defer resp.Body.Close()
 
-    thumbUrlBytes, err = io.ReadAll(resp.Body)
+    thumbUrlBytes, err := io.ReadAll(resp.Body)
     if err != nil {
         logger.Warn.Println("could not read thumburl")
+        return nil, err
     }
 
-    return thumbUrlBytes
+    return thumbUrlBytes, nil
 }
 
 func (og *OGData) readHTML(buffer io.Reader) error {
