@@ -110,13 +110,13 @@ func setCompletion() {
 }
 
 func fishCompletion() {
-    homePath, err := os.UserHomeDir()
+    cachePath, err := os.UserCacheDir()
     if err != nil {
         log.Println("error finding home directory. ERROR:", err)
         return
     }
 
-    fishLocalPath := filepath.Join(homePath, ".local", "share", "fish", "generated_completions")
+    fishLocalPath := filepath.Join(cachePath, "fish", "generated_completions")
     fishLocalStat, err := os.Stat(fishLocalPath)
     if err != nil {
         log.Println("error getting fish shell local directory info. ERROR", err)
