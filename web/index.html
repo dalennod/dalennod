@@ -1,9 +1,9 @@
 {{ block "index" . }}
 <!doctype html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta property="og:image" content="http://localhost:41415/static/imgs/favicon.ico">
     <link rel="icon" href="static/imgs/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="static/css/styles.css" />
     <script src="static/js/htmx.min.js" type="text/javascript" defer></script>
@@ -123,13 +123,13 @@
       </div>
       <div class="dialog-inputs">
         <div class="pad-like-p">
-          URL<span class="red-text">*</span>:<br /><input autofocus type="text" class="uac-input" id="create-url" placeholder="URL to save" required />
+          URL: <span class="red-text">*</span><br /><input autofocus type="text" class="uac-input" id="create-url" placeholder="URL to save" required />
         </div>
         <div class="pad-like-p">
           Title:<br /><input type="text" class="uac-input" id="create-title" placeholder="Title for the bookmark" />
         </div>
         <div class="pad-like-p">
-          Notes:<br /><input type="text" class="uac-input" id="create-note" placeholder="Log notes for bookmark" />
+          Notes:<br /><textarea class="uac-input" id="create-note" placeholder="Log notes for bookmark"></textarea>
         </div>
         <div class="pad-like-p">
           Keywords:<br /><input type="text" class="uac-input" id="create-keywords" placeholder="Keywords, to, search, bookmark" />
@@ -162,13 +162,13 @@
       <div class="dialog-inputs">
         <span id="bm-id" hidden></span>
         <div class="pad-like-p">
-          URL<span class="red-text">*</span>:<br /><input type="text" class="uac-input" id="update-url" placeholder="URL to save" required />
+          URL: <span class="red-text">*</span><br /><input type="text" class="uac-input" id="update-url" placeholder="URL to save" required />
         </div>
         <div class="pad-like-p">
           Title:<br /><input type="text" class="uac-input" id="update-title" placeholder="Title for the bookmark" />
         </div>
         <div class="pad-like-p">
-          Notes:<br /><input type="text" class="uac-input" id="update-note" autofocus placeholder="Log notes for bookmark" />
+          Notes:<br /><textarea class="uac-input" id="update-note" autofocus placeholder="Log notes for bookmark"></textarea>
         </div>
         <div class="pad-like-p">
           Keywords:<br /><input type="text" class="uac-input" id="update-keywords" placeholder="Keywords, to, search, bookmark" />

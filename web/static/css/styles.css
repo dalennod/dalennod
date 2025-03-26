@@ -48,14 +48,28 @@ dialog,
     outline: none;
 }
 
-input {
+input,
+textarea {
     background: none;
-    border-width: 0px;
+    border: none;
     text-decoration: none;
+    font-size: 0.83em;
 }
 
-input[type="text"]:focus {
+input[type="text"]:focus,
+textarea:focus {
     outline: none;
+}
+
+textarea {
+    resize: vertical;
+    font-family: inherit;
+    /*
+        Not available everywhere yet. But, accomplishes how I'd want
+        this element to behave.
+        https://developer.mozilla.org/en-US/docs/Web/CSS/field-sizing
+    */
+    /* field-sizing: content; */
 }
 
 .red-text {
@@ -219,7 +233,8 @@ main {
     border-radius: 2px;
 }
 
-.dialog-inputs input[type="text"] {
+.dialog-inputs input[type="text"],
+.dialog-inputs textarea {
     width: 50vw;
     border-bottom: 1px dotted var(--global-border-color);
 }
@@ -322,6 +337,7 @@ body:has(dialog[open]) {
     }
 
     input,
+    textarea,
     .grid-child .group,
     .grid-child .keywords,
     .grid-child a,

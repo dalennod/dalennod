@@ -1,6 +1,6 @@
 "use strict";
 
-const API_ENDPOINT = "http://localhost:41415/api/";
+const API_ENDPOINT  = "http://localhost:41415/api/";
 const ROOT_ENDPOINT = "http://localhost:41415/";
 
 const createDialog = document.querySelector(".dialog-create");
@@ -11,7 +11,12 @@ const showCreateDialog = () => {
 const closeCreateDialog = () => createDialog.close();
 
 const updateDialog = document.querySelector(".dialog-update");
-const showUpdateDialog = () => updateDialog.showModal();
+const showUpdateDialog = () => {
+    updateDialog.showModal();
+    const noteTextArea = document.getElementById("update-note");
+    noteTextArea.style.height = "auto";
+    noteTextArea.style.height = noteTextArea.scrollHeight + "px";
+}
 const closeUpdateDialog = () => updateDialog.close();
 
 const getOldData = async (ele) => {
