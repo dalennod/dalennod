@@ -135,6 +135,7 @@ main {
     margin-top: 10px;
 }
 
+
 .grid-view-list {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -169,6 +170,10 @@ main {
     width: 50%;
     height: 50%;
     object-fit: cover;
+}
+
+.grid-child .show-note {
+    white-space: pre-line;
 }
 
 .grid-child .default-thumburl img {
