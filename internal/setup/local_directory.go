@@ -5,8 +5,8 @@ import (
     "dalennod/internal/logger"
     "log"
     "os"
-    "runtime"
     "path/filepath"
+    "runtime"
 )
 
 func setupDirectories() string {
@@ -49,12 +49,12 @@ func InitLocalDirs() string {
     if _, err := os.Stat(constants.DB_PATH); os.IsNotExist(err) {
         constants.DB_PATH = setupDirectories()
     } else {
-        readConfig, err := ReadCfg()
+        readConfig, err := readCfg()
         if err != nil {
             log.Fatalln("error reading config. ERROR:", err)
         }
         if readConfig.FirstRun {
-            writeCfg(false)
+            writeCfg(false, readConfig.Host, readConfig.Port)
         }
     }
 
@@ -65,20 +65,21 @@ func InitLocalDirs() string {
         setupDirectories()
     }
 
-    enableLogs()
-
-    return constants.DB_PATH
-}
-
-func enableLogs() {
-    logger.Enable()
-
-    readConfig, err := ReadCfg()
+    readConfig, err := readCfg()
     if err != nil {
         log.Fatalln("error reading config. ERROR:", err)
     }
 
-    if readConfig.FirstRun {
+    constants.WEBUI_ADDR = readConfig.Host + readConfig.Port
+    enableLogs(readConfig.FirstRun)
+
+    return constants.DB_PATH
+}
+
+func enableLogs(firstRun bool) {
+    logger.Enable()
+
+    if firstRun {
         logger.Info.Printf("Database and config directory: %s\n", constants.CONFIG_PATH)
         logger.Info.Printf("Error logs directory: %s\n", constants.LOGS_PATH)
     }

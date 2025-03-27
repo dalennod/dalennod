@@ -9,12 +9,16 @@ import (
 )
 
 type CFG struct {
-    FirstRun bool `json:"firstRun"`
+    FirstRun bool   `json:"firstRun"`
+    Host     string `json:"host"`
+    Port     string `json:"port"`
 }
 
 func configSetup(cfgDir string) {
     config := CFG{
         FirstRun: true,
+        Host: "",
+        Port: constants.WEBUI_PORT,
     }
     cfgJson, err := json.MarshalIndent(config, "", "\t")
     if err != nil {
@@ -32,7 +36,7 @@ func configSetup(cfgDir string) {
     }
 }
 
-func ReadCfg() (CFG, error) {
+func readCfg() (CFG, error) {
     var conf CFG
 
     cfgContent, err := os.ReadFile(filepath.Join(constants.CONFIG_PATH, constants.CONFIG_FILENAME))
@@ -48,9 +52,11 @@ func ReadCfg() (CFG, error) {
     return conf, nil
 }
 
-func writeCfg(firstRun bool) error {
+func writeCfg(firstRun bool, host string, port string) error {
     config := CFG{
         FirstRun: firstRun,
+        Host: host,
+        Port: port,
     }
     cfgJson, err := json.MarshalIndent(config, "", "\t")
     if err != nil {

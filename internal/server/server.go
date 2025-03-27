@@ -57,10 +57,15 @@ func Start(data *sql.DB) {
     mux.HandleFunc("/api/refetch-thumbnail/{id}", refetchThumbnailHandler)
     mux.HandleFunc("/api/pages/", pagesHandler)
 
-    logger.Info.Printf("Web-server starting on http://localhost%s/\n", constants.WEBUI_PORT)
-    fmt.Printf("Web-server starting on http://localhost%s/\n", constants.WEBUI_PORT)
+    if constants.WEBUI_ADDR[0] == 58 { // ':'
+        logger.Info.Printf("Web-server starting at: http://localhost%s\n", constants.WEBUI_ADDR)
+        fmt.Printf("Web-server starting at: http://localhost%s\n", constants.WEBUI_ADDR)
+    } else {
+        logger.Info.Printf("Web-server starting at: http://%s\n", constants.WEBUI_ADDR)
+        fmt.Printf("Web-server starting at: http://%s\n", constants.WEBUI_ADDR)
+    }
 
-    if err := http.ListenAndServe(constants.WEBUI_PORT, mux); err != nil {
+    if err := http.ListenAndServe(constants.WEBUI_ADDR, mux); err != nil {
         fmt.Println("Stopping. ERROR:", err)
         logger.Error.Fatalln("Stopping. ERROR:", err)
     }

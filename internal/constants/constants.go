@@ -25,4 +25,6 @@ var (
     LOGS_PATH           string
     DB_PATH             string
     CONFIG_PATH         string
+
+    WEBUI_ADDR          string
 )
