@@ -3,21 +3,19 @@
 const API_ENDPOINT  = "http://localhost:41415/api/";
 const ROOT_ENDPOINT = "http://localhost:41415/";
 
-const createDialog = document.querySelector(".dialog-create");
 const showCreateDialog = () => {
-    createDialog.showModal();
+    document.querySelector(".dialog-create").showModal();
     clearImportTimeout();
 };
-const closeCreateDialog = () => createDialog.close();
+const closeCreateDialog = () => document.querySelector(".dialog-create").close();
 
-const updateDialog = document.querySelector(".dialog-update");
 const showUpdateDialog = () => {
-    updateDialog.showModal();
+    document.querySelector(".dialog-update").showModal();
     const noteTextArea = document.getElementById("update-note");
     noteTextArea.style.height = "auto";
     noteTextArea.style.height = noteTextArea.scrollHeight + "px";
 }
-const closeUpdateDialog = () => updateDialog.close();
+const closeUpdateDialog = () => document.querySelector(".dialog-update").close();
 
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.id;
