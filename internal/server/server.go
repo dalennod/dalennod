@@ -33,13 +33,14 @@ func Start(data *sql.DB) {
     }
     mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webStatic))))
 
-    tmplFuncMap["getHostname"] = getHostname
-    tmplFuncMap["keywordSplit"] = keywordSplit
-    tmplFuncMap["byteConversion"] = byteConversion
-    tmplFuncMap["pageCountUp"] = pageCountUp
-    tmplFuncMap["pageCountDown"] = pageCountDown
+    tmplFuncMap["getHostname"]        = getHostname
+    tmplFuncMap["keywordSplit"]       = keywordSplit
+    tmplFuncMap["byteConversion"]     = byteConversion
+    tmplFuncMap["pageCountUp"]        = pageCountUp
+    tmplFuncMap["pageCountDown"]      = pageCountDown
     tmplFuncMap["pageCountNowUpdate"] = pageCountNowUpdate
     tmplFuncMap["pageCountNowDelete"] = pageCountNowDelete
+    tmplFuncMap["webUIAddress"]       = webUIAddress
 
     mux.HandleFunc("/{$}", rootHandler)
     mux.HandleFunc("/import/", importHandler)

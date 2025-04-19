@@ -1,6 +1,7 @@
 package server
 
 import (
+    "dalennod/internal/constants"
     "encoding/base64"
     "net/http"
     "regexp"
@@ -14,6 +15,14 @@ func getHostname(input string) string {
         return ""
     }
     return matches[0]
+}
+
+func webUIAddress() string {
+    if constants.WEBUI_ADDR[0] == 58 { // ':'
+        return "http://localhost" + constants.WEBUI_ADDR
+    } else {
+        return "http://%s\n" + constants.WEBUI_ADDR
+    }
 }
 
 func keywordSplit(keywords string, delimiter string) []string {
