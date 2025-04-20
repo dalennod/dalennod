@@ -1,8 +1,8 @@
 package setup
 
 import (
-    "dalennod/internal/constants"
     "bufio"
+    "dalennod/internal/constants"
     "flag"
     "fmt"
     "log"
@@ -43,23 +43,30 @@ func cliFlags() {
         w := flag.CommandLine.Output()
         fmt.Fprintln(w, "Usage of dalennod: dalennod [OPTION] ...")
         fmt.Fprintln(w, "\nOptions:")
-        fmt.Fprintln(w, "  -s, --serve\t\tStart webserver locally for Web UI & Extension")
-        fmt.Fprintln(w, "  -a, --add\t\tAdd a bookmark entry to the database")
-        fmt.Fprintln(w, "  -r, --remove [id]\tRemove specific bookmark using its ID")
-        fmt.Fprintln(w, "  -u, --update [id]\tUpdate specific bookmark using its ID")
-        fmt.Fprintln(w, "  -v, --view [id]\tView specific bookmark using its ID")
-        fmt.Fprintln(w, "  -V, --view-all\tView all bookmarks")
-        fmt.Fprintln(w, "  -i, --import\t\tImport bookmarks from a browser")
-        fmt.Fprintln(w, "  --firefox [file]\tImport bookmarks from Firefox \n\t\t\t  Must use alongside -i, --import option")
-        fmt.Fprintln(w, "  --chromium [file]\tImport bookmarks from Chromium \n\t\t\t  Must use alongside -i, --import option")
-        fmt.Fprintln(w, "  --dalennod [file]\tImport bookmarks from exported Dalennod JSON \n\t\t\t  Must use alongside -i, --import option")
-        fmt.Fprintln(w, "  -b, --backup\t\tStart backup process")
-        fmt.Fprintln(w, "  --json\t\tPrint entire DB in JSON \n\t\t\t  Use alongside -b, --backup flag")
-        fmt.Fprintln(w, "  --crypt\t\tEncrypt/decrypt the JSON backup \n\t\t\t  Use alongside --json flag to encrypt \n\t\t\t  Use alongside --import --dalennod to decrypt")
-        fmt.Fprintln(w, "  --where\t\tPrint config and logs directory path")
-        fmt.Fprintln(w, "  --profile\t\tShow profile names found in local directory")
-        fmt.Fprintln(w, "  --switch [profile]\tSwitch profiles \n\t\t\t  Must use alongside --profile flag")
-        fmt.Fprintln(w, "  -h, --help\t\tShows this help message")
+        fmt.Fprintln(w, "  -s, --serve         Start webserver locally for Web UI & Extension")
+        fmt.Fprintln(w, "  -a, --add           Add a bookmark entry to the database")
+        fmt.Fprintln(w, "  -r, --remove [id]   Remove specific bookmark using its ID")
+        fmt.Fprintln(w, "  -u, --update [id]   Update specific bookmark using its ID")
+        fmt.Fprintln(w, "  -v, --view [id]     View specific bookmark using its ID")
+        fmt.Fprintln(w, "  -V, --view-all      View all bookmarks")
+        fmt.Fprintln(w, "  -i, --import        Import bookmarks from a browser")
+        fmt.Fprintln(w, "  --firefox [file]    Import bookmarks from Firefox")
+        fmt.Fprintln(w, "                        Must use alongside -i, --import option")
+        fmt.Fprintln(w, "  --chromium [file]   Import bookmarks from Chromium")
+        fmt.Fprintln(w, "                        Must use alongside -i, --import option")
+        fmt.Fprintln(w, "  --dalennod [file]   Import bookmarks from exported Dalennod JSON")
+        fmt.Fprintln(w, "                        Must use alongside -i, --import option")
+        fmt.Fprintln(w, "  -b, --backup        Start backup process")
+        fmt.Fprintln(w, "  --json              Print entire DB in JSON")
+        fmt.Fprintln(w, "                        Use alongside -b, --backup flag")
+        fmt.Fprintln(w, "  --crypt             Encrypt/decrypt the JSON backup")
+        fmt.Fprintln(w, "                        Use alongside --json flag to encrypt")
+        fmt.Fprintln(w, "                        Use alongside --import --dalennod to decrypt")
+        fmt.Fprintln(w, "  --where             Print config and logs directory path")
+        fmt.Fprintln(w, "  --profile           Show profile names found in local directory")
+        fmt.Fprintln(w, "  --switch [profile]  Switch profiles")
+        fmt.Fprintln(w, "                        Must use alongside --profile flag")
+        fmt.Fprintln(w, "  -h, --help          Shows this help message")
     }
 
     flag.BoolVar(&FlagVals.StartServer, "s", false, "Start webserver locally for Web UI & Extension")
