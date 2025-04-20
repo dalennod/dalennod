@@ -58,7 +58,7 @@ func cliFlags() {
         fmt.Fprintln(w, "  --crypt\t\tEncrypt/decrypt the JSON backup \n\t\t\t  Use alongside --json flag to encrypt \n\t\t\t  Use alongside --import --dalennod to decrypt")
         fmt.Fprintln(w, "  --where\t\tPrint config and logs directory path")
         fmt.Fprintln(w, "  --profile\t\tShow profile names found in local directory")
-        fmt.Fprintln(w, "  --switch\t\tSwitch profiles \n\t\t\t  Must use alongside --profile flag")
+        fmt.Fprintln(w, "  --switch [profile]\tSwitch profiles \n\t\t\t  Must use alongside --profile flag")
         fmt.Fprintln(w, "  -h, --help\t\tShows this help message")
     }
 
