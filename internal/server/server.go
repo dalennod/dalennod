@@ -3,6 +3,7 @@ package server
 import (
     "dalennod/internal/logger"
     "dalennod/internal/constants"
+    "dalennod/internal/setup"
     "database/sql"
     "embed"
     "fmt"
@@ -12,9 +13,9 @@ import (
 )
 
 var (
-    pageCount    int                    = 0
-    tmplFuncMap  template.FuncMap       = make(template.FuncMap)
-    allBookmarks map[string]interface{} = make(map[string]interface{})
+    pageCount    int                         = 0
+    tmplFuncMap  template.FuncMap            = make(template.FuncMap)
+    allBookmarks map[string][]setup.Bookmark = make(map[string][]setup.Bookmark)
     database     *sql.DB
     tmpl         *template.Template
     Web          embed.FS
