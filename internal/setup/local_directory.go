@@ -71,6 +71,10 @@ func InitLocalDirs() string {
     }
 
     constants.WEBUI_ADDR = readConfig.Host + readConfig.Port
+    if len(constants.WEBUI_ADDR) == 0 {
+        log.Fatalf("Improper config. Expected Host and Port information. Got '%s'\n", constants.WEBUI_ADDR)
+    }
+
     enableLogs(readConfig.FirstRun)
 
     return constants.DB_PATH

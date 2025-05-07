@@ -6,7 +6,6 @@
     <meta property="og:image" content="{{ webUIAddress  }}/static/imgs/favicon.ico">
     <link rel="icon" href="static/imgs/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="static/css/styles.css" />
-    <script src="static/js/htmx.min.js" type="text/javascript" defer></script>
     <script src="static/js/main.js" type="text/javascript" defer></script>
     <title>Dalennod</title>
   </head>
@@ -14,7 +13,7 @@
   <body>
     <nav>
       <form class="search-form" hx-post="/api/search/">
-        <input autofocus type="text" name="searchTerm" class="input-search" placeholder="Search a keyword..." />
+        <input type="text" name="searchTerm" class="input-search" placeholder="Search a keyword..." />
         <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search/" title="Search">
           <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button" />
         </button>
