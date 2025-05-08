@@ -1,7 +1,7 @@
 "use strict";
 
-const API_ENDPOINT  = "http://localhost:41415/api/";
-const ROOT_ENDPOINT = "http://localhost:41415/";
+let API = "";
+let root = "";
 
 const showCreateDialog = () => {
     document.querySelector(".dialog-create").showModal();
@@ -19,7 +19,7 @@ const closeUpdateDialog = () => document.querySelector(".dialog-update").close()
 
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.id;
-    const fetchURL = API_ENDPOINT + "row/" + entryID;
+    const fetchURL = API + "row/" + entryID;
     const res = await fetch(fetchURL);
     const oldData = await res.json();
     if (typeof Storage !== "undefined") localStorage.setItem("oldData", JSON.stringify(oldData));
@@ -62,7 +62,7 @@ const updateEntry = async () => {
     updateButton.disabled = true;
 
     const dataID = document.querySelector("#bm-id").innerText;
-    const fetchURL = API_ENDPOINT + "update/" + dataID;
+    const fetchURL = API + "update/" + dataID;
     const res = await fetch(fetchURL, {
         method: "POST",
         headers: {
@@ -99,7 +99,7 @@ const addEntry = async () => {
     const addButton = document.getElementById("button-add-req");
     addButton.disabled = true;
 
-    const fetchURL = API_ENDPOINT + "add/";
+    const fetchURL = API + "add/";
     const res = await fetch(fetchURL, {
         method: "POST",
         headers: {
@@ -119,7 +119,7 @@ const addEntry = async () => {
 
 let changeToImportTimeout = "";
 const changeToImport = () => changeToImportTimeout = setTimeout(() => showImportPage(), 5000);
-const showImportPage = () => document.location.href = ROOT_ENDPOINT + "import/";
+const showImportPage = () => document.location.href = root + "import/";
 const clearImportTimeout = () => clearTimeout(changeToImportTimeout);
 
 const archiveCheckbox = () => {
@@ -139,7 +139,7 @@ const clearInputs = () => {
 };
 
 const updatePagination = async () => {
-    const fetchUrl = API_ENDPOINT + "pages/";
+    const fetchUrl = API + "pages/";
     const res = await fetch(fetchUrl);
     if (!res.ok) {
         console.error(res.status);
@@ -174,4 +174,10 @@ const updatePagination = async () => {
         paginationNumbers.appendChild(pageNumberLink);
     };
 };
-updatePagination();
+
+window.onload = () => {
+    const host = new URL(window.location.href).host;
+    root = `http://${host}`;
+    API = `${root}/api/`;
+    updatePagination();
+};
