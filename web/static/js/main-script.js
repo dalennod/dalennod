@@ -6,7 +6,7 @@ let root = "";
 const showCreateDialog = () => {
     document.querySelector(".dialog-create").showModal();
     clearImportTimeout();
-};
+}
 const closeCreateDialog = () => document.querySelector(".dialog-create").close();
 
 const showUpdateDialog = () => {
@@ -24,7 +24,7 @@ const getOldData = async (ele) => {
     const oldData = await res.json();
     if (typeof Storage !== "undefined") localStorage.setItem("oldData", JSON.stringify(oldData));
     setOldData();
-};
+}
 
 let oldData = "";
 const setOldData = () => {
@@ -39,7 +39,7 @@ const setOldData = () => {
         oldData.archive ? document.querySelector("#update-archive-div").setAttribute("hidden", "") : document.querySelector("#update-archive-div").removeAttribute("hidden");
     }
     showUpdateDialog();
-};
+}
 
 const updateEntry = async () => {
     const newDataJSON = {
@@ -49,7 +49,7 @@ const updateEntry = async () => {
         keywords: document.querySelector("#update-keywords").value,
         bmGroup: document.querySelector("#update-bmGroup").value,
         archive: document.getElementById("update-archive").checked ? true : false
-    };
+    }
 
     if (newDataJSON.archive) {
         document.querySelector("#update-archive-warn").removeAttribute("hidden");
@@ -69,7 +69,7 @@ const updateEntry = async () => {
             "Content-Type": "application/json; charset=utf-8",
         },
         body: JSON.stringify(newDataJSON),
-    });
+    })
 
     if (res.ok) {
         updateButton.disabled = false;
@@ -77,7 +77,7 @@ const updateEntry = async () => {
         document.querySelector("#update-checkmark").removeAttribute("hidden");
         setTimeout(() => document.querySelector("#update-checkmark").setAttribute("hidden", ""), 1000);
     }
-};
+}
 
 const addEntry = async () => {
     if (document.querySelector("#create-url").value === "") {
@@ -92,7 +92,7 @@ const addEntry = async () => {
         keywords: document.querySelector("#create-keywords").value,
         bmGroup: document.querySelector("#create-bmGroup").value,
         archive: document.getElementById("create-archive").checked ? true : false,
-    };
+    }
 
     if (dataJSON.archive) document.getElementById("create-archive-warn").removeAttribute("hidden");
 
@@ -106,7 +106,7 @@ const addEntry = async () => {
             "Content-Type": "application/json; charset=utf-8",
         },
         body: JSON.stringify(dataJSON),
-    });
+    })
 
     if (res.ok) {
         clearInputs();
@@ -115,11 +115,21 @@ const addEntry = async () => {
         document.querySelector("#create-checkmark").removeAttribute("hidden");
         setTimeout(() => document.querySelector("#create-checkmark").setAttribute("hidden", ""), 1000);
     }
-};
+}
+
+const deleteEntry = async (element) => {
+    const bookmarkID = element.parentNode.parentNode.id;
+    let fetchURL = API + "delete/" + bookmarkID;
+    const res = await fetch(fetchURL);
+    if (res.ok) {
+        location.reload();
+    }
+}
 
 let changeToImportTimeout = "";
-const changeToImport = () => changeToImportTimeout = setTimeout(() => showImportPage(), 5000);
-const showImportPage = () => document.location.href = root + "import/";
+const showImportPageTimeout = 5 * 1000; // 5 seconds
+const changeToImport = () => changeToImportTimeout = setTimeout(() => showImportPage(), showImportPageTimeout);
+const showImportPage = () => document.location.href = root + "/import/";
 const clearImportTimeout = () => clearTimeout(changeToImportTimeout);
 
 const archiveCheckbox = () => {
@@ -130,13 +140,13 @@ const archiveCheckbox = () => {
     createArchive.checked ? createArchiveLabel.innerText = "Yes" : createArchiveLabel.innerText = "No";
     updateArchive.checked ? updateArchiveLabel.innerText = "Yes" : updateArchiveLabel.innerText = "No";
     return;
-};
+}
 
 const clearInputs = () => {
     const input = document.querySelectorAll(".uac-input");
     if (input.length === 0) return;
-    for (let i = 0; i < input.length; i++) input[i].value = "";
-};
+    for (let i = 0; i < input.length; ++i) input[i].value = "";
+}
 
 const updatePagination = async () => {
     const fetchUrl = API + "pages/";
@@ -151,17 +161,17 @@ const updatePagination = async () => {
     try { currentPage = Number(window.location.href.split("?")[1].split("=")[1]); } catch (err) { currentPage = 0; }
     if (currentPage <= 0) document.getElementById("prev-page").style.pointerEvents = "none";
     if (currentPage === totalPages) document.getElementById("next-page").style.pointerEvents = "none";
-    document.getElementById("last-page").href = `/?page=${totalPages}`
+    document.getElementById("last-page").href = `/?page=${totalPages}`;
 
     const paginationNumbers = document.getElementById("pagination-numbers");
     paginationNumbers.innerHTML = "";
     if (totalPages <= pagesToShow) {
-        for (let index = 0; index <= totalPages; index++) createPaginationLink(index, currentPage);
+         for (let index = 0; index <= totalPages; ++index) createPaginationLink(index, currentPage);
     } else {
         if (currentPage >= totalPages - 3) {
-            for (let index = totalPages - pagesToShow; index <= totalPages; index++) createPaginationLink(index, currentPage);
+            for (let index = totalPages - pagesToShow; index <= totalPages; ++index) createPaginationLink(index, currentPage);
         } else {
-            for (let index = currentPage; index <= currentPage + pagesToShow; index++) createPaginationLink(index, currentPage);
+            for (let index = currentPage; index <= currentPage + pagesToShow; ++index) createPaginationLink(index, currentPage);
         }
     }
 
@@ -172,12 +182,12 @@ const updatePagination = async () => {
         pageNumberLink.title = `Page ${pageNumber}`;
         if (pageNumber === current) pageNumberLink.classList.add("active");
         paginationNumbers.appendChild(pageNumberLink);
-    };
-};
+    }
+}
 
 window.onload = () => {
     const host = new URL(window.location.href).host;
     root = `http://${host}`;
     API = `${root}/api/`;
     updatePagination();
-};
+}
