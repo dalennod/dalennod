@@ -3,19 +3,42 @@
 let API = "";
 let root = "";
 
-const showCreateDialog = () => {
+let changeToImportTimeout = "";
+const showImportPageTimeout = 5 * 1000; // 5 seconds
+const changeToImport = () => changeToImportTimeout = setTimeout(() => showImportPage(), showImportPageTimeout);
+const showImportPage = () => document.location.href = root + "/import/";
+const clearImportTimeout = () => clearTimeout(changeToImportTimeout);
+
+const groupsDatalistOptions = async () => {
+    const fetchURL = API + "groups/";
+    const res = await fetch(fetchURL);
+    return await res.text();
+};
+
+const showCreateDialog = async () => {
     document.querySelector(".dialog-create").showModal();
     clearImportTimeout();
-}
+    const bookmarkCreateDatalist = document.getElementById("bmGroups-list-create");
+    bookmarkCreateDatalist.innerHTML = await groupsDatalistOptions();
+};
 const closeCreateDialog = () => document.querySelector(".dialog-create").close();
+document.querySelector(".dialog-create").addEventListener("close", () => {
+    location.href = root;
+});
 
-const showUpdateDialog = () => {
+const showUpdateDialog = async () => {
     document.querySelector(".dialog-update").showModal();
     const noteTextArea = document.getElementById("update-note");
     noteTextArea.style.height = "auto";
     noteTextArea.style.height = noteTextArea.scrollHeight + "px";
-}
+
+    const bookmarkUpdateDatalist = document.getElementById("bmGroups-list-update");
+    bookmarkUpdateDatalist.innerHTML = await groupsDatalistOptions();
+};
 const closeUpdateDialog = () => document.querySelector(".dialog-update").close();
+document.querySelector(".dialog-update").addEventListener("close", () => {
+    location.reload();
+});
 
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.id;
@@ -24,7 +47,7 @@ const getOldData = async (ele) => {
     const oldData = await res.json();
     if (typeof Storage !== "undefined") localStorage.setItem("oldData", JSON.stringify(oldData));
     setOldData();
-}
+};
 
 let oldData = "";
 const setOldData = () => {
@@ -39,7 +62,7 @@ const setOldData = () => {
         oldData.archive ? document.querySelector("#update-archive-div").setAttribute("hidden", "") : document.querySelector("#update-archive-div").removeAttribute("hidden");
     }
     showUpdateDialog();
-}
+};
 
 const updateEntry = async () => {
     const newDataJSON = {
@@ -77,7 +100,7 @@ const updateEntry = async () => {
         document.querySelector("#update-checkmark").removeAttribute("hidden");
         setTimeout(() => document.querySelector("#update-checkmark").setAttribute("hidden", ""), 1000);
     }
-}
+};
 
 const addEntry = async () => {
     if (document.querySelector("#create-url").value === "") {
@@ -115,22 +138,18 @@ const addEntry = async () => {
         document.querySelector("#create-checkmark").removeAttribute("hidden");
         setTimeout(() => document.querySelector("#create-checkmark").setAttribute("hidden", ""), 1000);
     }
-}
+};
 
 const deleteEntry = async (element) => {
     const bookmarkID = element.parentNode.parentNode.id;
     let fetchURL = API + "delete/" + bookmarkID;
     const res = await fetch(fetchURL);
-    if (res.ok) {
-        location.reload();
+    if (!res.ok) {
+        console.error(res.status);
+        return;
     }
+    location.reload();
 }
-
-let changeToImportTimeout = "";
-const showImportPageTimeout = 5 * 1000; // 5 seconds
-const changeToImport = () => changeToImportTimeout = setTimeout(() => showImportPage(), showImportPageTimeout);
-const showImportPage = () => document.location.href = root + "/import/";
-const clearImportTimeout = () => clearTimeout(changeToImportTimeout);
 
 const archiveCheckbox = () => {
     const createArchive = document.getElementById("create-archive");
@@ -139,14 +158,13 @@ const archiveCheckbox = () => {
     const updateArchiveLabel = document.querySelector(".update-archive-label");
     createArchive.checked ? createArchiveLabel.innerText = "Yes" : createArchiveLabel.innerText = "No";
     updateArchive.checked ? updateArchiveLabel.innerText = "Yes" : updateArchiveLabel.innerText = "No";
-    return;
-}
+};
 
 const clearInputs = () => {
     const input = document.querySelectorAll(".uac-input");
     if (input.length === 0) return;
     for (let i = 0; i < input.length; ++i) input[i].value = "";
-}
+};
 
 const updatePagination = async () => {
     const fetchUrl = API + "pages/";
@@ -183,11 +201,11 @@ const updatePagination = async () => {
         if (pageNumber === current) pageNumberLink.classList.add("active");
         paginationNumbers.appendChild(pageNumberLink);
     }
-}
+};
 
 window.onload = () => {
     const host = new URL(window.location.href).host;
     root = `http://${host}`;
     API = `${root}/api/`;
     updatePagination();
-}
+};
