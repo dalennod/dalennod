@@ -192,7 +192,9 @@ func BackupViewAll(database *sql.DB) []setup.Bookmark {
     return results
 }
 
-func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
+// TODO: refactoring opportunity for ViewAll[..] using GotURLParams struct
+
+func ViewAllWhere(database *sql.DB, keyword string, pageNumber int) []setup.Bookmark {
     var results []setup.Bookmark
     var result setup.Bookmark
     var modified time.Time
@@ -202,13 +204,15 @@ func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
     }
     keyword = "%" + keyword + "%"
 
-    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) or bmGroup LIKE (?) or note LIKE (?) or title LIKE (?) or url LIKE (?) ORDER BY id DESC;")
+    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) or bmGroup LIKE (?) or note LIKE (?) or title LIKE (?) or url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);")
     if err != nil {
         logger.Error.Println("error preparing database statement. ERROR:", err)
         return results
     }
 
-    execRes, err := stmt.Query(keyword, keyword, keyword, keyword, keyword)
+    pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT
+
+    execRes, err := stmt.Query(keyword, keyword, keyword, keyword, keyword, constants.PAGE_UPDATE_LIMIT, pageOffset)
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return results
@@ -223,20 +227,22 @@ func ViewAllWhere(database *sql.DB, keyword string) []setup.Bookmark {
     return results
 }
 
-func ViewAllWhereKeyword(database *sql.DB, keyword string) []setup.Bookmark {
+func ViewAllWhereKeyword(database *sql.DB, keyword string, pageNumber int) []setup.Bookmark {
     var results []setup.Bookmark
     var result setup.Bookmark
     var modified time.Time
 
     keyword = "%" + keyword + "%"
 
-    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) ORDER BY id DESC;")
+    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);")
     if err != nil {
         logger.Error.Println("error preparing database statement. ERROR:", err)
         return results
     }
 
-    execRes, err := stmt.Query(keyword)
+    pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT
+
+    execRes, err := stmt.Query(keyword, constants.PAGE_UPDATE_LIMIT, pageOffset)
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return results
@@ -251,20 +257,22 @@ func ViewAllWhereKeyword(database *sql.DB, keyword string) []setup.Bookmark {
     return results
 }
 
-func ViewAllWhereGroup(database *sql.DB, keyword string) []setup.Bookmark {
+func ViewAllWhereGroup(database *sql.DB, keyword string, pageNumber int) []setup.Bookmark {
     var results []setup.Bookmark
     var result setup.Bookmark
     var modified time.Time
 
     keyword = "%" + keyword + "%"
 
-    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE bmGroup LIKE (?) ORDER BY id DESC;")
+    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE bmGroup LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);")
     if err != nil {
         logger.Error.Println("error preparing database statement. ERROR:", err)
         return results
     }
 
-    execRes, err := stmt.Query(keyword)
+    pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT;
+
+    execRes, err := stmt.Query(keyword, constants.PAGE_UPDATE_LIMIT, pageOffset)
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return results
@@ -279,20 +287,21 @@ func ViewAllWhereGroup(database *sql.DB, keyword string) []setup.Bookmark {
     return results
 }
 
-func ViewAllWhereHostname(database *sql.DB, hostname string) []setup.Bookmark {
+func ViewAllWhereHostname(database *sql.DB, hostname string, pageNumber int) []setup.Bookmark {
     var results []setup.Bookmark
     var result setup.Bookmark
     var modified time.Time
 
     hostname = "%" + hostname + "%"
 
-    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC;")
+    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);")
     if err != nil {
         logger.Error.Println("error preparing database statement. ERROR:", err)
         return results
     }
 
-    execRes, err := stmt.Query(hostname)
+    pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT;
+    execRes, err := stmt.Query(hostname, constants.PAGE_UPDATE_LIMIT, pageOffset);
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return results

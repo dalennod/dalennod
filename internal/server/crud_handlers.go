@@ -9,24 +9,59 @@ import (
     "html/template"
     "net/http"
     "strconv"
+    "fmt"
 )
+
+type GotURLParams struct {
+    pageNumber string
+    searchType string
+    searchTerm string
+}
+
+func parseURLParams(r *http.Request) GotURLParams {
+    var gotURLParams GotURLParams;
+    err := r.ParseForm();
+    if err != nil {
+        logger.Error.Println("error parsing URL params. ERROR:", err);
+        return gotURLParams;
+    }
+    gotURLParams.pageNumber = r.FormValue("page");
+    gotURLParams.searchType = r.FormValue("search-type");
+    gotURLParams.searchTerm = r.FormValue("search-term");
+    return gotURLParams;
+}
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
     if r.Method == http.MethodGet {
         pageCount = 0
         var bookmarks []setup.Bookmark
-        r.ParseForm()
 
-        var pageNo string = r.FormValue("page")
-        if pageNo == "" {
-            bookmarks = db.ViewAllWebUI(database, 0)
-        } else {
-            pageNoInt, err := strconv.Atoi(pageNo)
+        gotURLParams := parseURLParams(r);
+        if gotURLParams.pageNumber != "" {
+            pageNoValid, err := strconv.Atoi(gotURLParams.pageNumber);
             if err != nil {
-                logger.Error.Printf("error: invalid page no. %v", err)
+                logger.Warn.Println("Invalid page number. Got:", gotURLParams.pageNumber);
             }
-            pageCount = pageNoInt
-            bookmarks = db.ViewAllWebUI(database, pageNoInt)
+            pageCount = pageNoValid;
+        }
+        if gotURLParams.searchType != "" {
+            switch (gotURLParams.searchType) {
+            case "general":
+                bookmarks = db.ViewAllWhere(database, gotURLParams.searchTerm, pageCount);
+            case "hostname":
+                bookmarks = db.ViewAllWhereHostname(database, gotURLParams.searchTerm, pageCount);
+            case "keyword":
+                bookmarks = db.ViewAllWhereKeyword(database, gotURLParams.searchTerm, pageCount);
+            case "group":
+                bookmarks = db.ViewAllWhereGroup(database, gotURLParams.searchTerm, pageCount);
+            default:
+                w.WriteHeader(http.StatusBadRequest);
+                fmt.Fprint(w, "ERROR: Unrecognized search type");
+                logger.Error.Println("ERROR: Unrecognized search type. Got:", gotURLParams.searchType);
+                return;
+            }
+        } else {
+            bookmarks = db.ViewAllWebUI(database, pageCount);
         }
 
         tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(Web, "web/index.html"))

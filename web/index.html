@@ -4,19 +4,19 @@
   <head>
     <meta charset="UTF-8" />
     <meta property="og:image" content="{{ webUIAddress  }}/static/imgs/favicon.ico">
-    <link rel="icon" href="static/imgs/favicon.ico" type="image/x-icon" />
+    <link rel="icon" type="image/x-icon" href="static/imgs/favicon.ico" />
     <!-- <link rel="stylesheet" href="static/css/reset.css" /> -->
     <link rel="stylesheet" href="static/css/styles.css" />
-    <script src="static/js/htmx.min.js" type="text/javascript" defer></script>
     <script src="static/js/main-script.js" type="text/javascript" defer></script>
     <title>Dalennod</title>
   </head>
 
   <body>
     <nav>
-      <form class="search-form" hx-post="/api/search/">
-        <input type="text" name="searchTerm" class="input-search" placeholder="Search a keyword..." />
-        <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search/" title="Search">
+      <form class="search-form" action="/" method="get">
+        <input type="text" name="search-type" value="general" hidden />
+        <input type="text" name="search-term" class="input-search" placeholder="Search a keyword..." />
+        <button class="button-svg" type="submit" id="button-search-html" title="Search">
           <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button" />
         </button>
       </form>
@@ -50,9 +50,10 @@
             {{ end }}
             <div class="center-text pad-like-p">
               {{ $hostname := getHostname .URL }}
-              <form hx-post="/api/search-hostname/">
-                <input hidden name="searchTerm" value="{{ $hostname }}" />
-                <button type="submit" hx-target="main" hx-post="/api/search-hostname/" class="button-hostname bm-hostname" title="Search for this host" tabindex="-1">{{ $hostname }}</button>
+              <form action="/" method="get">
+                <input hidden name="search-type" value="hostname" />
+                <input hidden name="search-term" value="{{ $hostname }}" />
+                <button type="submit" class="button-hostname bm-hostname" title="Search for this host" tabindex="-1">{{ $hostname }}</button>
               </form>
             </div>
             {{ if .Title }}
@@ -77,9 +78,10 @@
               {{ $keywords := keywordSplit .Keywords "," }}
               {{ range $_, $keyword := $keywords}}
               <div class="bm-keywords">
-                <form hx-post="/api/search-keyword/">
-                  <input hidden name="searchTerm" value="{{ $keyword }}" />
-                  <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search-keyword/" title="Search for this keyword">
+                <form action="/" method="get">
+                  <input hidden name="search-type" value="keyword" />
+                  <input hidden name="search-term" value="{{ $keyword }}" />
+                  <button class="button-svg" type="submit" id="button-search-html" title="Search for '{{ $keyword }}' keyword">
                     <span id="keywords" class="keywords">{{ $keyword }}</span>
                   </button>
                 </form>
@@ -89,9 +91,10 @@
             {{ end }}
             <div class="pad-like-p">
               {{ if .BmGroup }}
-              <form hx-post="/api/search-group/">
-                <input hidden name="searchTerm" value="{{ .BmGroup }}" />
-                <button class="button-svg" type="submit" id="button-search-html" hx-target="main" hx-post="/api/search-group/" title="Search for this group">
+              <form action="/" method="get">
+                <input hidden name="search-type" value="group" />
+                <input hidden name="search-term" value="{{ .BmGroup }}" />
+                <button class="button-svg" type="submit" id="button-search-html" title="Search for '{{ .BmGroup }}' group">
                   <span id="group" class="group">{{ .BmGroup }}</span>
                 </button>
               </form>

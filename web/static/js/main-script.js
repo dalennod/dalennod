@@ -59,7 +59,9 @@ const setOldData = () => {
         document.querySelector("#update-note").value = oldData.note;
         document.querySelector("#update-keywords").value = oldData.keywords;
         document.querySelector("#update-bmGroup").value = oldData.bmGroup;
-        oldData.archive ? document.querySelector("#update-archive-div").setAttribute("hidden", "") : document.querySelector("#update-archive-div").removeAttribute("hidden");
+        oldData.archive
+            ? document.querySelector("#update-archive-div").setAttribute("hidden", "")
+            : document.querySelector("#update-archive-div").removeAttribute("hidden");
     }
     showUpdateDialog();
 };
@@ -92,7 +94,7 @@ const updateEntry = async () => {
             "Content-Type": "application/json; charset=utf-8",
         },
         body: JSON.stringify(newDataJSON),
-    })
+    });
 
     if (res.ok) {
         updateButton.disabled = false;
@@ -129,7 +131,7 @@ const addEntry = async () => {
             "Content-Type": "application/json; charset=utf-8",
         },
         body: JSON.stringify(dataJSON),
-    })
+    });
 
     if (res.ok) {
         clearInputs();
@@ -149,7 +151,7 @@ const deleteEntry = async (element) => {
         return;
     }
     location.reload();
-}
+};
 
 const archiveCheckbox = () => {
     const createArchive = document.getElementById("create-archive");
@@ -166,17 +168,29 @@ const clearInputs = () => {
     for (let i = 0; i < input.length; ++i) input[i].value = "";
 };
 
+const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocation) => {
+    const params = new URLSearchParams(hrefLocation.search);
+    params.set("page", pageNumber);
+
+    const pageNumberLink = document.createElement("a");
+    pageNumberLink.innerHTML = pageNumber;
+    pageNumberLink.title = `Page ${pageNumber}`;
+    pageNumberLink.href = "?"+params.toString();
+    if (pageNumber === current) pageNumberLink.classList.add("active");
+    paginationNumbers.appendChild(pageNumberLink);
+};
+
 const updatePagination = async () => {
-    const fetchUrl = API + "pages/";
-    const res = await fetch(fetchUrl);
+    const hrefLocation = new URL(location.href);
+    const res = await fetch(API + "pages/");
     if (!res.ok) {
         console.error(res.status);
         return;
     }
     const totalPages = Number(await res.text());
+
     const pagesToShow = 5;
-    let currentPage = 0;
-    try { currentPage = Number(window.location.href.split("?")[1].split("=")[1]); } catch (err) { currentPage = 0; }
+    const currentPage = Number(hrefLocation.searchParams.get("page"));
     if (currentPage <= 0) document.getElementById("prev-page").style.pointerEvents = "none";
     if (currentPage === totalPages) document.getElementById("next-page").style.pointerEvents = "none";
     document.getElementById("last-page").href = `/?page=${totalPages}`;
@@ -184,27 +198,24 @@ const updatePagination = async () => {
     const paginationNumbers = document.getElementById("pagination-numbers");
     paginationNumbers.innerHTML = "";
     if (totalPages <= pagesToShow) {
-         for (let index = 0; index <= totalPages; ++index) createPaginationLink(index, currentPage);
+        for (let index = 0; index <= totalPages; ++index) {
+            createPaginationLink(index, currentPage, paginationNumbers, hrefLocation);
+        }
     } else {
         if (currentPage >= totalPages - 3) {
-            for (let index = totalPages - pagesToShow; index <= totalPages; ++index) createPaginationLink(index, currentPage);
+            for (let index = totalPages - pagesToShow; index <= totalPages; ++index) {
+                createPaginationLink(index, currentPage, paginationNumbers, hrefLocation);
+            }
         } else {
-            for (let index = currentPage; index <= currentPage + pagesToShow; ++index) createPaginationLink(index, currentPage);
+            for (let index = currentPage; index <= currentPage + pagesToShow; ++index) {
+                createPaginationLink(index, currentPage, paginationNumbers, hrefLocation);
+            }
         }
-    }
-
-    function createPaginationLink(pageNumber, current) {
-        const pageNumberLink = document.createElement("a");
-        pageNumberLink.innerHTML = pageNumber;
-        pageNumberLink.href = `/?page=${pageNumber}`;
-        pageNumberLink.title = `Page ${pageNumber}`;
-        if (pageNumber === current) pageNumberLink.classList.add("active");
-        paginationNumbers.appendChild(pageNumberLink);
     }
 };
 
 window.onload = () => {
-    const host = new URL(window.location.href).host;
+    const host = new URL(location.href).host;
     root = `http://${host}`;
     API = `${root}/api/`;
     updatePagination();
