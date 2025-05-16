@@ -205,128 +205,63 @@ func BackupViewAll(database *sql.DB) []setup.Bookmark {
     return results
 }
 
-// TODO: refactoring opportunity for ViewAll[..] using GotURLParams struct
-
-func ViewAllWhere(database *sql.DB, keyword string, pageNumber int) []setup.Bookmark {
-    var results []setup.Bookmark
-    var result setup.Bookmark
-    var modified time.Time
-
-    if keyword == "" {
-        return results
+func executeSearchQuery(database *sql.DB, searchType, searchTerm string, pageOffset int) (*sql.Rows, error) {
+    var query string;
+    var params []interface{};
+    switch searchType {
+    case "general":
+        query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) OR bmGroup LIKE (?) OR note LIKE (?) OR title LIKE (?) OR url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);";
+        params = []interface{}{searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset};
+    case "hostname":
+        query = "SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);";
+        params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset};
+    case "keyword":
+        query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);";
+        params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset};
+    case "group":
+        query = "SELECT * FROM bookmarks WHERE bmGroup LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);";
+        params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset};
+    default:
+        return nil, fmt.Errorf("unrecognized search type: %s", searchType);
     }
-    keyword = "%" + keyword + "%"
 
-    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) or bmGroup LIKE (?) or note LIKE (?) or title LIKE (?) or url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);")
+    stmt, err := database.Prepare(query);
     if err != nil {
-        logger.Error.Println("error preparing database statement. ERROR:", err)
-        return results
+        return nil, err;
     }
 
-    pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT
-
-    execRes, err := stmt.Query(keyword, keyword, keyword, keyword, keyword, constants.PAGE_UPDATE_LIMIT, pageOffset)
+    rows, err := stmt.Query(params...);
     if err != nil {
-        logger.Error.Println("error executing database statement. ERROR:", err)
-        return results
+        return nil, err;
     }
 
-    for execRes.Next() {
-        result = setup.Bookmark{}
-        execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        appendBookmarks(&results, result, modified)
-    }
-
-    return results
+    return rows, nil;
 }
 
-func ViewAllWhereKeyword(database *sql.DB, keyword string, pageNumber int) []setup.Bookmark {
-    var results []setup.Bookmark
-    var result setup.Bookmark
-    var modified time.Time
+func SearchFor(database *sql.DB, searchType, searchTerm string, pageNumber int) []setup.Bookmark {
+    var results []setup.Bookmark;
+    var result setup.Bookmark;
+    var modified time.Time;
 
-    keyword = "%" + keyword + "%"
-
-    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);")
-    if err != nil {
-        logger.Error.Println("error preparing database statement. ERROR:", err)
-        return results
+    if searchTerm == "" {
+        return results;
     }
-
-    pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT
-
-    execRes, err := stmt.Query(keyword, constants.PAGE_UPDATE_LIMIT, pageOffset)
-    if err != nil {
-        logger.Error.Println("error executing database statement. ERROR:", err)
-        return results
-    }
-
-    for execRes.Next() {
-        result = setup.Bookmark{}
-        execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        appendBookmarks(&results, result, modified)
-    }
-
-    return results
-}
-
-func ViewAllWhereGroup(database *sql.DB, keyword string, pageNumber int) []setup.Bookmark {
-    var results []setup.Bookmark
-    var result setup.Bookmark
-    var modified time.Time
-
-    keyword = "%" + keyword + "%"
-
-    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE bmGroup LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);")
-    if err != nil {
-        logger.Error.Println("error preparing database statement. ERROR:", err)
-        return results
-    }
-
+    searchTerm = "%" + searchTerm + "%";
     pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT;
 
-    execRes, err := stmt.Query(keyword, constants.PAGE_UPDATE_LIMIT, pageOffset)
+    rows, err := executeSearchQuery(database, searchType, searchTerm, pageOffset)
     if err != nil {
-        logger.Error.Println("error executing database statement. ERROR:", err)
+        logger.Error.Println("error executing database query. ERROR:", err)
         return results
     }
 
-    for execRes.Next() {
+    for rows.Next() {
         result = setup.Bookmark{}
-        execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
+        rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
         appendBookmarks(&results, result, modified)
     }
 
-    return results
-}
-
-func ViewAllWhereHostname(database *sql.DB, hostname string, pageNumber int) []setup.Bookmark {
-    var results []setup.Bookmark
-    var result setup.Bookmark
-    var modified time.Time
-
-    hostname = "%" + hostname + "%"
-
-    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);")
-    if err != nil {
-        logger.Error.Println("error preparing database statement. ERROR:", err)
-        return results
-    }
-
-    pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT;
-    execRes, err := stmt.Query(hostname, constants.PAGE_UPDATE_LIMIT, pageOffset);
-    if err != nil {
-        logger.Error.Println("error executing database statement. ERROR:", err)
-        return results
-    }
-
-    for execRes.Next() {
-        result = setup.Bookmark{}
-        execRes.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.BmGroup, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
-        appendBookmarks(&results, result, modified)
-    }
-
-    return results
+    return results;
 }
 
 func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
@@ -344,19 +279,7 @@ func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
     }
 
     for execRes.Next() {
-        if err = execRes.Scan(
-            &rowResult.ID,
-            &rowResult.URL,
-            &rowResult.Title,
-            &rowResult.Note,
-            &rowResult.Keywords,
-            &rowResult.BmGroup,
-            &rowResult.Archived,
-            &rowResult.SnapshotURL,
-            &rowResult.ThumbURL,
-            &rowResult.ByteThumbURL,
-            &modified,
-        ); err != nil {
+        if err = execRes.Scan(&rowResult.ID, &rowResult.URL, &rowResult.Title, &rowResult.Note, &rowResult.Keywords, &rowResult.BmGroup, &rowResult.Archived, &rowResult.SnapshotURL, &rowResult.ThumbURL, &rowResult.ByteThumbURL, &modified); err != nil {
             return rowResult, err
         }
         rowResult.Modified = modified.Local().Format(constants.TIME_FORMAT)
@@ -369,6 +292,10 @@ func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
     return rowResult, nil
 }
 
+// SearchByUrl function:
+// Used in browser extension to check if the current tab is bookmarked
+// or not, so appropriate extension icon is shown. Not related to SearchFor
+// function.
 func SearchByUrl(database *sql.DB, searchUrl string) (setup.Bookmark, error) {
     var urlResult setup.Bookmark
 
@@ -383,19 +310,7 @@ func SearchByUrl(database *sql.DB, searchUrl string) (setup.Bookmark, error) {
     }
 
     for execRes.Next() {
-        if err = execRes.Scan(
-            &urlResult.ID,
-            &urlResult.URL,
-            &urlResult.Title,
-            &urlResult.Note,
-            &urlResult.Keywords,
-            &urlResult.BmGroup,
-            &urlResult.Archived,
-            &urlResult.SnapshotURL,
-            &urlResult.ThumbURL,
-            &urlResult.ByteThumbURL,
-            &urlResult.Modified,
-        ); err != nil {
+        if err = execRes.Scan(&urlResult.ID, &urlResult.URL, &urlResult.Title, &urlResult.Note, &urlResult.Keywords, &urlResult.BmGroup, &urlResult.Archived, &urlResult.SnapshotURL, &urlResult.ThumbURL, &urlResult.ByteThumbURL, &urlResult.Modified); err != nil {
             return urlResult, err;
         }
     }
@@ -414,7 +329,6 @@ func GetAllGroups(database *sql.DB) ([]string, error) {
     var bmGroup string
     for rows.Next() {
         rows.Scan(&bmGroup)
-
         if bmGroup != "" {
             allGroups = append(allGroups, bmGroup)
         }

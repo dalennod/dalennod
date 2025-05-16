@@ -47,13 +47,13 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
         if gotURLParams.searchType != "" {
             switch (gotURLParams.searchType) {
             case "general":
-                bookmarks = db.ViewAllWhere(database, gotURLParams.searchTerm, pageCount);
+                fallthrough;
             case "hostname":
-                bookmarks = db.ViewAllWhereHostname(database, gotURLParams.searchTerm, pageCount);
+                fallthrough;
             case "keyword":
-                bookmarks = db.ViewAllWhereKeyword(database, gotURLParams.searchTerm, pageCount);
+                fallthrough;
             case "group":
-                bookmarks = db.ViewAllWhereGroup(database, gotURLParams.searchTerm, pageCount);
+                bookmarks = db.SearchFor(database, gotURLParams.searchType, gotURLParams.searchTerm, pageCount);
             default:
                 w.WriteHeader(http.StatusBadRequest);
                 fmt.Fprint(w, "ERROR: Unrecognized search type");
