@@ -32,9 +32,23 @@ func Add(database *sql.DB, bmStruct setup.Bookmark) {
     }
 }
 
+// serverCall boolean explanation:
+// When updating from CLI, newline/empty input means to retain old data.
+// But, when updating from Web UI or extension the empty input means no
+// input. So, if updating from CLI the old data needs to be retrieved to
+// replace the empty input, thus if not serverCall then get old data and
+// replace the empty input with old data.
 func Update(database *sql.DB, bmStruct setup.Bookmark, serverCall bool) {
     if !serverCall {
         bmStruct = updateCheck(database, bmStruct)
+    }
+
+    if bmStruct.ThumbURL == "" || len(bmStruct.ByteThumbURL) == 0 {
+        var err error
+        bmStruct.ThumbURL, bmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
+        if err != nil {
+            logger.Error.Println("error getting webpage thumbnail. ERROR:", err)
+        }
     }
 
     stmt, err := database.Prepare("UPDATE bookmarks SET url=(?), title=(?), note=(?), keywords=(?), bmGroup=(?), archived=(?), snapshotURL=(?), thumbURL=(?), byteThumbURL=(?), modified=(?) WHERE id=(?);")
@@ -43,8 +57,7 @@ func Update(database *sql.DB, bmStruct setup.Bookmark, serverCall bool) {
         return
     }
 
-
-    _, err = stmt.Exec(bmStruct.URL, bmStruct.Title, bmStruct.Note, bmStruct.Keywords, bmStruct.BmGroup, bmStruct.Archived, bmStruct.SnapshotURL, bmStruct.ThumbURL, bmStruct.ByteThumbURL, time.Now().UTC().Format(constants.TIME_FORMAT),  bmStruct.ID)
+    _, err = stmt.Exec(bmStruct.URL, bmStruct.Title, bmStruct.Note, bmStruct.Keywords, bmStruct.BmGroup, bmStruct.Archived, bmStruct.SnapshotURL, bmStruct.ThumbURL, bmStruct.ByteThumbURL, time.Now().UTC().Format(constants.TIME_FORMAT), bmStruct.ID)
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return
