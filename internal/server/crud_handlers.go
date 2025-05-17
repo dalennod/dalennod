@@ -33,7 +33,7 @@ func parseURLParams(r *http.Request) GotURLParams {
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
     if r.Method == http.MethodGet {
-        pageCount = 0
+        pageCount := 0
         var bookmarks []setup.Bookmark
 
         gotURLParams := parseURLParams(r);
@@ -53,7 +53,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
             case "keyword":
                 fallthrough;
             case "group":
-                bookmarks = db.SearchFor(database, gotURLParams.searchType, gotURLParams.searchTerm, pageCount);
+                bookmarks, pageCountForSearch = db.SearchFor(database, gotURLParams.searchType, gotURLParams.searchTerm, pageCount);
             default:
                 w.WriteHeader(http.StatusBadRequest);
                 fmt.Fprint(w, "ERROR: Unrecognized search type");

@@ -13,7 +13,7 @@ import (
 )
 
 var (
-    pageCount    int                         = 0
+    pageCountForSearch int                   = 0
     tmplFuncMap  template.FuncMap            = make(template.FuncMap)
     allBookmarks map[string][]setup.Bookmark = make(map[string][]setup.Bookmark)
     database     *sql.DB
@@ -37,10 +37,6 @@ func Start(data *sql.DB) {
     tmplFuncMap["getHostname"]        = getHostname
     tmplFuncMap["keywordSplit"]       = keywordSplit
     tmplFuncMap["byteConversion"]     = byteConversion
-    tmplFuncMap["pageCountUp"]        = pageCountUp
-    tmplFuncMap["pageCountDown"]      = pageCountDown
-    tmplFuncMap["pageCountNowUpdate"] = pageCountNowUpdate
-    tmplFuncMap["pageCountNowDelete"] = pageCountNowDelete
     tmplFuncMap["webUIAddress"]       = webUIAddress
 
     mux.HandleFunc("/{$}", rootHandler)

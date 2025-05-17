@@ -49,21 +49,3 @@ func byteConversion(blobImage []byte) string {
 
     return base64Encoded
 }
-
-func pageCountUp() int {
-    pageCount = pageCount + 2
-    return pageCount
-}
-
-func pageCountDown() int {
-    pageCount = pageCount - 1
-    return pageCount
-}
-
-func pageCountNowUpdate() int {
-    return pageCount - 1
-}
-
-func pageCountNowDelete() int {
-    return pageCount
-}

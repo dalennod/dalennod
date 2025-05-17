@@ -169,7 +169,7 @@ const clearInputs = () => {
 };
 
 const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocation) => {
-    const params = new URLSearchParams(hrefLocation.search);
+    const params = new URLSearchParams(hrefLocation.search); // .search = +rw
     params.set("page", pageNumber);
 
     const pageNumberLink = document.createElement("a");
@@ -180,9 +180,32 @@ const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocati
     paginationNumbers.appendChild(pageNumberLink);
 };
 
+const updateNavATags = (current, totalPages, hrefParams) => {
+    const nextPage = current + 1;
+    const prevPage = current - 1;
+    if (hrefParams.get("search-type")) {
+        document.getElementById("prev-page").href = `/?search-type=${hrefParams.get("search-type")}&search-term=${hrefParams.get("search-term")}&page=${prevPage}`;
+        document.getElementById("next-page").href = `/?search-type=${hrefParams.get("search-type")}&search-term=${hrefParams.get("search-term")}&page=${nextPage}`;
+        document.getElementById("last-page").href = `/?search-type=${hrefParams.get("search-type")}&search-term=${hrefParams.get("search-term")}&page=${totalPages}`;
+    } else {
+        document.getElementById("prev-page").href = `/?page=${prevPage}`;
+        document.getElementById("next-page").href = `/?page=${nextPage}`;
+        document.getElementById("last-page").href = `/?page=${totalPages}`;
+    }
+};
+
 const updatePagination = async () => {
     const hrefLocation = new URL(location.href);
-    const res = await fetch(API + "pages/");
+    const hrefParams = hrefLocation.searchParams; // .searchParams = +r
+    const fetchURL = API + "pages/";
+    let res;
+    if (hrefParams.get("search-type")) {
+        res = await fetch(fetchURL, {
+            method: "POST",
+        });
+    } else {
+        res = await fetch(fetchURL);
+    }
     if (!res.ok) {
         console.error(res.status);
         return;
@@ -190,10 +213,10 @@ const updatePagination = async () => {
     const totalPages = Number(await res.text());
 
     const pagesToShow = 5;
-    const currentPage = Number(hrefLocation.searchParams.get("page"));
+    const currentPage = Number(hrefParams.get("page"));
+    updateNavATags(currentPage, totalPages, hrefParams);
     if (currentPage <= 0) document.getElementById("prev-page").style.pointerEvents = "none";
     if (currentPage === totalPages) document.getElementById("next-page").style.pointerEvents = "none";
-    document.getElementById("last-page").href = `/?page=${totalPages}`;
 
     const paginationNumbers = document.getElementById("pagination-numbers");
     paginationNumbers.innerHTML = "";

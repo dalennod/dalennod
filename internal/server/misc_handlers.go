@@ -153,8 +153,9 @@ func groupsHandler(w http.ResponseWriter, r *http.Request) {
 
 func pagesHandler(w http.ResponseWriter, r *http.Request) {
     if r.Method == http.MethodGet {
-        pageCount := db.TotalPageCount(database)
-        fmt.Fprint(w, pageCount)
+        fmt.Fprint(w, db.TotalPageCount(database))
+    } else if r.Method == http.MethodPost {
+        fmt.Fprint(w, pageCountForSearch);
     } else {
         internalServerErrorHandler(w, r)
     }
