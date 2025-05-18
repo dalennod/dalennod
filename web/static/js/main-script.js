@@ -173,9 +173,10 @@ const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocati
     params.set("page", pageNumber);
 
     const pageNumberLink = document.createElement("a");
-    pageNumberLink.innerHTML = pageNumber;
+    pageNumberLink.textContent = pageNumber;
     pageNumberLink.title = `Page ${pageNumber}`;
     pageNumberLink.href = "?"+params.toString();
+
     if (pageNumber === current) pageNumberLink.classList.add("active");
     paginationNumbers.appendChild(pageNumberLink);
 };
@@ -220,20 +221,12 @@ const updatePagination = async () => {
 
     const paginationNumbers = document.getElementById("pagination-numbers");
     paginationNumbers.innerHTML = "";
-    if (totalPages <= pagesToShow) {
-        for (let index = 0; index <= totalPages; ++index) {
-            createPaginationLink(index, currentPage, paginationNumbers, hrefLocation);
-        }
-    } else {
-        if (currentPage >= totalPages - 3) {
-            for (let index = totalPages - pagesToShow; index <= totalPages; ++index) {
-                createPaginationLink(index, currentPage, paginationNumbers, hrefLocation);
-            }
-        } else {
-            for (let index = currentPage; index <= currentPage + pagesToShow; ++index) {
-                createPaginationLink(index, currentPage, paginationNumbers, hrefLocation);
-            }
-        }
+
+    const start = Math.max(0, currentPage - pagesToShow);
+    const end = Math.min(totalPages, currentPage + pagesToShow);
+
+    for (let i = start; i <= end; ++i) {
+        createPaginationLink(i, currentPage, paginationNumbers, hrefLocation);
     }
 };
 
