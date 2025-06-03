@@ -5,7 +5,6 @@
     <meta charset="UTF-8" />
     <meta property="og:image" content="{{ webUIAddress  }}/static/imgs/favicon.ico">
     <link rel="icon" type="image/x-icon" href="static/imgs/favicon.ico" />
-    <!-- <link rel="stylesheet" href="static/css/reset.css" /> -->
     <link rel="stylesheet" href="static/css/styles.css" />
     <script src="static/js/main-script.js" type="text/javascript" defer></script>
     <title>Dalennod</title>
@@ -31,29 +30,25 @@
         {{ range .Bookmarks }}
         <div class="grid-child" id="{{ .ID }}">
           <div class="bm-info">
-            <div class="id-creation pad-like-p">
-              <a href="/api/row/{{ .ID }}" target="_blank">{{ .ID }}.</a>
-              <span>{{ .Modified }}</span>
-            </div>
-            {{ if .ByteThumbURL }}
-            <div class="thumburl">
+            <div class="thumbnail-image">
+              {{ if .ByteThumbURL }}
+              <img class="thumburl-bg" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" />
               <a href="{{ .URL }}" target="_blank">
-                <img src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" />
+                <img class="thumburl" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" />
               </a>
-            </div>
-            {{ else }}
-            <div class="default-thumburl">
+              {{ else }}
+              <img class="default-thumburl-bg" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" />
               <a href="{{ .URL }}" target="_blank">
-                <img src="static/imgs/41415.png" alt="[couldn't load thumbnail]" />
+                <img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" />
               </a>
+              {{ end }}
             </div>
-            {{ end }}
             <div class="center-text pad-like-p">
               {{ $hostname := getHostname .URL }}
               <form action="/" method="get">
                 <input hidden name="search-type" value="hostname" />
                 <input hidden name="search-term" value="{{ $hostname }}" />
-                <button type="submit" class="button-hostname bm-hostname" title="Search for this host" tabindex="-1">{{ $hostname }}</button>
+                <button type="submit" class="button-hostname bm-hostname" title="Search host: '{{ $hostname }}'" tabindex="-1">{{ $hostname }}</button>
               </form>
             </div>
             {{ if .Title }}
@@ -81,7 +76,7 @@
                 <form action="/" method="get">
                   <input hidden name="search-type" value="keyword" />
                   <input hidden name="search-term" value="{{ $keyword }}" />
-                  <button class="button-svg" type="submit" id="button-search-html" title="Search for '{{ $keyword }}' keyword">
+                  <button class="button-svg" type="submit" id="button-search-html" title="Search keyword: '{{ $keyword }}'">
                     <span id="keywords" class="keywords">{{ $keyword }}</span>
                   </button>
                 </form>
@@ -94,20 +89,26 @@
               <form action="/" method="get">
                 <input hidden name="search-type" value="group" />
                 <input hidden name="search-term" value="{{ .BmGroup }}" />
-                <button class="button-svg" type="submit" id="button-search-html" title="Search for '{{ .BmGroup }}' group">
+                <button class="button-svg" type="submit" id="button-search-html" title="Search group: '{{ .BmGroup }}'">
                   <span id="group" class="group">{{ .BmGroup }}</span>
                 </button>
               </form>
               {{ end }}
             </div>
           </div>
-          <div id="buttons" class="buttons">
-            <button class="button-svg" id="button-update" onclick="getOldData(this);" title="Update">
-              <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
-            </button>
-            <button class="button-svg" id="button-delete" title="Delete" ondblclick="deleteEntry(this);">
-              <img class="svg-img" src="static/imgs/delete_button.svg" alt="Delete button" />
-            </button>
+          <div class="footer-grid-child">
+            <div class="id-creation">
+              <a href="/api/row/{{ .ID }}" target="_blank">[{{ .ID }}]</a>
+              <span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span>
+            </div>
+            <div>
+              <button class="button-svg" id="button-update" title="Update" onclick="getOldData(this);">
+                <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
+              </button>
+              <button class="button-svg" id="button-delete" title="Delete" ondblclick="deleteEntry(this);">
+                <img class="svg-img" src="static/imgs/delete_button.svg" alt="Delete button" />
+              </button>
+            </div>
           </div>
         </div>
         {{ end }}

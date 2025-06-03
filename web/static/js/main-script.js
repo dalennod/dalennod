@@ -6,7 +6,7 @@ let root = "";
 let changeToImportTimeout = "";
 const showImportPageTimeout = 5 * 1000; // 5 seconds
 const changeToImport = () => changeToImportTimeout = setTimeout(() => showImportPage(), showImportPageTimeout);
-const showImportPage = () => document.location.href = root + "/import/";
+const showImportPage = () => window.location.href = root + "/import/";
 const clearImportTimeout = () => clearTimeout(changeToImportTimeout);
 
 const groupsDatalistOptions = async () => {
@@ -41,7 +41,7 @@ document.querySelector(".dialog-update").addEventListener("close", () => {
 });
 
 const getOldData = async (ele) => {
-    const entryID = ele.parentNode.parentNode.id;
+    const entryID = ele.parentNode.parentNode.parentNode.id;
     const fetchURL = API + "row/" + entryID;
     const res = await fetch(fetchURL);
     const oldData = await res.json();
@@ -143,7 +143,7 @@ const addEntry = async () => {
 };
 
 const deleteEntry = async (element) => {
-    const bookmarkID = element.parentNode.parentNode.id;
+    const bookmarkID = element.parentNode.parentNode.parentNode.id;
     let fetchURL = API + "delete/" + bookmarkID;
     const res = await fetch(fetchURL);
     if (!res.ok) {

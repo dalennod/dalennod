@@ -34,7 +34,7 @@ dialog,
 
 .drop-area {
     border: 2px dashed var(--global-border-color);
-    border-radius: 2px;
+    border-radius: 1%;
     padding: 20px;
 }
 
@@ -43,7 +43,7 @@ dialog,
     height: 200px;
     resize: none;
     border: 1px solid var(--global-border-color);
-    border-radius: 2px;
+    border-radius: 1%;
     padding: 10px;
     outline: none;
 }
@@ -84,7 +84,7 @@ textarea {
 }
 
 .button-text {
-    border-radius: 2px;
+    border-radius: 1%;
     cursor: pointer;
     color: var(--light-mode-text);
 }
@@ -122,7 +122,7 @@ nav {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    border-radius: 2px;
+    border-radius: 1%;
 }
 
 .search-form {
@@ -134,7 +134,6 @@ nav {
 main {
     margin-top: 10px;
 }
-
 
 .grid-view-list {
     display: grid;
@@ -148,9 +147,14 @@ main {
 }
 
 .grid-child {
-    position: relative;
+    display: flex;
+    flex-direction: column;
     padding: 10px;
-    border-radius: 2px;
+    border-radius: 1%;
+}
+
+.grid-child .bm-info {
+    flex: 1;
 }
 
 .grid-child a {
@@ -163,31 +167,45 @@ main {
     color: var(--accent-color);
 }
 
-.grid-child .thumburl img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 50%;
-    height: 50%;
+.grid-child .thumbnail-image {
+    display: grid;
+}
+
+.grid-child .thumbnail-image img,
+.grid-child .thumbnail-image a {
+    grid-row: 1;
+    grid-column: 1;
+}
+
+.grid-child .default-thumburl-bg,
+.grid-child .default-thumburl,
+.grid-child .thumburl-bg,
+.grid-child .thumburl {
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+}
+
+.grid-child .default-thumburl-bg,
+.grid-child .thumburl-bg {
     object-fit: cover;
+    filter: blur(15px);
+    opacity: 0.05;
+}
+
+.grid-child .default-thumburl,
+.grid-child .thumburl {
+    object-fit: contain;
+    position: relative;
 }
 
 .grid-child .show-note {
     white-space: pre-line;
 }
 
-.grid-child .default-thumburl img {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 25%;
-    height: 25%;
-    object-fit: cover;
-}
-
 .grid-child .group {
     border: 1px solid var(--global-border-color);
-    border-radius: 2px;
+    border-radius: 1%;
     padding: 3px;
 }
 
@@ -210,16 +228,12 @@ main {
     border-bottom: 1px solid var(--global-border-color);
 }
 
-.grid-child .id-creation {
+.grid-child .footer-grid-child {
     display: flex;
     justify-content: space-between;
-}
-
-.grid-child .buttons {
-    position: absolute;
-    bottom: 0;
-    right: 2%;
-    margin-bottom: 2%;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 0.5em;
 }
 
 .svg-img {
@@ -228,14 +242,15 @@ main {
     filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
 }
 
-.svg-img:hover {
+.button-svg:hover {
     opacity: 0.5;
     transition: all ease 0.3s;
+    cursor: pointer;
 }
 
 .dialog-inputs {
     padding: 10px;
-    border-radius: 2px;
+    border-radius: 1%;
 }
 
 .dialog-inputs input[type="text"],
@@ -246,7 +261,7 @@ main {
 
 dialog {
     border: 0.5px solid var(--accent-color);
-    border-radius: 2px;
+    border-radius: 1%;
     padding: 20px;
     min-width: 50%;
     animation: fade-out 0.5s ease-out;
@@ -294,12 +309,12 @@ body:has(dialog[open]) {
 .pagination a.active {
     background-color: dodgerblue;
     color: black;
-    border-radius: 2px;
+    border-radius: 1%;
 }
 
 .pagination a:hover:not(.active) {
     background-color: var(--light-mode-foreground);
-    border-radius: 2px;
+    border-radius: 1%;
 }
 
 @keyframes fade-in {
