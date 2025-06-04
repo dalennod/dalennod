@@ -26,6 +26,8 @@ dialog,
     color: var(--light-mode-text);
 }
 
+/* Specficially for /import/ index.html */
+
 .container {
     padding: 20px;
     width: 50%;
@@ -47,6 +49,8 @@ dialog,
     padding: 10px;
     outline: none;
 }
+
+/* End: Specficially for /import/ index.html */
 
 input,
 textarea {
@@ -187,6 +191,11 @@ main {
 }
 
 .grid-child .default-thumburl-bg,
+.grid-child .default-thumburl {
+    height: 75px;
+}
+
+.grid-child .default-thumburl-bg,
 .grid-child .thumburl-bg {
     object-fit: cover;
     filter: blur(15px);
@@ -236,6 +245,10 @@ main {
     padding-top: 0.5em;
 }
 
+.grid-child .footer-grid-child .footer-buttons {
+    display: flex;
+}
+
 .svg-img {
     width: 1.5em;
     height: 1.5em;
@@ -261,7 +274,6 @@ main {
 
 dialog {
     border: 0.5px solid var(--accent-color);
-    border-radius: 1%;
     padding: 20px;
     min-width: 50%;
     animation: fade-out 0.5s ease-out;

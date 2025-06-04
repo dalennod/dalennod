@@ -101,7 +101,7 @@
               <a href="/api/row/{{ .ID }}" target="_blank">[{{ .ID }}]</a>
               <span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span>
             </div>
-            <div>
+            <div class="footer-buttons">
               <button class="button-svg" id="button-update" title="Update" onclick="getOldData(this);">
                 <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
               </button>
@@ -117,7 +117,7 @@
     </main>
 
     <div class="pagination center-text">
-      <a href="/" title="First page">&lt;&lt;</a><a id="prev-page" title="Previous page">&lt;</a><span id="pagination-numbers"></span><a id="next-page" title="Next page">&gt;</a><a id="last-page" title="Last page">&gt;&gt;</a>
+      <a href="/" title="Root page">&lt;&lt;</a><a id="prev-page" title="Previous page">&lt;</a><span id="pagination-numbers"></span><a id="next-page" title="Next page">&gt;</a><a id="last-page" title="Last page">&gt;&gt;</a>
     </div>
 
     <dialog class="dialog-create">
