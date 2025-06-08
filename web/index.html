@@ -51,22 +51,18 @@
                 <button type="submit" class="button-hostname bm-hostname" title="Search host: '{{ $hostname }}'" tabindex="-1">{{ $hostname }}</button>
               </form>
             </div>
-            {{ if .Title }}
             <div class="pad-like-p">
+              {{ if .Title }}
               <a href="{{ .URL }}" target="_blank">{{ .Title }}</a>
-            </div>
-            {{ else if not .Title }}
-            <div class="pad-like-p">
+              {{ else if not .Title }}
               <a href="{{ .URL }}" target="_blank">{{ .URL }}</a>
+              {{ end }}
             </div>
-            {{ end }}
             {{ if .Note }}
-            <div class="pad-like-p show-note">Notes: {{ .Note }}</div>
+            <div class="bm-note">{{ .Note }}</div>
             {{ end }}
             {{ if .Archived }}
-            <div class="pad-like-p">
-              Archive: <a href="{{ .SnapshotURL }}" target="_blank" title="{{ .SnapshotURL }}">[click here]</a>
-            </div>
+            <div class="pad-like-p">Archive: <a href="{{ .SnapshotURL }}" target="_blank" title="{{ .SnapshotURL }}">[click here]</a></div>
             {{ end }}
             {{ if .Keywords }}
             <div class="pad-like-p">
@@ -84,8 +80,8 @@
               {{ end }}
             </div>
             {{ end }}
+            {{ if .BmGroup }}
             <div class="pad-like-p">
-              {{ if .BmGroup }}
               <form action="/" method="get">
                 <input hidden name="search-type" value="group" />
                 <input hidden name="search-term" value="{{ .BmGroup }}" />
@@ -93,11 +89,11 @@
                   <span id="group" class="group">{{ .BmGroup }}</span>
                 </button>
               </form>
-              {{ end }}
             </div>
+            {{ end }}
           </div>
           <div class="footer-grid-child">
-            <div class="id-creation">
+            <div class="id-modified">
               <a href="/api/row/{{ .ID }}" target="_blank">[{{ .ID }}]</a>
               <span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span>
             </div>

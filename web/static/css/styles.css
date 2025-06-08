@@ -1,13 +1,15 @@
 :root {
-    --light-mode-foreground: #ddd;
-    --light-mode-background: #eee;
-    --light-mode-text: #000;
-    --dark-mode-foreground: #232323;
-    --dark-mode-background: #131313;
-    --dark-mode-text: #eaeaea;
-    --global-border-color: #aaa;
-    --accent-color: #2f9df7;
-    --red-text: #ff3535;
+    --light-mode-foreground             : #dddddd;
+    --light-mode-background             : rgb(238, 238, 238);
+    --light-mode-background-transparent : rgba(238, 238, 238, 0.3);
+    --light-mode-text                   : #000000;
+    --dark-mode-foreground              : #232323;
+    --dark-mode-background              : rgb(19, 19, 19);
+    --dark-mode-background-transparent  : rgba(19, 19, 19, 0.3);
+    --dark-mode-text                    : #eeeeee;
+    --global-border-color               : #aaaaaa;
+    --accent-color                      : #2f9df7;
+    --red-text                          : #ff3535;
 }
 
 body {
@@ -171,28 +173,26 @@ main {
     color: var(--accent-color);
 }
 
-.grid-child .thumbnail-image {
+.thumbnail-image {
     display: grid;
 }
 
-.grid-child .thumbnail-image img,
-.grid-child .thumbnail-image a {
+.thumbnail-image img,
+.thumbnail-image a {
     grid-row: 1;
     grid-column: 1;
 }
 
-.grid-child .default-thumburl-bg,
-.grid-child .default-thumburl,
-.grid-child .thumburl-bg,
-.grid-child .thumburl {
+.thumbnail-image img {
     width: 100%;
     height: 150px;
     overflow: hidden;
 }
 
-.grid-child .default-thumburl-bg,
 .grid-child .default-thumburl {
-    height: 75px;
+    display: block;
+    margin: auto;
+    width: 75px;
 }
 
 .grid-child .default-thumburl-bg,
@@ -208,8 +208,11 @@ main {
     position: relative;
 }
 
-.grid-child .show-note {
+.grid-child .bm-note {
     white-space: pre-line;
+    padding: 0.5em;
+    /* box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px; */
+    background-color: var(--light-mode-background-transparent);
 }
 
 .grid-child .group {
@@ -219,7 +222,7 @@ main {
 }
 
 .bm-hostname,
-.id-creation {
+.id-modified {
     font-family: monospace;
     opacity: 0.5;
     font-weight: bold;
@@ -233,11 +236,11 @@ main {
     display: inline-block;
 }
 
-.grid-child .keywords {
+.keywords {
     border-bottom: 1px solid var(--global-border-color);
 }
 
-.grid-child .footer-grid-child {
+.footer-grid-child {
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -245,7 +248,7 @@ main {
     padding-top: 0.5em;
 }
 
-.grid-child .footer-grid-child .footer-buttons {
+.footer-grid-child .footer-buttons {
     display: flex;
 }
 
@@ -394,6 +397,10 @@ body:has(dialog[open]) {
     .dialog-inputs,
     .update-main div {
         background-color: var(--dark-mode-foreground);
+    }
+
+    .grid-child .bm-note {
+        background-color: var(--dark-mode-background-transparent);
     }
 
     .svg-img {
