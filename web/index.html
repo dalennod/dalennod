@@ -25,173 +25,201 @@
     </nav>
 
     <main>
-      {{ block "bm_list" . }}
-      <div class="grid-view-list">
-        {{ range .Bookmarks }}
-        <div class="grid-child" id="{{ .ID }}">
-          <div class="bm-info">
-            <div class="thumbnail-image">
-              {{ if .ByteThumbURL }}
-              <img class="thumburl-bg" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" />
-              <a href="{{ .URL }}" target="_blank">
-                <img class="thumburl" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" />
-              </a>
-              {{ else }}
-              <img class="default-thumburl-bg" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" />
-              <a href="{{ .URL }}" target="_blank">
-                <img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" />
-              </a>
-              {{ end }}
-            </div>
-            <div class="center-text pad-like-p">
-              {{ $hostname := getHostname .URL }}
-              <form action="/" method="get">
-                <input hidden name="search-type" value="hostname" />
-                <input hidden name="search-term" value="{{ $hostname }}" />
-                <button type="submit" class="button-hostname bm-hostname" title="Search host: '{{ $hostname }}'" tabindex="-1">{{ $hostname }}</button>
-              </form>
-            </div>
-            <div class="pad-like-p">
-              {{ if .Title }}
-              <a href="{{ .URL }}" target="_blank">{{ .Title }}</a>
-              {{ else if not .Title }}
-              <a href="{{ .URL }}" target="_blank">{{ .URL }}</a>
-              {{ end }}
-            </div>
-            {{ if .Note }}
-            <div class="bm-note">{{ .Note }}</div>
-            {{ end }}
-            {{ if .Archived }}
-            <div class="pad-like-p">Archive: <a href="{{ .SnapshotURL }}" target="_blank" title="{{ .SnapshotURL }}">[click here]</a></div>
-            {{ end }}
-            {{ if .Keywords }}
-            <div class="pad-like-p">
-              {{ $keywords := keywordSplit .Keywords "," }}
-              {{ range $_, $keyword := $keywords}}
-              <div class="bm-keywords">
-                <form action="/" method="get">
-                  <input hidden name="search-type" value="keyword" />
-                  <input hidden name="search-term" value="{{ $keyword }}" />
-                  <button class="button-svg" type="submit" id="button-search-html" title="Search keyword: '{{ $keyword }}'">
-                    <span id="keywords" class="keywords">{{ $keyword }}</span>
-                  </button>
-                </form>
-              </div>
-              {{ end }}
-            </div>
-            {{ end }}
-            {{ if .BmGroup }}
-            <div class="pad-like-p">
-              <form action="/" method="get">
-                <input hidden name="search-type" value="group" />
-                <input hidden name="search-term" value="{{ .BmGroup }}" />
-                <button class="button-svg" type="submit" id="button-search-html" title="Search group: '{{ .BmGroup }}'">
-                  <span id="group" class="group">{{ .BmGroup }}</span>
-                </button>
-              </form>
-            </div>
-            {{ end }}
-          </div>
-          <div class="footer-grid-child">
-            <div class="id-modified">
-              <a href="/api/row/{{ .ID }}" target="_blank">[{{ .ID }}]</a>
-              <span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span>
-            </div>
-            <div class="footer-buttons">
-              <button class="button-svg" id="button-update" title="Update" onclick="getOldData(this);">
-                <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
-              </button>
-              <button class="button-svg" id="button-delete" title="Delete" ondblclick="deleteEntry(this);">
-                <img class="svg-img" src="static/imgs/delete_button.svg" alt="Delete button" />
-              </button>
-            </div>
-          </div>
-        </div>
-        {{ end }}
+      {{ if .RecentBookmarks }}
+      <div id="special-category-bookmarks">
+        <p><code>Recently Interacted Bookmarks</code></p>
+        {{ block "recent_bookmarks_list" . }} {{ end }}
+        <hr>
       </div>
       {{ end }}
+      <div id="all-bookmarks">
+        <p><code id="all-bookmarks-list">All Bookmarks</code></p>
+        {{ block "all_bookmarks_list" . }} {{ end }}
+      </div>
     </main>
 
-    <div class="pagination center-text">
+    <footer class="pagination center-text">
       <a href="/" title="Root page">&lt;&lt;</a><a id="prev-page" title="Previous page">&lt;</a><span id="pagination-numbers"></span><a id="next-page" title="Next page">&gt;</a><a id="last-page" title="Last page">&gt;&gt;</a>
-    </div>
+    </footer>
 
-    <dialog class="dialog-create">
-      <div class="dialog-top">
-        <span class="dialog-type">Create a new bookmark</span>
-        <button onclick="closeCreateDialog();" class="button-svg" id="button-close" title="Close modal">
-          <img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" />
-        </button>
-      </div>
-      <div class="dialog-inputs">
-        <div class="pad-like-p">
-          URL: <span class="red-text">*</span><br /><input autofocus type="text" class="uac-input" id="create-url" placeholder="URL to save" required />
-        </div>
-        <div class="pad-like-p">
-          Title:<br /><input type="text" class="uac-input" id="create-title" placeholder="Title for the bookmark" />
-        </div>
-        <div class="pad-like-p">
-          Notes:<br /><textarea class="uac-input" id="create-note" placeholder="Log notes for bookmark"></textarea>
-        </div>
-        <div class="pad-like-p">
-          Keywords:<br /><input type="text" class="uac-input" id="create-keywords" placeholder="Keywords, to, search, bookmark" />
-        </div>
-        <div class="pad-like-p">
-          Group:<br /><input type="text" class="uac-input" id="create-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list-create" />
-          <datalist id="bmGroups-list-create"></datalist>
-        </div>
-        <div class="pad-like-p">
-          Archive?:
-          <input type="checkbox" name="create-archive" id="create-archive" title="Check to archive" onclick="archiveCheckbox()" />
-          <label for="create-archive" class="create-archive-label" title="Check to archive">No</label>
-        </div>
-        <p class="red-text">* required</p>
-        <div class="center-text pad-like-p">
-          <button class="button-text" id="button-add-req" onclick="addEntry();" title="Create">Create</button>
-          <span id="create-checkmark" hidden>&check;</span>
-          <span id="create-archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
-        </div>
-      </div>
-    </dialog>
-
-    <dialog class="dialog-update">
-      <div class="dialog-top">
-        <span class="dialog-type">Update a bookmark</span>
-        <button onclick="closeUpdateDialog();" class="button-svg" id="button-close" title="Close modal">
-          <img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" />
-        </button>
-      </div>
-      <div class="dialog-inputs">
-        <span id="bm-id" hidden></span>
-        <div class="pad-like-p">
-          URL: <span class="red-text">*</span><br /><input type="text" class="uac-input" id="update-url" placeholder="URL to save" required />
-        </div>
-        <div class="pad-like-p">
-          Title:<br /><input type="text" class="uac-input" id="update-title" placeholder="Title for the bookmark" />
-        </div>
-        <div class="pad-like-p">
-          Notes:<br /><textarea class="uac-input" id="update-note" autofocus placeholder="Log notes for bookmark"></textarea>
-        </div>
-        <div class="pad-like-p">
-          Keywords:<br /><input type="text" class="uac-input" id="update-keywords" placeholder="Keywords, to, search, bookmark" />
-        </div>
-        <div class="pad-like-p">
-          Group:<br /><input type="text" class="uac-input" id="update-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list-update" />
-          <datalist id="bmGroups-list-update"></datalist>
-        </div>
-        <div class="pad-like-p" id="update-archive-div">
-          Archive?:
-          <input type="checkbox" name="update-archive" id="update-archive" title="Check to archive" onclick="archiveCheckbox()" />
-          <label for="update-archive" class="update-archive-label" title="Check to archive">No</label>
-        </div>
-        <p class="red-text">* required</p>
-        <div class="center-text pad-like-p">
-          <button class="button-text" id="button-update-req" onclick="updateEntry();" title="Update">Update</button>
-          <span id="update-checkmark" hidden>&check;</span>
-          <span id="update-archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
-        </div>
-      </div>
-    </dialog>
+    {{ block "dialogs" . }} {{ end }}
   </body>
 </html>
+{{ end }}
+
+{{ define "all_bookmarks_list" }}
+<div class="grid-view-list">
+  {{ range .AllBookmarks }}
+  {{ template "bkm_card" . }}
+  {{ end }}
+</div>
+{{ end }}
+
+{{ define "recent_bookmarks_list" }}
+<div class="grid-view-list">
+  {{ range .RecentBookmarks }}
+  {{ template "bkm_card" . }}
+  {{ end }}
+</div>
+{{ end }}
+
+{{ define "bkm_card" }}
+<div class="grid-child" id="{{ .ID }}">
+  <div class="bm-info">
+    <div class="thumbnail-image">
+      {{ if .ByteThumbURL }}
+      <img class="thumburl-bg" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" />
+      <a href="{{ .URL }}" target="_blank">
+        <img class="thumburl" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" />
+      </a>
+      {{ else }}
+      <img class="default-thumburl-bg" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" />
+      <a href="{{ .URL }}" target="_blank">
+        <img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" />
+      </a>
+      {{ end }}
+    </div>
+    <div class="center-text pad-like-p">
+      {{ $hostname := getHostname .URL }}
+      <form action="/" method="get">
+        <input hidden name="search-type" value="hostname" />
+        <input hidden name="search-term" value="{{ $hostname }}" />
+        <button type="submit" class="button-hostname bm-hostname" title="Search host: '{{ $hostname }}'" tabindex="-1">{{ $hostname }}</button>
+      </form>
+    </div>
+    <div class="pad-like-p">
+      {{ if .Title }}
+      <a href="{{ .URL }}" target="_blank">{{ .Title }}</a>
+      {{ else if not .Title }}
+      <a href="{{ .URL }}" target="_blank">{{ .URL }}</a>
+      {{ end }}
+    </div>
+    {{ if .Note }}
+    <div class="bm-note">{{ .Note }}</div>
+    {{ end }}
+    {{ if .Archived }}
+    <div class="pad-like-p">Archive: <a href="{{ .SnapshotURL }}" target="_blank" title="{{ .SnapshotURL }}">[click here]</a></div>
+    {{ end }}
+    {{ if .Keywords }}
+    <div class="pad-like-p">
+      {{ $keywords := keywordSplit .Keywords "," }}
+      {{ range $_, $keyword := $keywords}}
+      <div class="bm-keywords">
+        <form action="/" method="get">
+          <input hidden name="search-type" value="keyword" />
+          <input hidden name="search-term" value="{{ $keyword }}" />
+          <button class="button-svg" type="submit" id="button-search-html" title="Search keyword: '{{ $keyword }}'">
+            <span id="keywords" class="keywords">{{ $keyword }}</span>
+          </button>
+        </form>
+      </div>
+      {{ end }}
+    </div>
+    {{ end }}
+    {{ if .BmGroup }}
+    <div class="pad-like-p">
+      <form action="/" method="get">
+        <input hidden name="search-type" value="group" />
+        <input hidden name="search-term" value="{{ .BmGroup }}" />
+        <button class="button-svg" type="submit" id="button-search-html" title="Search group: '{{ .BmGroup }}'">
+          <span id="group" class="group">{{ .BmGroup }}</span>
+        </button>
+      </form>
+    </div>
+    {{ end }}
+  </div>
+  <div class="footer-grid-child">
+    <div class="id-modified">
+      <a href="/api/row/{{ .ID }}" target="_blank">[{{ .ID }}]</a>
+      <span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span>
+    </div>
+    <div class="footer-buttons">
+      <button class="button-svg" id="button-update" title="Update" onclick="getOldData(this);">
+        <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
+      </button>
+      <button class="button-svg" id="button-delete" title="Delete" ondblclick="deleteEntry(this);">
+        <img class="svg-img" src="static/imgs/delete_button.svg" alt="Delete button" />
+      </button>
+    </div>
+  </div>
+</div>
+{{ end }}
+
+{{ define "dialogs" }}
+<dialog class="dialog-create">
+  <div class="dialog-top">
+    <span class="dialog-type">Create a new bookmark</span>
+    <button onclick="closeCreateDialog();" class="button-svg" id="button-close" title="Close modal">
+      <img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" />
+    </button>
+  </div>
+  <div class="dialog-inputs">
+    <div class="pad-like-p">
+      URL: <span class="red-text">*</span><br /><input autofocus type="text" class="uac-input" id="create-url" placeholder="URL to save" required />
+    </div>
+    <div class="pad-like-p">
+      Title:<br /><input type="text" class="uac-input" id="create-title" placeholder="Title for the bookmark" />
+    </div>
+    <div class="pad-like-p">
+      Notes:<br /><textarea class="uac-input" id="create-note" placeholder="Log notes for bookmark"></textarea>
+    </div>
+    <div class="pad-like-p">
+      Keywords:<br /><input type="text" class="uac-input" id="create-keywords" placeholder="Keywords, to, search, bookmark" />
+    </div>
+    <div class="pad-like-p">
+      Group:<br /><input type="text" class="uac-input" id="create-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list-create" />
+      <datalist id="bmGroups-list-create"></datalist>
+    </div>
+    <div class="pad-like-p">
+      Archive?:
+      <input type="checkbox" name="create-archive" id="create-archive" title="Check to archive" onclick="archiveCheckbox()" />
+      <label for="create-archive" class="create-archive-label" title="Check to archive">No</label>
+    </div>
+    <p class="red-text">* required</p>
+    <div class="center-text pad-like-p">
+      <button class="button-text" id="button-add-req" onclick="addEntry();" title="Create">Create</button>
+      <span id="create-checkmark" hidden>&check;</span>
+      <span id="create-archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="dialog-update">
+  <div class="dialog-top">
+    <span class="dialog-type">Update a bookmark</span>
+    <button onclick="closeUpdateDialog();" class="button-svg" id="button-close" title="Close modal">
+      <img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" />
+    </button>
+  </div>
+  <div class="dialog-inputs">
+    <span id="bm-id" hidden></span>
+    <div class="pad-like-p">
+      URL: <span class="red-text">*</span><br /><input type="text" class="uac-input" id="update-url" placeholder="URL to save" required />
+    </div>
+    <div class="pad-like-p">
+      Title:<br /><input type="text" class="uac-input" id="update-title" placeholder="Title for the bookmark" />
+    </div>
+    <div class="pad-like-p">
+      Notes:<br /><textarea class="uac-input" id="update-note" autofocus placeholder="Log notes for bookmark"></textarea>
+    </div>
+    <div class="pad-like-p">
+      Keywords:<br /><input type="text" class="uac-input" id="update-keywords" placeholder="Keywords, to, search, bookmark" />
+    </div>
+    <div class="pad-like-p">
+      Group:<br /><input type="text" class="uac-input" id="update-bmGroup" placeholder="Group to store bookmark into" list="bmGroups-list-update" />
+      <datalist id="bmGroups-list-update"></datalist>
+    </div>
+    <div class="pad-like-p" id="update-archive-div">
+      Archive?:
+      <input type="checkbox" name="update-archive" id="update-archive" title="Check to archive" onclick="archiveCheckbox()" />
+      <label for="update-archive" class="update-archive-label" title="Check to archive">No</label>
+    </div>
+    <p class="red-text">* required</p>
+    <div class="center-text pad-like-p">
+      <button class="button-text" id="button-update-req" onclick="updateEntry();" title="Update">Update</button>
+      <span id="update-checkmark" hidden>&check;</span>
+      <span id="update-archive-warn" class="red-text" hidden>WARN: Archiving may take few seconds to minutes. It's safe to navigate away in the meantime.</span>
+    </div>
+  </div>
+</dialog>
 {{ end }}

@@ -185,9 +185,14 @@ const updateNavATags = (current, totalPages, hrefParams) => {
     const nextPage = current + 1;
     const prevPage = current - 1;
     if (hrefParams.get("search-type")) {
-        document.getElementById("prev-page").href = `/?search-type=${hrefParams.get("search-type")}&search-term=${hrefParams.get("search-term")}&page=${prevPage}`;
-        document.getElementById("next-page").href = `/?search-type=${hrefParams.get("search-type")}&search-term=${hrefParams.get("search-term")}&page=${nextPage}`;
-        document.getElementById("last-page").href = `/?search-type=${hrefParams.get("search-type")}&search-term=${hrefParams.get("search-term")}&page=${totalPages}`;
+        const searchType = hrefParams.get("search-type");
+        const searchTerm = hrefParams.get("search-term");
+        document.getElementById("prev-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${prevPage}`;
+        document.getElementById("next-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${nextPage}`;
+        document.getElementById("last-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${totalPages}`;
+
+        const allBookmarksList = document.getElementById("all-bookmarks-list");
+        searchType === "general" ? allBookmarksList.innerText = `All Bookmarks with '${searchTerm}'` : allBookmarksList.innerText = `Bookmarks with '${searchTerm}' in '${searchType}'`;
     } else {
         document.getElementById("prev-page").href = `/?page=${prevPage}`;
         document.getElementById("next-page").href = `/?page=${nextPage}`;

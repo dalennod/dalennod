@@ -1,15 +1,16 @@
 package server
 
 import (
-    "dalennod/internal/archive"
-    "dalennod/internal/db"
-    "dalennod/internal/logger"
-    "dalennod/internal/setup"
     "encoding/json"
     "html/template"
     "net/http"
     "strconv"
     "fmt"
+
+    "dalennod/internal/archive"
+    "dalennod/internal/db"
+    "dalennod/internal/logger"
+    "dalennod/internal/setup"
 )
 
 type GotURLParams struct {
@@ -35,6 +36,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
     if r.Method == http.MethodGet {
         pageCount := 0
         var bookmarks []setup.Bookmark
+        var recentlyInteracted setup.RecentInteractions
 
         gotURLParams := parseURLParams(r);
         if gotURLParams.pageNumber != "" {
@@ -63,10 +65,14 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
         } else {
             bookmarks = db.ViewAllWebUI(database, pageCount);
         }
+        if gotURLParams.pageNumber == "" && gotURLParams.searchType == "" {
+            recentlyInteracted = db.RecentInteractions(database);
+        }
 
         tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(Web, "web/index.html"))
-        allBookmarks["Bookmarks"] = bookmarks
-        if err := tmpl.ExecuteTemplate(w, "index", allBookmarks); err != nil {
+        bookmarksMap["AllBookmarks"] = bookmarks
+        bookmarksMap["RecentBookmarks"] = recentlyInteracted.Bookmarks
+        if err := tmpl.ExecuteTemplate(w, "index", bookmarksMap); err != nil {
             logger.Warn.Println("error executing template for root index. ERROR:", err)
         }
     } else {

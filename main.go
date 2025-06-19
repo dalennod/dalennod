@@ -1,12 +1,13 @@
 package main
 
 import (
-    "dalennod/internal/server"
-    "dalennod/internal/setup"
-    "dalennod/internal/user_input"
     "embed"
     "flag"
     "os"
+
+    "dalennod/internal/server"
+    "dalennod/internal/setup"
+    "dalennod/internal/user_input"
 
     _ "github.com/mattn/go-sqlite3" // CGO driver
     // _ "modernc.org/sqlite" // CGO-free driver

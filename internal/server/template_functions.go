@@ -1,10 +1,11 @@
 package server
 
 import (
-    "dalennod/internal/constants"
     "encoding/base64"
     "net/http"
     "regexp"
+
+    "dalennod/internal/constants"
 )
 
 func getHostname(input string) string {

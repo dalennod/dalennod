@@ -1,15 +1,16 @@
 package server
 
 import (
-    "dalennod/internal/constants"
-    "dalennod/internal/db"
-    "dalennod/internal/logger"
-    "dalennod/internal/setup"
     "encoding/json"
     "fmt"
     "io"
     "net/http"
     "strconv"
+
+    "dalennod/internal/constants"
+    "dalennod/internal/db"
+    "dalennod/internal/logger"
+    "dalennod/internal/setup"
 )
 
 func internalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
@@ -70,6 +71,7 @@ func checkUrlHandler(w http.ResponseWriter, r *http.Request) {
             logger.Error.Println(err)
         }
         w.Write([]byte(writeData))
+        db.AddToRecents(database, getData.ID);
     } else {
         internalServerErrorHandler(w, r)
     }

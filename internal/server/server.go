@@ -1,21 +1,22 @@
 package server
 
 import (
-    "dalennod/internal/logger"
-    "dalennod/internal/constants"
-    "dalennod/internal/setup"
     "database/sql"
     "embed"
     "fmt"
     "html/template"
     "io/fs"
     "net/http"
+
+    "dalennod/internal/logger"
+    "dalennod/internal/constants"
+    "dalennod/internal/setup"
 )
 
 var (
     pageCountForSearch int                   = 0
     tmplFuncMap  template.FuncMap            = make(template.FuncMap)
-    allBookmarks map[string][]setup.Bookmark = make(map[string][]setup.Bookmark)
+    bookmarksMap map[string][]setup.Bookmark = make(map[string][]setup.Bookmark)
     database     *sql.DB
     tmpl         *template.Template
     Web          embed.FS
@@ -34,10 +35,10 @@ func Start(data *sql.DB) {
     }
     mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webStatic))))
 
-    tmplFuncMap["getHostname"]        = getHostname
-    tmplFuncMap["keywordSplit"]       = keywordSplit
-    tmplFuncMap["byteConversion"]     = byteConversion
-    tmplFuncMap["webUIAddress"]       = webUIAddress
+    tmplFuncMap["getHostname"]    = getHostname
+    tmplFuncMap["keywordSplit"]   = keywordSplit
+    tmplFuncMap["byteConversion"] = byteConversion
+    tmplFuncMap["webUIAddress"]   = webUIAddress
 
     mux.HandleFunc("/{$}", rootHandler)
     mux.HandleFunc("/import/", importHandler)
