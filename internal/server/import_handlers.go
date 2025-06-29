@@ -54,7 +54,7 @@ func importBookmarkHandler(w http.ResponseWriter, r *http.Request) {
 
             for _, parsedBookmark := range parsedBookmarks {
                 db.Add(database, parsedBookmark)
-                output := "Added || { TITLE: " + parsedBookmark.Title + ", URL: " + parsedBookmark.URL + "GROUP: " + parsedBookmark.BmGroup + ", KEYWORDS: " + parsedBookmark.Keywords + "}\n"
+                output := "Added || { TITLE: " + parsedBookmark.Title + ", URL: " + parsedBookmark.URL + "CATEGORY: " + parsedBookmark.Category + ", KEYWORDS: " + parsedBookmark.Keywords + "}\n"
                 w.Write([]byte(output))
             }
             w.Write([]byte("Added " + parsedBookmarksLength + " bookmarks to database."))
@@ -72,7 +72,7 @@ func importBookmarkHandler(w http.ResponseWriter, r *http.Request) {
 
             for _, parsedBookmark := range parsedBookmarks {
                 db.Add(database, parsedBookmark)
-                output := "Added || { TITLE: " + parsedBookmark.Title + ", URL: " + parsedBookmark.URL + "GROUP: " + parsedBookmark.BmGroup + ", KEYWORDS: " + parsedBookmark.Keywords + "}\n"
+                output := "Added || { TITLE: " + parsedBookmark.Title + ", URL: " + parsedBookmark.URL + "CATEGORY: " + parsedBookmark.Category + ", KEYWORDS: " + parsedBookmark.Keywords + "}\n"
                 w.Write([]byte(output))
             }
             w.Write([]byte("Added " + parsedBookmarksLength + " bookmarks to database."))

@@ -9,8 +9,8 @@ const changeToImport = () => changeToImportTimeout = setTimeout(() => showImport
 const showImportPage = () => window.location.href = root + "/import/";
 const clearImportTimeout = () => clearTimeout(changeToImportTimeout);
 
-const groupsDatalistOptions = async () => {
-    const fetchURL = API + "groups/";
+const categoriesOptions = async () => {
+    const fetchURL = API + "categories/";
     const res = await fetch(fetchURL);
     return await res.text();
 };
@@ -18,8 +18,8 @@ const groupsDatalistOptions = async () => {
 const showCreateDialog = async () => {
     document.querySelector(".dialog-create").showModal();
     clearImportTimeout();
-    const bookmarkCreateDatalist = document.getElementById("bmGroups-list-create");
-    bookmarkCreateDatalist.innerHTML = await groupsDatalistOptions();
+    const bookmarkCreateDatalist = document.getElementById("categories-list-create");
+    bookmarkCreateDatalist.innerHTML = await categoriesOptions();
 };
 const closeCreateDialog = () => document.querySelector(".dialog-create").close();
 document.querySelector(".dialog-create").addEventListener("close", () => {
@@ -32,8 +32,8 @@ const showUpdateDialog = async () => {
     noteTextArea.style.height = "auto";
     noteTextArea.style.height = noteTextArea.scrollHeight + "px";
 
-    const bookmarkUpdateDatalist = document.getElementById("bmGroups-list-update");
-    bookmarkUpdateDatalist.innerHTML = await groupsDatalistOptions();
+    const bookmarkUpdateDatalist = document.getElementById("categories-list-update");
+    bookmarkUpdateDatalist.innerHTML = await categoriesOptions();
 };
 const closeUpdateDialog = () => document.querySelector(".dialog-update").close();
 document.querySelector(".dialog-update").addEventListener("close", () => {
@@ -53,12 +53,12 @@ let oldData = "";
 const setOldData = () => {
     if (typeof Storage !== "undefined") {
         oldData = JSON.parse(localStorage.getItem("oldData"));
-        document.querySelector("#bm-id").innerText = oldData.id;
+        document.querySelector("#bkm-id").innerText = oldData.id;
         document.querySelector("#update-url").value = oldData.url;
         document.querySelector("#update-title").value = oldData.title;
         document.querySelector("#update-note").value = oldData.note;
         document.querySelector("#update-keywords").value = oldData.keywords;
-        document.querySelector("#update-bmGroup").value = oldData.bmGroup;
+        document.querySelector("#update-category").value = oldData.category;
         oldData.archive
             ? document.querySelector("#update-archive-div").setAttribute("hidden", "")
             : document.querySelector("#update-archive-div").removeAttribute("hidden");
@@ -72,7 +72,7 @@ const updateEntry = async () => {
         title: document.querySelector("#update-title").value,
         note: document.querySelector("#update-note").value,
         keywords: document.querySelector("#update-keywords").value,
-        bmGroup: document.querySelector("#update-bmGroup").value,
+        category: document.querySelector("#update-category").value,
         archive: document.getElementById("update-archive").checked ? true : false
     }
 
@@ -86,7 +86,7 @@ const updateEntry = async () => {
     const updateButton = document.getElementById("button-update-req");
     updateButton.disabled = true;
 
-    const dataID = document.querySelector("#bm-id").innerText;
+    const dataID = document.querySelector("#bkm-id").innerText;
     const fetchURL = API + "update/" + dataID;
     const res = await fetch(fetchURL, {
         method: "POST",
@@ -115,7 +115,7 @@ const addEntry = async () => {
         title: document.querySelector("#create-title").value,
         note: document.querySelector("#create-note").value,
         keywords: document.querySelector("#create-keywords").value,
-        bmGroup: document.querySelector("#create-bmGroup").value,
+        category: document.querySelector("#create-category").value,
         archive: document.getElementById("create-archive").checked ? true : false,
     }
 
@@ -187,12 +187,13 @@ const updateNavATags = (current, totalPages, hrefParams) => {
     if (hrefParams.get("search-type")) {
         const searchType = hrefParams.get("search-type");
         const searchTerm = hrefParams.get("search-term");
+        document.getElementById("root-first-page").href = `/?search-type=${searchType}&search-term=${searchTerm}`;
         document.getElementById("prev-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${prevPage}`;
         document.getElementById("next-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${nextPage}`;
         document.getElementById("last-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${totalPages}`;
 
         const allBookmarksList = document.getElementById("all-bookmarks-list");
-        searchType === "general" ? allBookmarksList.innerText = `All Bookmarks with '${searchTerm}'` : allBookmarksList.innerText = `Bookmarks with '${searchTerm}' in '${searchType}'`;
+        searchType === "general" ? allBookmarksList.innerHTML = `<img class="svg-img" src="static/imgs/search_button.svg" alt="Search all bookmark icon" />All Bookmarks with '${searchTerm}'` : allBookmarksList.innerHTML = `<img class="svg-img" src="static/imgs/search_button.svg" alt="Search all bookmark icon" />Bookmarks with '${searchTerm}' in '${searchType}'`;
     } else {
         document.getElementById("prev-page").href = `/?page=${prevPage}`;
         document.getElementById("next-page").href = `/?page=${nextPage}`;

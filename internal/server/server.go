@@ -47,7 +47,7 @@ func Start(data *sql.DB) {
     mux.HandleFunc("/api/row/{id}", rowHandler)
     mux.HandleFunc("/api/update/{id}", updateHandler)
     mux.HandleFunc("/api/delete/{id}", deleteHandler)
-    mux.HandleFunc("/api/groups/", groupsHandler)
+    mux.HandleFunc("/api/categories/", categoriesHandler)
     mux.HandleFunc("/api/check-url/", checkUrlHandler)
     mux.HandleFunc("/api/refetch-thumbnail/{id}", refetchThumbnailHandler)
     mux.HandleFunc("/api/pages/", pagesHandler)

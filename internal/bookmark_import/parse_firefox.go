@@ -111,13 +111,13 @@ type Anno struct {
 }
 
 var (
-    currentGroup    string
+    currentCategory string
     parsedBookmarks []setup.Bookmark
 )
 
 func ParseFirefox(bookmarks *Item, prefix string) []setup.Bookmark {
     if bookmarks.TypeCode == TypeFolder && len(bookmarks.Children) > 0 {
-        currentGroup = bookmarks.Title
+        currentCategory = bookmarks.Title
         for i := range bookmarks.Children {
             ParseFirefox(bookmarks.Children[i], prefix+"\t")
         }
@@ -126,7 +126,7 @@ func ParseFirefox(bookmarks *Item, prefix string) []setup.Bookmark {
             URL:      bookmarks.URI,
             Title:    bookmarks.Title,
             Keywords: bookmarks.Keyword,
-            BmGroup:  currentGroup,
+            Category:  currentCategory,
         })
 
     }

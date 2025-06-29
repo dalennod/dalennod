@@ -54,7 +54,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
                 fallthrough;
             case "keyword":
                 fallthrough;
-            case "group":
+            case "category":
                 bookmarks, pageCountForSearch = db.SearchFor(database, gotURLParams.searchType, gotURLParams.searchTerm, pageCount);
             default:
                 w.WriteHeader(http.StatusBadRequest);

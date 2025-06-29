@@ -12,85 +12,85 @@ import (
     "strconv"
 )
 
-func addInput(bmStruct setup.Bookmark, callToUpdate bool) {
+func addInput(bkmStruct setup.Bookmark, callToUpdate bool) {
     var archiveUrl string
-    bmStruct, archiveUrl = getBmInfo(bmStruct)
+    bkmStruct, archiveUrl = getBKMInfo(bkmStruct)
 
     if !callToUpdate {
-        addBm(bmStruct, archiveUrl)
+        addBKM(bkmStruct, archiveUrl)
     } else {
-        updateBm(bmStruct, archiveUrl)
+        updateBKM(bkmStruct, archiveUrl)
     }
 }
 
-func getBmInfo(bmStruct setup.Bookmark) (setup.Bookmark, string) {
+func getBKMInfo(bkmStruct setup.Bookmark) (setup.Bookmark, string) {
     var scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
     var err error
 
     fmt.Print("URL to save: ")
     scanner.Scan()
-    bmStruct.URL = scanner.Text()
+    bkmStruct.URL = scanner.Text()
 
-    bmStruct.ThumbURL, bmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bmStruct.URL)
+    bkmStruct.ThumbURL, bkmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
     if err != nil {
-        bmStruct.ThumbURL = bmStruct.URL
+        bkmStruct.ThumbURL = bkmStruct.URL
     }
 
     fmt.Print("Title for the bookmark: ")
     scanner.Scan()
-    bmStruct.Title = scanner.Text()
+    bkmStruct.Title = scanner.Text()
 
     fmt.Print("Notes/log reason for bookmark: ")
     scanner.Scan()
-    bmStruct.Note = scanner.Text()
+    bkmStruct.Note = scanner.Text()
 
     fmt.Print("Keywords for searching later: ")
     scanner.Scan()
-    bmStruct.Keywords = scanner.Text()
+    bkmStruct.Keywords = scanner.Text()
 
-    fmt.Print("Group to store the bookmark into: ")
+    fmt.Print("Category to store the bookmark into: ")
     scanner.Scan()
-    bmStruct.BmGroup = scanner.Text()
+    bkmStruct.Category = scanner.Text()
 
     fmt.Print("Archive URL? (y/N): ")
     scanner.Scan()
     var archiveUrl string = scanner.Text()
 
-    return bmStruct, archiveUrl
+    return bkmStruct, archiveUrl
 }
 
-func updateBm(bmStruct setup.Bookmark, archiveUrl string) {
+func updateBKM(bkmStruct setup.Bookmark, archiveUrl string) {
     switch archiveUrl {
     case "y", "Y":
-        bmStruct.Archived, bmStruct.SnapshotURL = archive.SendSnapshot(bmStruct.URL)
-        if bmStruct.Archived {
-            db.Update(database, bmStruct, false)
+        bkmStruct.Archived, bkmStruct.SnapshotURL = archive.SendSnapshot(bkmStruct.URL)
+        if bkmStruct.Archived {
+            db.Update(database, bkmStruct, false)
         } else {
             logger.Warn.Println("Snapshot failed")
-            db.Update(database, bmStruct, false)
+            db.Update(database, bkmStruct, false)
         }
     case "n", "N", "":
-        db.Update(database, bmStruct, false)
+        db.Update(database, bkmStruct, false)
     default:
-        db.Update(database, bmStruct, false)
+        db.Update(database, bkmStruct, false)
         logger.Warn.Println("Invalid input for archive request. URL has not been archived")
     }
 }
 
-func addBm(bmStruct setup.Bookmark, archiveUrl string) {
+func addBKM(bkmStruct setup.Bookmark, archiveUrl string) {
     switch archiveUrl {
     case "y", "Y":
-        bmStruct.Archived, bmStruct.SnapshotURL = archive.SendSnapshot(bmStruct.URL)
-        if bmStruct.Archived {
-            db.Add(database, bmStruct)
+        bkmStruct.Archived, bkmStruct.SnapshotURL = archive.SendSnapshot(bkmStruct.URL)
+        if bkmStruct.Archived {
+            db.Add(database, bkmStruct)
         } else {
             logger.Warn.Println("Snapshot failed")
-            db.Add(database, bmStruct)
+            db.Add(database, bkmStruct)
         }
     case "n", "N", "":
-        db.Add(database, bmStruct)
+        db.Add(database, bkmStruct)
     default:
-        db.Add(database, bmStruct)
+        db.Add(database, bkmStruct)
         logger.Warn.Println("Invalid input for archive request. URL has not been archived")
     }
 }
@@ -108,13 +108,13 @@ func updateInput(updateID string) {
         return
     }
 
-    bmAtID, err := db.ViewSingleRow(database, idToINT)
+    bkmAtID, err := db.ViewSingleRow(database, idToINT)
     if err != nil {
         fmt.Println(err)
         logger.Error.Println(err)
         return
     }
-    db.PrintRow(bmAtID)
+    db.PrintRow(bkmAtID)
 
     fmt.Print("Update this entry? (Y/n): ")
     scanner.Scan()
@@ -123,7 +123,7 @@ func updateInput(updateID string) {
     switch confirm {
     case "y", "Y", "":
         fmt.Println("Leave empty to retain old information")
-        addInput(bmAtID, true)
+        addInput(bkmAtID, true)
     case "n", "N":
         return
     default:
@@ -145,13 +145,13 @@ func removeInput(removeID string) {
         return
     }
 
-    bmAtID, err := db.ViewSingleRow(database, idToINT)
+    bkmAtID, err := db.ViewSingleRow(database, idToINT)
     if err != nil {
         fmt.Println(err)
         logger.Error.Println(err)
         return
     }
-    db.PrintRow(bmAtID)
+    db.PrintRow(bkmAtID)
 
     fmt.Print("Remove this entry? (Y/n): ")
     scanner.Scan()
@@ -175,13 +175,13 @@ func viewInput(viewID string) {
         logger.Error.Println("Invalid input")
         return
     }
-    bmAtID, err := db.ViewSingleRow(database, idToINT)
+    bkmAtID, err := db.ViewSingleRow(database, idToINT)
     if err != nil {
         fmt.Println(err)
         logger.Error.Println(err)
         return
     }
-    db.PrintRow(bmAtID)
+    db.PrintRow(bkmAtID)
 }
 
 func viewAllInput(bookmarks []setup.Bookmark) {

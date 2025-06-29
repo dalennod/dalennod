@@ -135,18 +135,18 @@ func refetchThumbnailHandler(w http.ResponseWriter, r *http.Request) {
     }
 }
 
-func groupsHandler(w http.ResponseWriter, r *http.Request) {
+func categoriesHandler(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Access-Control-Allow-Methods", "*")
     if r.Method == http.MethodGet {
-        listCurrGroups, err := db.GetAllGroups(database)
+        listCategories, err := db.GetAllCategories(database)
         if err != nil {
-            logger.Error.Println("error getting groups. ERROR:", err)
+            logger.Error.Println("error getting categories. ERROR:", err)
             return
         }
 
-        for _, group := range listCurrGroups {
-            fmt.Fprintf(w, "<option value=\"%s\"></option>", group)
+        for _, category := range listCategories {
+            fmt.Fprintf(w, "<option value=\"%s\"></option>", category)
         }
     } else {
         internalServerErrorHandler(w, r)

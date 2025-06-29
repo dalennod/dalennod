@@ -14,7 +14,7 @@ type Bookmark struct {
     Title        string `json:"title"`
     Note         string `json:"note"`
     Keywords     string `json:"keywords"`
-    BmGroup      string `json:"bmGroup"`
+    Category     string `json:"category"`
     Archived     bool   `json:"archive"`
     SnapshotURL  string `json:"snapshotURL"`
     ThumbURL     string `json:"thumbURL"`
@@ -43,7 +43,7 @@ func CreateDB(dbSavePath string) *sql.DB {
             title        TEXT,
             note         TEXT,
             keywords     TEXT,
-            bmGroup      TEXT,
+            category     TEXT,
             archived     BOOLEAN NOT NULL,
             snapshotURL  TEXT,
             thumbURL     TEXT,

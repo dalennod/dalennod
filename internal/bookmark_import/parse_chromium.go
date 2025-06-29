@@ -47,13 +47,13 @@ func deeper(array []BookmarkNode, depth int, maxDepth int) {
 
     for _, node := range array {
         if len(node.Children) > 0 {
-            currentGroup = node.Name
+            currentCategory = node.Name
             deeper(node.Children, depth+1, maxDepth)
         } else if node.URL != "" {
             parsedBookmarks = append(parsedBookmarks, setup.Bookmark{
                 URL:     node.URL,
                 Title:   node.Name,
-                BmGroup: currentGroup,
+                Category: currentCategory,
             })
         }
     }

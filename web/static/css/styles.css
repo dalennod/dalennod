@@ -159,7 +159,7 @@ main {
     border-radius: 1%;
 }
 
-.grid-child .bm-info {
+.grid-child .bkm-info {
     flex: 1;
 }
 
@@ -208,20 +208,20 @@ main {
     position: relative;
 }
 
-.grid-child .bm-note {
+.grid-child .bkm-note {
     white-space: pre-line;
     padding: 0.5em;
     /* box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px; */
     background-color: var(--light-mode-background-transparent);
 }
 
-.grid-child .group {
+.grid-child .category {
     border: 1px solid var(--global-border-color);
     border-radius: 1%;
     padding: 3px;
 }
 
-.bm-hostname,
+.bkm-hostname,
 .id-modified {
     font-family: monospace;
     opacity: 0.5;
@@ -232,7 +232,7 @@ main {
     padding: 0.5em 0px;
 }
 
-.bm-keywords {
+.bkm-keywords {
     display: inline-block;
 }
 
@@ -378,7 +378,7 @@ body:has(dialog[open]) {
 
     input,
     textarea,
-    .grid-child .group,
+    .grid-child .category,
     .grid-child .keywords,
     .grid-child a,
     .pagination a {
@@ -404,7 +404,7 @@ body:has(dialog[open]) {
         background-color: var(--dark-mode-foreground);
     }
 
-    .grid-child .bm-note {
+    .grid-child .bkm-note {
         background-color: var(--dark-mode-background-transparent);
     }
 
