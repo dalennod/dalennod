@@ -27,13 +27,12 @@
     <main>
       {{ if .RecentBookmarks }}
       <div id="special-category-bookmarks">
-        <p><code>Recently Interacted Bookmarks</code></p>
+        <h2 class="special-bookmarks"><img class="svg-img" src="static/imgs/recent-icon.svg" alt="Recently Interacted Bookmarks Icon" />Recently Interacted</h2>
         {{ block "recent_bookmarks_list" . }} {{ end }}
-        <hr>
       </div>
       {{ end }}
       <div id="all-bookmarks">
-        <p><code id="all-bookmarks-list">All Bookmarks</code></p>
+        <h2 id="all-bookmarks-list" class="special-bookmarks"><img class="svg-img" src="static/imgs/bookmark-icon.svg" alt="All Bookmark Icons" />All Bookmarks</h2>
         {{ block "all_bookmarks_list" . }} {{ end }}
       </div>
     </main>

@@ -252,6 +252,11 @@ main {
     display: flex;
 }
 
+.special-bookmarks {
+    display: flex;
+    align-items: center;
+}
+
 .svg-img {
     width: 1.5em;
     height: 1.5em;

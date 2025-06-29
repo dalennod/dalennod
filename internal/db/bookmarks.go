@@ -52,13 +52,13 @@ func Update(database *sql.DB, bmStruct setup.Bookmark, serverCall bool) {
         }
     }
 
-    stmt, err := database.Prepare("UPDATE bookmarks SET url=(?), title=(?), note=(?), keywords=(?), bmGroup=(?), archived=(?), snapshotURL=(?), thumbURL=(?), byteThumbURL=(?), modified=(?) WHERE id=(?);")
+    stmt, err := database.Prepare("UPDATE bookmarks SET url=(?), title=(?), note=(?), keywords=(?), bmGroup=(?), archived=(?), snapshotURL=(?), thumbURL=(?), byteThumbURL=(?), modified=CURRENT_TIMESTAMP WHERE id=(?);")
     if err != nil {
         logger.Error.Println("error preparing database statement. ERROR:", err)
         return
     }
 
-    _, err = stmt.Exec(bmStruct.URL, bmStruct.Title, bmStruct.Note, bmStruct.Keywords, bmStruct.BmGroup, bmStruct.Archived, bmStruct.SnapshotURL, bmStruct.ThumbURL, bmStruct.ByteThumbURL, time.Now().UTC().Format(constants.TIME_FORMAT), bmStruct.ID)
+    _, err = stmt.Exec(bmStruct.URL, bmStruct.Title, bmStruct.Note, bmStruct.Keywords, bmStruct.BmGroup, bmStruct.Archived, bmStruct.SnapshotURL, bmStruct.ThumbURL, bmStruct.ByteThumbURL, bmStruct.ID)
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return
@@ -119,8 +119,7 @@ func Remove(database *sql.DB, id int) {
         return
     }
 
-    _, err = stmt.Exec(id)
-    if err != nil {
+    if _, err = stmt.Exec(id); err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return
     }

@@ -19,7 +19,7 @@ const (
     LOG_FILE_SIZE       int64  = 10<<20 // ~10.48MB limit on log file size
     IMPORT_FILE_SIZE    int64  = 10<<21 // 10<<21 = 10*(2^21) = 20,971,520 = ~20.9MB limit on import file size
 
-    COMMON_USERAGENT    string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36"
+    COMMON_USERAGENT    string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36"
 )
 
 var (

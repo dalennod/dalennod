@@ -24,12 +24,22 @@ func recentsCount(database *sql.DB) int {
 }
 
 func sanitizeRecents(database *sql.DB) {
-    if count := recentsCount(database); count <= constants.RECENT_ENGAGE_LIMIT {
+    count := recentsCount(database)
+    if count <= constants.RECENT_ENGAGE_LIMIT {
         logger.Info.Println("count less than RECENT_ENGAGE_LIMIT");
         return;
     }
 
-    // TODO: delete rows if total row count more than RECENT_ENGAGE_LIMIT
+    deleteLimit := count - constants.RECENT_ENGAGE_LIMIT
+    stmt, err := database.Prepare("DELETE FROM recents WHERE id IN (SELECT id FROM recents ORDER BY lastAccessed ASC LIMIT (?));")
+    if err != nil {
+        logger.Error.Println("could not prepare database query. ERROR:", err)
+        return
+    }
+    if _, err := stmt.Exec(deleteLimit); err != nil {
+        logger.Error.Println("could not execute query. ERROR:", err)
+        return
+    }
 }
 
 func AddToRecents(database *sql.DB, bkmID int) {
