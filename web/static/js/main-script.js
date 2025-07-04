@@ -179,6 +179,7 @@ const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocati
 
     if (pageNumber === current) pageNumberLink.classList.add("active");
     paginationNumbers.appendChild(pageNumberLink);
+    paginationNumbers.appendChild(document.createTextNode(" "));
 };
 
 const updateNavATags = (current, totalPages, hrefParams) => {
