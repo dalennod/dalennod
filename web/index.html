@@ -12,19 +12,19 @@
 
   <body>
     <nav>
-      <form class="search-form" action="/" method="get">
-        <input type="text" name="search-type" value="general" hidden />
-        <input type="text" name="search-term" class="input-search" placeholder="Search a keyword..." />
-        <button class="button-svg" type="submit" id="button-search-html" title="Search">
+      <div class="nav-left">
+        <button class="button-svg" id="home-button" title="Root page" onclick="homeButton();">
+          <img class="svg-img" src="static/imgs/home-button.svg" alt="Home button" />
+        </button>
+      </div>
+      <div class="nav-right">
+        <button class="button-svg" title="Search" onclick="openSearchDialog();">
           <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button" />
         </button>
-      </form>
-      <button class="button-svg" title="Root page">
-        <a href="/"><img class="svg-img" src="static/imgs/home-button.svg" alt="Home button"></a>
-      </button>
-      <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();" onmouseenter="changeToImport();" onmouseleave="clearImportTimeout();">
-        <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button" />
-      </button>
+        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();" onmouseenter="changeToImport();" onmouseleave="clearImportTimeout();">
+          <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button" />
+        </button>
+      </div>
     </nav>
 
     <main>
@@ -110,7 +110,7 @@
         <form action="/" method="get">
           <input hidden name="search-type" value="keyword" />
           <input hidden name="search-term" value="{{ $keyword }}" />
-          <button class="button-svg" type="submit" id="button-search-html" title="Search keyword: '{{ $keyword }}'">
+          <button class="button-svg" type="submit" title="Search keyword: '{{ $keyword }}'">
             <span id="keywords" class="keywords">{{ $keyword }}</span>
           </button>
         </form>
@@ -123,7 +123,7 @@
       <form action="/" method="get">
         <input hidden name="search-type" value="category" />
         <input hidden name="search-term" value="{{ .Category }}" />
-        <button class="button-svg" type="submit" id="button-search-html" title="Search category: '{{ .Category }}'">
+        <button class="button-svg" type="submit" title="Search category: '{{ .Category }}'">
           <span id="category" class="category">{{ .Category }}</span>
         </button>
       </form>
@@ -148,6 +148,18 @@
 {{ end }}
 
 {{ define "dialogs" }}
+<dialog class="dialog-search">
+  <form action="/" method="get">
+    <label for="general-search-term" class="label-input">
+      <input type="text" name="search-type" value="general" hidden />
+      <input type="text" name="search-term" id="general-search-term" class="input-search" placeholder="&nbsp;" />
+      <span class="input-placeholder">Search for a bookmark...</span>
+      <span class="focus-bg"></span>
+    </label>
+    <button class="button-svg" type="submit" title="Search" hidden></button>
+  </form>
+</dialog>
+
 <dialog class="dialog-create">
   <div class="dialog-top">
     <span class="dialog-type">Create a new bookmark</span>
@@ -157,20 +169,40 @@
   </div>
   <div class="dialog-inputs">
     <div class="pad-like-p">
-      URL: <span class="red-text">*</span><br /><input autofocus type="text" class="uac-input" id="create-url" placeholder="URL to save" required />
+      <label for ="create-url" class="label-input">
+        <input autofocus type="url" class="uac-input" id="create-url" placeholder="&nbsp;" required />
+        <span class="input-placeholder">Bookmark URL <span class="red-text">*</span><br /></span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p">
-      Title:<br /><input type="text" class="uac-input" id="create-title" placeholder="Title for the bookmark" />
+      <label for="create-title" class="label-input">
+        <input type="text" class="uac-input" id="create-title" placeholder="&nbsp;" />
+        <span class="input-placeholder">Bookmark Title</span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p">
-      Notes:<br /><textarea class="uac-input" id="create-note" placeholder="Log notes for bookmark"></textarea>
+      <label for="create-note" class="label-input">
+        <textarea class="uac-input" id="create-note" placeholder="&nbsp;"></textarea>
+        <span class="input-placeholder">Log notes for bookmark</span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p">
-      Keywords:<br /><input type="text" class="uac-input" id="create-keywords" placeholder="Keywords, to, search, bookmark" />
+      <label for="create-keywords" class="label-input">
+        <input type="text" class="uac-input" id="create-keywords" placeholder="&nbsp;" />
+        <span class="input-placeholder">Keywords, to, search, bookmark</span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p">
-      Category:<br /><input type="text" class="uac-input" id="create-category" placeholder="Category to store bookmark into" list="categories-list-create" />
-      <datalist id="categories-list-create"></datalist>
+      <label for="create-category" class="label-input">
+        <datalist id="categories-list-create"></datalist>
+        <input type="text" class="uac-input" id="create-category" placeholder="&nbsp;" list="categories-list-create" />
+        <span class="input-placeholder">Bookmark Category</span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p">
       Archive?:
@@ -196,20 +228,40 @@
   <div class="dialog-inputs">
     <span id="bkm-id" hidden></span>
     <div class="pad-like-p">
-      URL: <span class="red-text">*</span><br /><input type="text" class="uac-input" id="update-url" placeholder="URL to save" required />
+      <label for="update-url" class="label-input">
+        <input type="text" class="uac-input" id="update-url" placeholder="&nbsp;" required />
+        <span class="input-placeholder">Bookmark URL <span class="red-text">*</span></span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p">
-      Title:<br /><input type="text" class="uac-input" id="update-title" placeholder="Title for the bookmark" />
+      <label for="update-title" class="label-input">
+        <input type="text" class="uac-input" id="update-title" placeholder="&nbsp;" />
+        <span class="input-placeholder">Bookmark Title</span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p">
-      Notes:<br /><textarea class="uac-input" id="update-note" autofocus placeholder="Log notes for bookmark"></textarea>
+      <label for="update-note" class="label-input">
+        <textarea class="uac-input" id="update-note" autofocus placeholder="&nbsp;"></textarea>
+        <span class="input-placeholder">Logged notes for bookmark</span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p">
-      Keywords:<br /><input type="text" class="uac-input" id="update-keywords" placeholder="Keywords, to, search, bookmark" />
+      <label for="update-keywords" class="label-input">
+        <input type="text" class="uac-input" id="update-keywords" placeholder="&nbsp;" />
+        <span class="input-placeholder">Keywords, to, search, bookmark</span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p">
-      Category:<br /><input type="text" class="uac-input" id="update-category" placeholder="Category to store bookmark into" list="categories-list-update" />
-      <datalist id="categories-list-update"></datalist>
+      <label for="update-category" class="label-input">
+        <datalist id="categories-list-update"></datalist>
+        <input type="text" class="uac-input" id="update-category" placeholder="&nbsp;" list="categories-list-update" />
+        <span class="input-placeholder">Bookmark Category</span>
+        <span class="focus-bg"></span>
+      </label>
     </div>
     <div class="pad-like-p" id="update-archive-div">
       Archive?:

@@ -18,6 +18,9 @@ const categoriesOptions = async () => {
 const showCreateDialog = async () => {
     document.querySelector(".dialog-create").showModal();
     clearImportTimeout();
+    const noteTextArea = document.getElementById("create-note");
+    adjustTextarea(noteTextArea);
+
     const bookmarkCreateDatalist = document.getElementById("categories-list-create");
     bookmarkCreateDatalist.innerHTML = await categoriesOptions();
 };
@@ -29,8 +32,7 @@ document.querySelector(".dialog-create").addEventListener("close", () => {
 const showUpdateDialog = async () => {
     document.querySelector(".dialog-update").showModal();
     const noteTextArea = document.getElementById("update-note");
-    noteTextArea.style.height = "auto";
-    noteTextArea.style.height = noteTextArea.scrollHeight + "px";
+    adjustTextarea(noteTextArea);
 
     const bookmarkUpdateDatalist = document.getElementById("categories-list-update");
     bookmarkUpdateDatalist.innerHTML = await categoriesOptions();
@@ -39,6 +41,7 @@ const closeUpdateDialog = () => document.querySelector(".dialog-update").close()
 document.querySelector(".dialog-update").addEventListener("close", () => {
     location.reload();
 });
+
 
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.parentNode.id;
@@ -237,9 +240,49 @@ const updatePagination = async () => {
     }
 };
 
+const openSearchDialog = () => {
+    document.querySelector(".dialog-search").showModal();
+}
+
+let keyBuffer = "";
+document.addEventListener("keydown", (event) => {
+    if (document.querySelector(".dialog-create").open ||
+        document.querySelector(".dialog-update").open ||
+        document.querySelector(".dialog-search").open ||
+        event.ctrlKey || event.altKey || event.metaKey) {
+        return;
+    }
+
+    keyBuffer += event.key;
+    if (keyBuffer.length > 2) {
+        keyBuffer = keyBuffer.slice(-2);
+    }
+
+    if (keyBuffer === ":s") {
+        openSearchDialog();
+        keyBuffer = "";
+        setTimeout(() => document.getElementById("general-search-term").value = "", 1);
+    }
+});
+
+const adjustTextarea = (tar) => {
+    tar.value.includes("\n")
+        ? tar.style.height = (tar.scrollHeight + 12) + "px"
+        : tar.style.height = tar.scrollHeight + "px";
+    tar.addEventListener("input", () => {
+        tar.style.height = "auto";
+        tar.value.includes("\n")
+            ? tar.style.height = (tar.scrollHeight + 12) + "px"
+            : tar.style.height = tar.scrollHeight + "px";
+    });
+};
+
+const homeButton = () => {
+    location.href = root;
+}
+
 window.onload = () => {
-    const host = new URL(location.href).host;
-    root = `http://${host}`;
+    root = new URL(location.href).origin;
     API = `${root}/api/`;
     updatePagination();
 };

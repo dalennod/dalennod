@@ -1,15 +1,17 @@
 :root {
     --light-mode-foreground             : #dddddd;
-    --light-mode-background             : rgb(238, 238, 238);
-    --light-mode-background-transparent : rgba(238, 238, 238, 0.3);
-    --light-mode-text                   : #000000;
+    --light-mode-background             : 238, 238, 238;
+    --light-mode-text                   : 0, 0, 0;
     --dark-mode-foreground              : #232323;
-    --dark-mode-background              : rgb(19, 19, 19);
-    --dark-mode-background-transparent  : rgba(19, 19, 19, 0.3);
-    --dark-mode-text                    : #eeeeee;
+    --dark-mode-background              : 19, 19, 19;
+    --dark-mode-text                    : var(--light-mode-background);
     --global-border-color               : #aaaaaa;
     --accent-color                      : #2f9df7;
     --red-text                          : #ff3535;
+}
+
+html {
+    width: 100%;
 }
 
 body {
@@ -24,8 +26,8 @@ body * {
 body,
 dialog,
 .logTextArea {
-    background-color: var(--light-mode-background);
-    color: var(--light-mode-text);
+    background-color: rgb(var(--light-mode-background));
+    color: rgb(var(--light-mode-text));
 }
 
 /* Specficially for /import/ index.html */
@@ -54,28 +56,94 @@ dialog,
 
 /* End: Specficially for /import/ index.html */
 
-input,
-textarea {
-    background: none;
-    border: none;
-    text-decoration: none;
-    font-size: 0.83em;
-}
-
-input[type="text"]:focus,
-textarea:focus {
-    outline: none;
-}
-
 textarea {
     resize: vertical;
     font-family: inherit;
-    /*
-        Not available everywhere yet. But, accomplishes how I'd want
-        this element to behave.
-        https://developer.mozilla.org/en-US/docs/Web/CSS/field-sizing
-    */
+    /* Not available everywhere yet. */
+    /* But, accomplishes how this element should behave. */
+    /* https://developer.mozilla.org/docs/Web/CSS/field-sizing */
     /* field-sizing: content; */
+}
+
+.label-input {
+    display: grid;
+    position: relative;
+    width: 100%;
+    border-radius: 1%;
+    overflow: hidden;
+}
+
+.label-input .input-placeholder {
+    position: absolute;
+    top: 20px;
+    left: 12px;
+    font-size: 1em;
+    color: rgba(var(--light-mode-text), 0.5);
+    transform-origin: 0 0;
+    transform: translate3d(0, 0, 0);
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.label-input .focus-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(var(--light-mode-text), 0.05);
+    z-index: -1;
+    transform: scaleX(0);
+    transform-origin: left;
+}
+
+.label-input input,
+.label-input textarea {
+    appearance: none;
+    width: 100%;
+    border: 0;
+    padding: 16px 12px 0 12px;
+    height: 56px;
+    font-size: 1em;
+    background: rgba(var(--light-mode-text), 0.02);
+    box-shadow: inset 0 -1px 0 rgba(var(--light-mode-text), 0.3);
+    color: rgb(var(--light-mode-text));
+    transition: all 0.15s ease;
+}
+
+.label-input textarea {
+    padding: 25px 12px 0px 12px;
+}
+
+.label-input input:hover,
+.label-input textarea:hover {
+    background: rgba(var(--light-mode-text), 0.04);
+    box-shadow: inset 0 -1px 0 rgba(var(--light-mode-text), 0.5);
+}
+
+.label-input input:not(:placeholder-shown) + .input-placeholder,
+.label-input textarea:not(:placeholder-shown) + .input-placeholder {
+    color: rgba(var(--light-mode-text), 0.5);
+    transform: translate3d(0, -12px, 0) scale(0.75);
+}
+
+.label-input input:focus,
+.label-input textarea:focus {
+    background: rgba(var(--light-mode-text), 0.05);
+    outline: none;
+    box-shadow: inset 0 -2px 0 var(--accent-color);
+}
+
+.label-input input:focus + .input-placeholder,
+.label-input textarea:focus + .input-placeholder {
+    color: var(--accent-color);
+    transform: translate3d(0, -12px, 0) scale(0.75);
+}
+
+.label-input input:focus + .input-placeholder + .focus-bg,
+.label-input textarea:focus + .input-placeholder + .focus-bg {
+    transform: scaleX(1);
+    transition: all 0.1s ease;
 }
 
 .red-text {
@@ -92,7 +160,7 @@ textarea {
 .button-text {
     border-radius: 1%;
     cursor: pointer;
-    color: var(--light-mode-text);
+    color: rgb(var(--light-mode-text));
 }
 
 .button-hostname {
@@ -124,14 +192,13 @@ nav {
     width: 100%;
     padding: 10px;
     background-color: var(--light-mode-foreground);
-    display: flex;
     border-radius: 1%;
+    display: flex;
+    align-items: center;
 }
 
-.search-form {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
+.nav-left {
+    margin-right: auto;
 }
 
 main {
@@ -206,15 +273,15 @@ main {
 }
 
 .grid-child .bkm-note {
-    white-space: pre-line;
+    white-space: preserve;
     padding: 0.5em;
     /* box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px; */
-    background-color: var(--light-mode-background-transparent);
+    background-color: rgba(var(--light-mode-background), 0.3);
 }
 
 .grid-child .category {
     border: 1px solid var(--global-border-color);
-    border-radius: 10%;
+    border-radius: 5%;
     padding: 3px;
 }
 
@@ -223,6 +290,7 @@ main {
     font-family: monospace;
     opacity: 0.5;
     font-weight: bold;
+    font-size: 0.83em;
 }
 
 .pad-like-p {
@@ -268,13 +336,6 @@ main {
 
 .dialog-inputs {
     padding: 10px;
-    border-radius: 1%;
-}
-
-.dialog-inputs input[type="text"],
-.dialog-inputs textarea {
-    width: 50vw;
-    border-bottom: 1px dotted var(--global-border-color);
 }
 
 dialog {
@@ -311,6 +372,10 @@ body:has(dialog[open]) {
     flex: 1;
 }
 
+.input-search {
+    font-size: 1em;
+}
+
 .center-text {
     text-align: center;
 }
@@ -328,7 +393,7 @@ body:has(dialog[open]) {
 }
 
 .pagination a.active {
-    background-color: dodgerblue;
+    background-color: var(--accent-color);
     color: black;
 }
 
@@ -349,30 +414,12 @@ body:has(dialog[open]) {
     }
 }
 
-@keyframes fade-out {
-    0% {
-        opacity: 1;
-        transform: scaleY(1);
-        display: block;
-    }
-    100% {
-        opacity: 0;
-        transform: scaleY(0);
-        display: none;
-    }
-}
-
-@keyframes backdrop-fade-in {
-    0% { background-color: rgba(0, 0, 0, 0); }
-    100% { background-color: rgba(0, 0, 0, 0.8); }
-}
-
 @media (prefers-color-scheme: dark) {
     body,
     dialog,
     .logTextArea {
-        background-color: var(--dark-mode-background);
-        color: var(--dark-mode-text);
+        background-color: rgb(var(--dark-mode-background));
+        color: rgb(var(--dark-mode-text));
     }
 
     input,
@@ -381,7 +428,38 @@ body:has(dialog[open]) {
     .grid-child .keywords,
     .grid-child a,
     .pagination a {
-        color: var(--dark-mode-text);
+        color: rgb(var(--dark-mode-text));
+    }
+
+    .label-input .input-placeholder {
+        color: rgba(var(--dark-mode-text), 0.5);
+    }
+
+    .label-input .focus-bg {
+        background: rgba(var(--dark-mode-text), 0.05);
+    }
+
+    .label-input input,
+    .label-input textarea {
+        background: rgba(var(--dark-mode-text), 0.02);
+        box-shadow: inset 0 -1px 0 rgba(var(--dark-mode-text), 0.3);
+        color: rgb(var(--dark-mode-text));
+    }
+
+    .label-input input:hover,
+    .label-input textarea:hover {
+        background: rgba(var(--dark-mode-text), 0.04);
+        box-shadow: inset 0 -1px 0 rgba(var(--dark-mode-text), 0.5);
+    }
+
+    .label-input input:not(:placeholder-shown) + .input-placeholder,
+    .label-input textarea:not(:placeholder-shown) + .input-placeholder {
+        color: rgba(var(--dark-mode-text), 0.5);
+    }
+
+    .label-input input:focus,
+    .label-input textarea:focus {
+        background: rgba(var(--dark-mode-text), 0.05);
     }
 
     .pagination a:hover:not(.active) {
@@ -404,7 +482,7 @@ body:has(dialog[open]) {
     }
 
     .grid-child .bkm-note {
-        background-color: var(--dark-mode-background-transparent);
+        background-color: rgba(var(--dark-mode-background), 0.3);
     }
 
     .svg-img {
