@@ -3,11 +3,9 @@
 let API = "";
 let root = "";
 
-let changeToImportTimeout = "";
-const showImportPageTimeout = 5 * 1000; // 5 seconds
-const changeToImport = () => changeToImportTimeout = setTimeout(() => showImportPage(), showImportPageTimeout);
-const showImportPage = () => window.location.href = root + "/import/";
-const clearImportTimeout = () => clearTimeout(changeToImportTimeout);
+const showImportPage = () => {
+    window.location.href = root + "/import/";
+}
 
 const categoriesOptions = async () => {
     const fetchURL = API + "categories/";
@@ -17,7 +15,6 @@ const categoriesOptions = async () => {
 
 const showCreateDialog = async () => {
     document.querySelector(".dialog-create").showModal();
-    clearImportTimeout();
     const noteTextArea = document.getElementById("create-note");
     adjustTextarea(noteTextArea);
 
@@ -240,8 +237,24 @@ const updatePagination = async () => {
     }
 };
 
+const listenSearchInput = (searchBox) => {
+    const searchButton = document.getElementById("search-button");
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") {
+            const searchContent = searchBox.value;
+            if (searchContent.startsWith("::import")) {
+                searchButton.disabled = true;
+                showImportPage();
+                return;
+            }
+        }
+    });
+}
+
 const openSearchDialog = () => {
     document.querySelector(".dialog-search").showModal();
+    const searchBox = document.getElementById("general-search-term");
+    listenSearchInput(searchBox);
 }
 
 let keyBuffer = "";

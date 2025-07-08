@@ -21,7 +21,7 @@
         <button class="button-svg" title="Search" onclick="openSearchDialog();">
           <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button" />
         </button>
-        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();" onmouseenter="changeToImport();" onmouseleave="clearImportTimeout();">
+        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();">
           <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button" />
         </button>
       </div>
@@ -156,7 +156,7 @@
       <span class="input-placeholder">Search for a bookmark...</span>
       <span class="focus-bg"></span>
     </label>
-    <button class="button-svg" type="submit" title="Search" hidden></button>
+    <button class="button-svg" id="search-button" type="submit" title="Search" hidden></button> <!-- TODO: id, input addEventListener, disable button, perform special action on certain keywords -->
   </form>
 </dialog>
 
@@ -169,7 +169,7 @@
   </div>
   <div class="dialog-inputs">
     <div class="pad-like-p">
-      <label for ="create-url" class="label-input">
+      <label for="create-url" class="label-input">
         <input autofocus type="url" class="uac-input" id="create-url" placeholder="&nbsp;" required />
         <span class="input-placeholder">Bookmark URL <span class="red-text">*</span><br /></span>
         <span class="focus-bg"></span>

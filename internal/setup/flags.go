@@ -63,7 +63,7 @@ func cliFlags() {
         fmt.Fprintln(w, "  --crypt             Encrypt/decrypt the JSON backup")
         fmt.Fprintln(w, "                        Use alongside --json flag to encrypt")
         fmt.Fprintln(w, "                        Use alongside --import --dalennod to decrypt")
-        fmt.Fprintln(w, "  --where             Print config and logs directory path")
+        fmt.Fprintln(w, "  --where             Print config and logs directory location")
         fmt.Fprintln(w, "  --redo-completion   Set command line completion again")
         fmt.Fprintln(w, "  --profile           Show profile names found in local directory")
         fmt.Fprintln(w, "  --switch [profile]  Switch profiles")
@@ -100,7 +100,7 @@ func cliFlags() {
     flag.StringVar(&FlagVals.Chromium, "chromium", "", "Import bookmarks from Chromium. Use alongside -i flag")
     flag.StringVar(&FlagVals.Dalennod, "dalennod", "", "Import bookmarks exported Dalennod JSON. Use alongside -i flag")
 
-    flag.BoolVar(&FlagVals.Where, "where", false, "Print config and logs directory path")
+    flag.BoolVar(&FlagVals.Where, "where", false, "Print config and logs directory location")
 
     flag.BoolVar(&FlagVals.RedoCompletion, "redo-completion", false, "Set CLI completion again")
 
@@ -158,7 +158,7 @@ func fishCompletion() {
     sb.WriteString("complete -c dalennod -s h -l help -d 'Shows help message'\n")
     sb.WriteString("complete -c dalennod -l json -d 'Dump entire DB in JSON. Use alongside -b, --backup flag'\n")
     sb.WriteString("complete -c dalennod -l crypt -d 'Encrypt/decrypt the JSON backup'\n")
-    sb.WriteString("complete -c dalennod -l where -d 'Print config and logs directory path'\n")
+    sb.WriteString("complete -c dalennod -l where -d 'Print config and logs directory location'\n")
     sb.WriteString("complete -c dalennod -l redo-completion -d 'Set CLI completion again'\n")
     sb.WriteString("complete -c dalennod -l profile -d 'Show profile names found in local directory'\n")
     sb.WriteString("complete -c dalennod -l switch -d 'Switch profiles. Must use alongside --profile flag'\n\n")
@@ -252,7 +252,7 @@ func zshCompletion() {
     sb.WriteString("    '(-b,--backup)'{-b,--backup}'[Start backup process]' \\\n")
     sb.WriteString("    '--json[Dump entire DB in JSON. Use alongside -b, --backup flag]' \\\n")
     sb.WriteString("    '--crypt[Encrypt or decrypt the JSON backup]' \\\n")
-    sb.WriteString("    '--where[Print config and logs directory path]'\\\n")
+    sb.WriteString("    '--where[Print config and logs directory location]'\\\n")
     sb.WriteString("    '--redo-completion[Set CLI completion again]'\\\n")
     sb.WriteString("    '--profile[Show profile names found in local directory]' \\\n")
     sb.WriteString("    '--switch[Switch profiles. Must use alongside --profile flag]'\n")
