@@ -39,6 +39,8 @@ func UserInput(bookmark_database *sql.DB) {
         switchProfile(setup.FlagVals.Switch)
     case setup.FlagVals.Backup && setup.FlagVals.JSONOut:
         backup.JSONOut(database)
+    case setup.FlagVals.RedoCompletion:
+        setup.SetCompletion()
     case setup.FlagVals.Import && setup.FlagVals.Firefox != "":
         importFirefoxInput(setup.FlagVals.Firefox)
     case setup.FlagVals.Import && setup.FlagVals.Chromium != "":

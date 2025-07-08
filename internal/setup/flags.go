@@ -12,22 +12,23 @@ import (
 )
 
 type FlagValues struct {
-    RemoveID    string
-    UpdateID    string
-    ViewID      string
-    ViewAll     bool
-    AddEntry    bool
-    StartServer bool
-    Backup      bool
-    JSONOut     bool
-    Crypt       bool
-    Import      bool
-    Firefox     string
-    Chromium    string
-    Dalennod    string
-    Where       bool
-    Profile     bool
-    Switch      string
+    RemoveID        string
+    UpdateID        string
+    ViewID          string
+    ViewAll         bool
+    AddEntry        bool
+    StartServer     bool
+    Backup          bool
+    JSONOut         bool
+    Crypt           bool
+    RedoCompletion  bool
+    Import          bool
+    Firefox         string
+    Chromium        string
+    Dalennod        string
+    Where           bool
+    Profile         bool
+    Switch          string
 }
 
 var FlagVals FlagValues
@@ -47,10 +48,10 @@ func cliFlags() {
         fmt.Fprintln(w, "  -a, --add           Add a bookmark entry to the database")
         fmt.Fprintln(w, "  -r, --remove [id]   Remove specific bookmark using its ID")
         fmt.Fprintln(w, "  -u, --update [id]   Update specific bookmark using its ID")
-        fmt.Fprintln(w, "  -v, --view [id]     View specific bookmark using its ID")
+        fmt.Fprintln(w, "  -v, --view   [id]   View specific bookmark using its ID")
         fmt.Fprintln(w, "  -V, --view-all      View all bookmarks")
         fmt.Fprintln(w, "  -i, --import        Import bookmarks from a browser")
-        fmt.Fprintln(w, "  --firefox [file]    Import bookmarks from Firefox")
+        fmt.Fprintln(w, "  --firefox  [file]   Import bookmarks from Firefox")
         fmt.Fprintln(w, "                        Must use alongside -i, --import option")
         fmt.Fprintln(w, "  --chromium [file]   Import bookmarks from Chromium")
         fmt.Fprintln(w, "                        Must use alongside -i, --import option")
@@ -63,6 +64,7 @@ func cliFlags() {
         fmt.Fprintln(w, "                        Use alongside --json flag to encrypt")
         fmt.Fprintln(w, "                        Use alongside --import --dalennod to decrypt")
         fmt.Fprintln(w, "  --where             Print config and logs directory path")
+        fmt.Fprintln(w, "  --redo-completion   Set command line completion again")
         fmt.Fprintln(w, "  --profile           Show profile names found in local directory")
         fmt.Fprintln(w, "  --switch [profile]  Switch profiles")
         fmt.Fprintln(w, "                        Must use alongside --profile flag")
@@ -100,11 +102,13 @@ func cliFlags() {
 
     flag.BoolVar(&FlagVals.Where, "where", false, "Print config and logs directory path")
 
+    flag.BoolVar(&FlagVals.RedoCompletion, "redo-completion", false, "Set CLI completion again")
+
     flag.BoolVar(&FlagVals.Profile, "profile", false, "Show profile names found in local directory")
     flag.StringVar(&FlagVals.Switch, "switch", "", "Switch profiles. Must use alongside --profile flag")
 }
 
-func setCompletion() {
+func SetCompletion() {
     shell := os.Getenv("SHELL")
     switch {
     case strings.Contains(shell, "fish"):
@@ -155,6 +159,7 @@ func fishCompletion() {
     sb.WriteString("complete -c dalennod -l json -d 'Dump entire DB in JSON. Use alongside -b, --backup flag'\n")
     sb.WriteString("complete -c dalennod -l crypt -d 'Encrypt/decrypt the JSON backup'\n")
     sb.WriteString("complete -c dalennod -l where -d 'Print config and logs directory path'\n")
+    sb.WriteString("complete -c dalennod -l redo-completion -d 'Set CLI completion again'\n")
     sb.WriteString("complete -c dalennod -l profile -d 'Show profile names found in local directory'\n")
     sb.WriteString("complete -c dalennod -l switch -d 'Switch profiles. Must use alongside --profile flag'\n\n")
     sb.WriteString("# import options\n")
@@ -165,7 +170,9 @@ func fishCompletion() {
 
     if _, err := fishCompletionFile.WriteString(sb.String()); err != nil {
         log.Println("error writing to fish completion file. ERROR:", err)
+        return
     }
+    fmt.Println("Created and set file for command line completion on fish shell.")
 }
 
 func bashCompletion() {
@@ -188,7 +195,7 @@ func bashCompletion() {
     sb.WriteString("    COMPREPLY=()\n")
     sb.WriteString("    cur=\"${COMP_WORDS[COMP_CWORD]}\"\n")
     sb.WriteString("    prev=\"${COMP_WORDS[COMP_CWORD-1]}\"\n")
-    sb.WriteString("    opts=\"-s --serve -a --add -r --remove -u --update -v --view -V --view-all -i --import --firefox --chromium --dalennod -b --backup --json --crypt --where --profile --switch\"\n\n")
+    sb.WriteString("    opts=\"-s --serve -a --add -r --remove -u --update -v --view -V --view-all -i --import --firefox --chromium --dalennod -b --backup --json --crypt --where --profile --switch --redo-completion\"\n\n")
     sb.WriteString("    if [[ ${cur} == -* ]] ; then\n")
     sb.WriteString("        COMPREPLY=( $(compgen -W \"${opts}\" -- ${cur}) )\n")
     sb.WriteString("        return 0\n")
@@ -246,6 +253,7 @@ func zshCompletion() {
     sb.WriteString("    '--json[Dump entire DB in JSON. Use alongside -b, --backup flag]' \\\n")
     sb.WriteString("    '--crypt[Encrypt or decrypt the JSON backup]' \\\n")
     sb.WriteString("    '--where[Print config and logs directory path]'\\\n")
+    sb.WriteString("    '--redo-completion[Set CLI completion again]'\\\n")
     sb.WriteString("    '--profile[Show profile names found in local directory]' \\\n")
     sb.WriteString("    '--switch[Switch profiles. Must use alongside --profile flag]'\n")
 
@@ -257,7 +265,7 @@ func zshCompletion() {
     zshrcPath := filepath.Join(homePath, ".zshrc")
     zshrcFile, err := os.OpenFile(zshrcPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
     if err != nil {
-        log.Println("error opening bashrc. ERROR:", zshrcPath)
+        log.Println("error opening zshrc. ERROR:", zshrcPath)
     }
     defer zshrcFile.Close()
 

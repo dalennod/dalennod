@@ -26,7 +26,7 @@ func setupDirectories() string {
     switch goos {
     case "linux", "darwin":
         createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH)
-        defer setCompletion()
+        defer SetCompletion()
     case "windows":
         createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH)
     default:
