@@ -39,7 +39,6 @@ document.querySelector(".dialog-update").addEventListener("close", () => {
     location.reload();
 });
 
-
 const getOldData = async (ele) => {
     const entryID = ele.parentNode.parentNode.parentNode.id;
     const fetchURL = API + "row/" + entryID;
@@ -252,7 +251,15 @@ const listenSearchInput = (searchBox) => {
 }
 
 const openSearchDialog = () => {
-    document.querySelector(".dialog-search").showModal();
+    const dialogSearch = document.querySelector(".dialog-search");
+    dialogSearch.showModal();
+    dialogSearch.addEventListener("click", () => {
+        dialogSearch.close();
+    });
+    const divDialogSearch = document.getElementById("dialog-search-div");
+    divDialogSearch.addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
     const searchBox = document.getElementById("general-search-term");
     listenSearchInput(searchBox);
 }
@@ -291,7 +298,7 @@ const adjustTextarea = (tar) => {
 };
 
 const homeButton = () => {
-    location.href = root;
+    window.location.href = root;
 }
 
 window.onload = () => {

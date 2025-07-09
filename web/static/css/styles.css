@@ -372,6 +372,10 @@ body:has(dialog[open]) {
     flex: 1;
 }
 
+.dialog-search {
+    padding: 0;
+}
+
 .input-search {
     font-size: 1em;
 }
