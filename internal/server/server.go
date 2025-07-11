@@ -8,18 +8,18 @@ import (
     "io/fs"
     "net/http"
 
-    "dalennod/internal/logger"
     "dalennod/internal/constants"
+    "dalennod/internal/logger"
     "dalennod/internal/setup"
 )
 
 var (
-    pageCountForSearch int                   = 0
-    tmplFuncMap  template.FuncMap            = make(template.FuncMap)
-    bookmarksMap map[string][]setup.Bookmark = make(map[string][]setup.Bookmark)
-    database     *sql.DB
-    tmpl         *template.Template
-    Web          embed.FS
+    pageCountForSearch int                         = 0
+    tmplFuncMap        template.FuncMap            = make(template.FuncMap)
+    bookmarksMap       map[string][]setup.Bookmark = make(map[string][]setup.Bookmark)
+    database           *sql.DB
+    tmpl               *template.Template
+    Web                embed.FS
 )
 
 func Start(data *sql.DB) {
@@ -35,10 +35,10 @@ func Start(data *sql.DB) {
     }
     mux.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.FS(webStatic))))
 
-    tmplFuncMap["getHostname"]    = getHostname
-    tmplFuncMap["keywordSplit"]   = keywordSplit
+    tmplFuncMap["getHostname"] = getHostname
+    tmplFuncMap["keywordSplit"] = keywordSplit
     tmplFuncMap["byteConversion"] = byteConversion
-    tmplFuncMap["webUIAddress"]   = webUIAddress
+    tmplFuncMap["webUIAddress"] = webUIAddress
 
     mux.HandleFunc("/{$}", rootHandler)
     mux.HandleFunc("/import/", importHandler)
@@ -52,6 +52,8 @@ func Start(data *sql.DB) {
     mux.HandleFunc("/api/refetch-thumbnail/{id}", refetchThumbnailHandler)
     mux.HandleFunc("/api/pages/", pagesHandler)
 
+    go secondaryServer()
+
     if constants.WEBUI_ADDR[0] == 58 { // ':'
         logger.Info.Printf("Web-server starting at: http://localhost%s\n", constants.WEBUI_ADDR)
         fmt.Printf("Web-server starting at: http://localhost%s\n", constants.WEBUI_ADDR)
@@ -63,5 +65,20 @@ func Start(data *sql.DB) {
     if err := http.ListenAndServe(constants.WEBUI_ADDR, mux); err != nil {
         fmt.Println("Stopping. ERROR:", err)
         logger.Error.Fatalln("Stopping. ERROR:", err)
+    }
+}
+
+func secondaryServer() {
+    secondaryMux := http.NewServeMux()
+    secondaryMux.Handle("/thumbnail/", http.StripPrefix("/thumbnail/", http.FileServer(http.Dir(constants.THUMBNAILS_PATH))))
+    // secondaryMux.Handle("/archive/", http.StripPrefix("/archive/", http.FileServer(http.Dir(constants.ARCHIVES_PATH))))
+
+    secondaryMux.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
+        internalServerErrorHandler(w, r)
+    })
+
+    if err := http.ListenAndServe(constants.SECONDARY_PORT, secondaryMux); err != nil {
+        fmt.Println("ERROR with starting secondary server:", err)
+        logger.Error.Fatalln("ERROR with starting secondary server:", err)
     }
 }

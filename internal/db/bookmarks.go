@@ -1,14 +1,15 @@
 package db
 
 import (
+    "database/sql"
+    "fmt"
+    "strings"
+    "time"
+
+    "dalennod/internal/constants"
     "dalennod/internal/logger"
     "dalennod/internal/setup"
     "dalennod/internal/thumb_url"
-    "dalennod/internal/constants"
-    "database/sql"
-    "fmt"
-    "time"
-    "strings"
 )
 
 func Add(database *sql.DB, bkmStruct setup.Bookmark) {
@@ -206,62 +207,62 @@ func BackupViewAll(database *sql.DB) []setup.Bookmark {
 }
 
 func searchPageCount(database *sql.DB, query string, params []interface{}) int {
-    updatedQuery := strings.Replace(query, "*", "COUNT(*)", 1);
+    updatedQuery := strings.Replace(query, "*", "COUNT(*)", 1)
     params[len(params)-1] = 0
     var count int
     if err := database.QueryRow(updatedQuery, params...).Scan(&count); err != nil {
         logger.Error.Println("error getting page count of search query. ERROR:", err)
     }
-    count = count / constants.PAGE_UPDATE_LIMIT;
-    return count;
+    count = count / constants.PAGE_UPDATE_LIMIT
+    return count
 }
 
 func executeSearchQuery(database *sql.DB, searchType, searchTerm string, pageOffset int) (*sql.Rows, int, error) {
-    var query string;
-    var params []interface{};
-    count := -1;
+    var query string
+    var params []interface{}
+    count := -1
     switch searchType {
     case "general":
-        query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) OR category LIKE (?) OR note LIKE (?) OR title LIKE (?) OR url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);";
-        params = []interface{}{searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset};
+        query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) OR category LIKE (?) OR note LIKE (?) OR title LIKE (?) OR url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
+        params = []interface{}{searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
     case "hostname":
-        query = "SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);";
-        params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset};
+        query = "SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
+        params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
     case "keyword":
-        query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);";
-        params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset};
+        query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
+        params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
     case "category":
-        query = "SELECT * FROM bookmarks WHERE category LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);";
-        params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset};
+        query = "SELECT * FROM bookmarks WHERE category LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
+        params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
     default:
-        return nil, count, fmt.Errorf("unrecognized search type: %s", searchType);
+        return nil, count, fmt.Errorf("unrecognized search type: %s", searchType)
     }
 
-    stmt, err := database.Prepare(query);
+    stmt, err := database.Prepare(query)
     if err != nil {
-        return nil, count, err;
+        return nil, count, err
     }
 
-    rows, err := stmt.Query(params...);
+    rows, err := stmt.Query(params...)
     if err != nil {
-        return nil, count, err;
+        return nil, count, err
     }
 
-    count = searchPageCount(database, query, params);
+    count = searchPageCount(database, query, params)
 
-    return rows, count, nil;
+    return rows, count, nil
 }
 
 func SearchFor(database *sql.DB, searchType, searchTerm string, pageNumber int) ([]setup.Bookmark, int) {
-    var results []setup.Bookmark;
-    var result setup.Bookmark;
-    var modified time.Time;
+    var results []setup.Bookmark
+    var result setup.Bookmark
+    var modified time.Time
 
     if searchTerm == "" {
-        return results, -1;
+        return results, -1
     }
-    searchTerm = "%" + searchTerm + "%";
-    pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT;
+    searchTerm = "%" + searchTerm + "%"
+    pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT
 
     rows, count, err := executeSearchQuery(database, searchType, searchTerm, pageOffset)
     if err != nil {
@@ -275,7 +276,7 @@ func SearchFor(database *sql.DB, searchType, searchTerm string, pageNumber int) 
         appendBookmarks(&results, result, modified)
     }
 
-    return results, count;
+    return results, count
 }
 
 func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
@@ -325,7 +326,7 @@ func SearchByUrl(database *sql.DB, searchUrl string) (setup.Bookmark, error) {
 
     for execRes.Next() {
         if err = execRes.Scan(&urlResult.ID, &urlResult.URL, &urlResult.Title, &urlResult.Note, &urlResult.Keywords, &urlResult.Category, &urlResult.Archived, &urlResult.SnapshotURL, &urlResult.ThumbURL, &urlResult.ByteThumbURL, &urlResult.Modified); err != nil {
-            return urlResult, err;
+            return urlResult, err
         }
     }
 

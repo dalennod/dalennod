@@ -4,15 +4,15 @@
 package thumb_url
 
 import (
-    "dalennod/internal/default_client"
-    "dalennod/internal/logger"
-
     "io"
     "net/http"
     "strings"
 
     "golang.org/x/net/html"
     "golang.org/x/net/html/atom"
+
+    "dalennod/internal/default_client"
+    "dalennod/internal/logger"
 )
 
 type OGData struct {
@@ -112,20 +112,20 @@ func (og *OGData) readHTML(buffer io.Reader) error {
 
 func (og *OGData) readMeta(metaAttributes map[string]string) {
     switch metaAttributes["property"] {
-    case "og:description":
-        og.Description = metaAttributes["content"]
-    case "og:title":
-        og.Title = metaAttributes["content"]
-    case "og:url":
-        og.URL = metaAttributes["content"]
-    case "og:determiner":
-        og.Determiner = metaAttributes["content"]
-    case "og:site_name":
-        og.SiteName = metaAttributes["content"]
-    case "og:locale":
-        og.Locale = metaAttributes["content"]
-    case "og:locale:alternate":
-        og.LocalesAlternate = append(og.LocalesAlternate, metaAttributes["content"])
+    // case "og:description":
+    //     og.Description = metaAttributes["content"]
+    // case "og:title":
+    //     og.Title = metaAttributes["content"]
+    // case "og:url":
+    //     og.URL = metaAttributes["content"]
+    // case "og:determiner":
+    //     og.Determiner = metaAttributes["content"]
+    // case "og:site_name":
+    //     og.SiteName = metaAttributes["content"]
+    // case "og:locale":
+    //     og.Locale = metaAttributes["content"]
+    // case "og:locale:alternate":
+    //     og.LocalesAlternate = append(og.LocalesAlternate, metaAttributes["content"])
     case "og:image":
         og.Images = addImageUrl(og.Images, metaAttributes["content"])
     case "og:image:url":

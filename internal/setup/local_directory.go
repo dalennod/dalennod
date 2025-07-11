@@ -1,34 +1,32 @@
 package setup
 
 import (
-    "dalennod/internal/constants"
-    "dalennod/internal/logger"
     "log"
     "os"
     "path/filepath"
     "runtime"
+
+    "dalennod/internal/constants"
+    "dalennod/internal/logger"
 )
 
 func setupDirectories() string {
     if _, err := configDir(); err != nil {
         log.Fatalln("error getting config directory. ERROR:", err)
     }
-
-    if _, err := databaseDir(); err != nil {
-        log.Fatalln("error getting database directory. ERROR:", err)
-    }
-
+    databaseDir()
     if _, err := cacheDir(); err != nil {
         log.Fatalln("error getting logs directory. ERROR:", err)
     }
+    thumbnailDataDir()
 
     goos := runtime.GOOS
     switch goos {
     case "linux", "darwin":
-        createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH)
+        createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH, constants.THUMBNAILS_PATH)
         defer SetCompletion()
     case "windows":
-        createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH)
+        createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH, constants.THUMBNAILS_PATH)
     default:
         log.Fatalln("ERROR: unrecognized OS:", goos)
     }
@@ -43,9 +41,7 @@ func InitLocalDirs() string {
         log.Fatalln("error getting config directory. ERROR:", err)
     }
 
-    if _, err := databaseDir(); err != nil {
-        log.Fatalln("error getting database directory. ERROR:", err)
-    }
+    databaseDir()
     if _, err := os.Stat(constants.DB_PATH); os.IsNotExist(err) {
         constants.DB_PATH = setupDirectories()
     } else {
@@ -62,6 +58,11 @@ func InitLocalDirs() string {
         log.Fatalln("error getting cache directory. ERROR:", err)
     }
     if _, err := os.Stat(constants.LOGS_PATH); os.IsNotExist(err) {
+        setupDirectories()
+    }
+
+    thumbnailDataDir()
+    if _, err := os.Stat(constants.THUMBNAILS_PATH); os.IsNotExist(err) {
         setupDirectories()
     }
 
@@ -107,9 +108,14 @@ func cacheDir() (string, error) {
     return constants.LOGS_PATH, nil
 }
 
-func databaseDir() (string, error) {
+func databaseDir() (string) {
     constants.DB_PATH = filepath.Join(constants.CONFIG_PATH, constants.DB_DIRNAME)
-    return constants.DB_PATH, nil
+    return constants.DB_PATH
+}
+
+func thumbnailDataDir() (string) {
+    constants.THUMBNAILS_PATH = filepath.Join(constants.CONFIG_PATH, constants.THUMBNAILS_DIRNAME)
+    return constants.THUMBNAILS_PATH
 }
 
 func createDir(args ...string) {

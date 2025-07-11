@@ -70,9 +70,11 @@
   <div class="bkm-info">
     <div class="thumbnail-image">
       {{ if .ByteThumbURL }}
-      <img class="thumburl-bg" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" loading="lazy" />
+      <!-- <img class="thumburl-bg" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" loading="lazy" /> -->
+      <img class="thumburl-bg" src="{{ .ThumbURL }}" alt="[couldn't load thumbnail]" loading="lazy" />
       <a href="{{ .URL }}" target="_blank">
-        <img class="thumburl" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" loading="lazy" />
+        <!-- <img class="thumburl" src="data:image/{{ byteConversion .ByteThumbURL }}" alt="[couldn't load thumbnail]" loading="lazy" /> -->
+        <img class="thumburl" src="{{ .ThumbURL }}" alt="[couldn't load thumbnail]" loading="lazy" />
       </a>
       {{ else }}
       <img class="default-thumburl-bg" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" />
