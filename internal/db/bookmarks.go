@@ -223,8 +223,8 @@ func executeSearchQuery(database *sql.DB, searchType, searchTerm string, pageOff
     count := -1
     switch searchType {
     case "general":
-        query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) OR category LIKE (?) OR note LIKE (?) OR title LIKE (?) OR url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
-        params = []interface{}{searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
+        query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) OR category LIKE (?) OR note LIKE (?) OR title LIKE (?) OR url LIKE (?) OR id LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
+        params = []interface{}{searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
     case "hostname":
         query = "SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
         params = []interface{}{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}

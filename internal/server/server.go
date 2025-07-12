@@ -25,9 +25,9 @@ var (
 func Start(data *sql.DB) {
     database = data
 
-    var mux *http.ServeMux = http.NewServeMux()
+    mux := http.NewServeMux()
 
-    var fsopen fs.FS = fs.FS(Web)
+    fsopen := fs.FS(Web)
     webStatic, err := fs.Sub(fsopen, "web/static")
     if err != nil {
         fmt.Println("error when opening embedded 'web' directory. ERROR:", err)
@@ -37,7 +37,7 @@ func Start(data *sql.DB) {
 
     tmplFuncMap["getHostname"] = getHostname
     tmplFuncMap["keywordSplit"] = keywordSplit
-    tmplFuncMap["byteConversion"] = byteConversion
+    tmplFuncMap["grabThumbnail"] = grabThumbnail
     tmplFuncMap["webUIAddress"] = webUIAddress
 
     mux.HandleFunc("/{$}", rootHandler)
@@ -70,11 +70,11 @@ func Start(data *sql.DB) {
 
 func secondaryServer() {
     secondaryMux := http.NewServeMux()
-    secondaryMux.Handle("/thumbnail/", http.StripPrefix("/thumbnail/", http.FileServer(http.Dir(constants.THUMBNAILS_PATH))))
-    // secondaryMux.Handle("/archive/", http.StripPrefix("/archive/", http.FileServer(http.Dir(constants.ARCHIVES_PATH))))
+    secondaryMux.Handle("GET /thumbnail/", http.StripPrefix("/thumbnail/", http.FileServer(http.Dir(constants.THUMBNAILS_PATH))))
+    // secondaryMux.Handle("GET /archive/", http.StripPrefix("/archive/", http.FileServer(http.Dir(constants.ARCHIVES_PATH))))
 
-    secondaryMux.HandleFunc("/{$}", func(w http.ResponseWriter, r *http.Request) {
-        internalServerErrorHandler(w, r)
+    secondaryMux.HandleFunc("GET /{$}", func(w http.ResponseWriter, r *http.Request) {
+        fmt.Fprintf(w, "Alive")
     })
 
     if err := http.ListenAndServe(constants.SECONDARY_PORT, secondaryMux); err != nil {

@@ -1,8 +1,7 @@
 package server
 
 import (
-    "encoding/base64"
-    "net/http"
+    "fmt"
     "regexp"
 
     "dalennod/internal/constants"
@@ -32,23 +31,6 @@ func keywordSplit(keywords string, delimiter string) []string {
     return re.Split(keywords, -1)
 }
 
-func byteConversion(blobImage []byte) string {
-    var base64Encoded string
-
-    mimeType := http.DetectContentType(blobImage)
-    switch mimeType {
-    case "image/avif":
-        base64Encoded = "avif;base64,"
-    case "image/webp":
-        base64Encoded = "webp;base64,"
-    case "image/png":
-        base64Encoded = "png;base64,"
-    case "image/jpeg":
-        base64Encoded = "jpeg;base64,"
-    default:
-        base64Encoded = "jpeg;base64,"
-    }
-    base64Encoded += base64.StdEncoding.EncodeToString(blobImage)
-
-    return base64Encoded
+func grabThumbnail(id int) string {
+    return fmt.Sprintf("http://localhost%s/thumbnail/%d", constants.SECONDARY_PORT, id)
 }
