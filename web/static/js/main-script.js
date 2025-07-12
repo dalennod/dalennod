@@ -222,6 +222,14 @@ const updatePagination = async () => {
     const pagesToShow = 5;
     const currentPage = Number(hrefParams.get("page"));
     updateNavATags(currentPage, totalPages, hrefParams);
+
+    // No pagination if there is only 1 page
+    if (totalPages === 0) {
+        const paginationFooter = document.querySelector(".pagination");
+        paginationFooter.hidden = true;
+        return;
+    }
+
     if (currentPage <= 0) document.getElementById("prev-page").style.pointerEvents = "none";
     if (currentPage === totalPages) document.getElementById("next-page").style.pointerEvents = "none";
 
