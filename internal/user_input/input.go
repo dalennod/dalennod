@@ -1,16 +1,18 @@
 package user_input
 
 import (
+    "database/sql"
+    "fmt"
+    "os"
+    "path/filepath"
+    "strconv"
+    "strings"
+
     "dalennod/internal/backup"
     "dalennod/internal/constants"
     "dalennod/internal/db"
     "dalennod/internal/server"
     "dalennod/internal/setup"
-    "database/sql"
-    "fmt"
-    "os"
-    "path/filepath"
-    "strings"
 )
 
 var database *sql.DB
@@ -47,6 +49,8 @@ func UserInput(bookmark_database *sql.DB) {
         importChromiumInput(setup.FlagVals.Chromium)
     case setup.FlagVals.Import && setup.FlagVals.Dalennod != "":
         importDalennodInput(setup.FlagVals.Dalennod)
+    case setup.FlagVals.FixDB:
+        applyDBUpdates(database)
     }
 }
 
@@ -130,4 +134,32 @@ func switchProfile(profileName string) {
 func whereConfigLog() {
     fmt.Printf("Database and config directory: %s\n", constants.CONFIG_PATH)
     fmt.Printf("Error logs directory: %s\n", constants.LOGS_PATH)
+}
+
+func applyDBUpdates(database *sql.DB) {
+    rows, err := database.Query("SELECT id, byteThumbURL from bookmarks WHERE byteThumbURL NOT NULL;")
+    if err != nil {
+        fmt.Println("error querying database. ERROR:", err)
+        return
+    }
+
+    var id int
+    var thumb []byte
+
+    for rows.Next() {
+        rows.Scan(&id, &thumb)
+
+        writeFilePath := filepath.Join(constants.THUMBNAILS_PATH, strconv.Itoa(id))
+        err := os.WriteFile(writeFilePath, thumb, 0644)
+        if err != nil {
+            fmt.Printf("failed to create local thumbnail for ID %d. ERROR: %v\n", id, err)
+            continue
+        }
+    }
+
+    if _, err := database.Exec("ALTER TABLE bookmarks DROP COLUMN byteThumbURL;"); err != nil {
+        fmt.Println("failed to drop column byteThumbURL. ERROR:", err)
+        fmt.Println("needs manual intervention")
+        return
+    }
 }

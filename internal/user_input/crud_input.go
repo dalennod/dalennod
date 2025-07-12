@@ -31,7 +31,7 @@ func getBKMInfo(bkmStruct setup.Bookmark) (setup.Bookmark, string) {
     scanner.Scan()
     bkmStruct.URL = scanner.Text()
 
-    bkmStruct.ThumbURL, bkmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
+    bkmStruct.ThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
     if err != nil {
         bkmStruct.ThumbURL = bkmStruct.URL
     }

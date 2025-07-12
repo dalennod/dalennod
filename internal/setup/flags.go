@@ -12,23 +12,24 @@ import (
 )
 
 type FlagValues struct {
-    RemoveID        string
-    UpdateID        string
-    ViewID          string
-    ViewAll         bool
-    AddEntry        bool
-    StartServer     bool
-    Backup          bool
-    JSONOut         bool
-    Crypt           bool
-    RedoCompletion  bool
-    Import          bool
-    Firefox         string
-    Chromium        string
-    Dalennod        string
-    Where           bool
-    Profile         bool
-    Switch          string
+    RemoveID       string
+    UpdateID       string
+    ViewID         string
+    ViewAll        bool
+    AddEntry       bool
+    StartServer    bool
+    Backup         bool
+    JSONOut        bool
+    Crypt          bool
+    RedoCompletion bool
+    Import         bool
+    Firefox        string
+    Chromium       string
+    Dalennod       string
+    Where          bool
+    Profile        bool
+    Switch         string
+    FixDB          bool
 }
 
 var FlagVals FlagValues
@@ -106,6 +107,8 @@ func cliFlags() {
 
     flag.BoolVar(&FlagVals.Profile, "profile", false, "Show profile names found in local directory")
     flag.StringVar(&FlagVals.Switch, "switch", "", "Switch profiles. Must use alongside --profile flag")
+
+    flag.BoolVar(&FlagVals.FixDB, "fix-db", false, "Apply appropriate database fixes and updates")
 }
 
 func SetCompletion() {

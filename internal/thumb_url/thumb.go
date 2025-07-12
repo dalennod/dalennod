@@ -4,25 +4,29 @@
 package thumb_url
 
 import (
+    "fmt"
     "io"
     "net/http"
+    "os"
+    "path/filepath"
+    "strconv"
     "strings"
 
     "golang.org/x/net/html"
     "golang.org/x/net/html/atom"
 
+    "dalennod/internal/constants"
     "dalennod/internal/default_client"
-    "dalennod/internal/logger"
 )
 
 type OGData struct {
-    URL              string    `json:"url"`
-    Title            string    `json:"title"`
-    Description      string    `json:"description"`
-    Determiner       string    `json:"determiner"`
-    SiteName         string    `json:"site_name"`
-    Locale           string    `json:"locale"`
-    LocalesAlternate []string  `json:"locales_alternate"`
+    // URL              string    `json:"url"`
+    // Title            string    `json:"title"`
+    // Description      string    `json:"description"`
+    // Determiner       string    `json:"determiner"`
+    // SiteName         string    `json:"site_name"`
+    // Locale           string    `json:"locale"`
+    // LocalesAlternate []string  `json:"locales_alternate"`
     Images           []*Images `json:"images"`
 }
 
@@ -32,56 +36,54 @@ type Images struct {
     Type      string `json:"type"`
 }
 
-func GetPageThumb(url string) (string, []byte, error) {
+func GetPageThumb(url string) (string, error) {
     res, err := default_client.HttpDefaultClientDo(http.MethodGet, url)
     if err != nil {
-        return "", nil, err
+        return "", err
     }
     defer res.Body.Close()
 
     pageHtml, err := io.ReadAll(res.Body)
     if err != nil {
-        return "", nil, err
+        return "", err
     }
 
     var og *OGData = &OGData{}
     err = og.readHTML(strings.NewReader(string(pageHtml)))
     if err != nil {
-        return "", nil, err
+        return "", err
     }
 
     if len(og.Images) == 0 {
-        return "", nil, nil
+        return "", fmt.Errorf("did not find any thumbnail in webpage")
     }
 
     var thumbURL string = og.Images[0].URL
     if thumbURL == "" {
-        return thumbURL, nil, nil
-    } else {
-        byteThumbURL, err := getBase64(thumbURL)
-        if err != nil || byteThumbURL == nil {
-            logger.Error.Println("could not get thumbnail. ERROR:", err)
-            return thumbURL, nil, err
-        }
-        return thumbURL, byteThumbURL, nil
+        return thumbURL, fmt.Errorf("webpage thumbnail is empty")
     }
+
+    return thumbURL, nil
 }
 
-func getBase64(thumbURL string) ([]byte, error) {
-    resp, err := default_client.HttpDefaultClientDo(http.MethodGet, thumbURL)
+func DownThumb(id int64, thumbURL string) error {
+    outFile, err := os.Create(filepath.Join(constants.THUMBNAILS_PATH, strconv.FormatInt(id, 10))) // 10 = base 10
     if err != nil {
-        logger.Warn.Println("could not request thumburl")
-        return nil, err
+        return err
     }
-    defer resp.Body.Close()
+    defer outFile.Close()
 
-    thumbUrlBytes, err := io.ReadAll(resp.Body)
+    fileRequest, err := default_client.HttpDefaultClientDo(http.MethodGet, thumbURL)
     if err != nil {
-        logger.Warn.Println("could not read thumburl")
-        return nil, err
+        return err
     }
+    defer fileRequest.Body.Close()
 
-    return thumbUrlBytes, nil
+    _, err = io.Copy(outFile, fileRequest.Body)
+    if err != nil {
+        return err
+    }
+    return nil
 }
 
 func (og *OGData) readHTML(buffer io.Reader) error {

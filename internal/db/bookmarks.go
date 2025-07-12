@@ -13,25 +13,27 @@ import (
 )
 
 func Add(database *sql.DB, bkmStruct setup.Bookmark) {
-    if bkmStruct.ThumbURL == "" || len(bkmStruct.ByteThumbURL) == 0 {
+    if bkmStruct.ThumbURL == "" {
         var err error
-        bkmStruct.ThumbURL, bkmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
+        bkmStruct.ThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
         if err != nil {
-            logger.Error.Println("error getting webpage thumbnail. ERROR:", err)
+            logger.Warn.Println("could not get webpage thumbnail. ERROR:", err)
         }
     }
 
-    stmt, err := database.Prepare("INSERT INTO bookmarks (url, title, note, keywords, category, archived, snapshotURL, thumbURL, byteThumbURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);")
+    stmt, err := database.Prepare("INSERT INTO bookmarks (url, title, note, keywords, category, archived, snapshotURL, thumbURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?);")
     if err != nil {
         logger.Error.Println("error preparing database statement. ERROR:", err)
         return
     }
 
-    _, err = stmt.Exec(bkmStruct.URL, bkmStruct.Title, bkmStruct.Note, bkmStruct.Keywords, bkmStruct.Category, bkmStruct.Archived, bkmStruct.SnapshotURL, bkmStruct.ThumbURL, bkmStruct.ByteThumbURL)
+    execResult, err := stmt.Exec(bkmStruct.URL, bkmStruct.Title, bkmStruct.Note, bkmStruct.Keywords, bkmStruct.Category, bkmStruct.Archived, bkmStruct.SnapshotURL, bkmStruct.ThumbURL)
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return
     }
+
+    go saveThumbLocally(execResult, bkmStruct.ThumbURL)
 }
 
 // serverCall boolean explanation:
@@ -45,25 +47,27 @@ func Update(database *sql.DB, bkmStruct setup.Bookmark, serverCall bool) {
         bkmStruct = updateCheck(database, bkmStruct)
     }
 
-    if bkmStruct.ThumbURL == "" || len(bkmStruct.ByteThumbURL) == 0 {
+    if bkmStruct.ThumbURL == "" {
         var err error
-        bkmStruct.ThumbURL, bkmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
+        bkmStruct.ThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
         if err != nil {
             logger.Error.Println("error getting webpage thumbnail. ERROR:", err)
         }
     }
 
-    stmt, err := database.Prepare("UPDATE bookmarks SET url=(?), title=(?), note=(?), keywords=(?), category=(?), archived=(?), snapshotURL=(?), thumbURL=(?), byteThumbURL=(?), modified=CURRENT_TIMESTAMP WHERE id=(?);")
+    stmt, err := database.Prepare("UPDATE bookmarks SET url=(?), title=(?), note=(?), keywords=(?), category=(?), archived=(?), snapshotURL=(?), thumbURL=(?), modified=CURRENT_TIMESTAMP WHERE id=(?);")
     if err != nil {
         logger.Error.Println("error preparing database statement. ERROR:", err)
         return
     }
 
-    _, err = stmt.Exec(bkmStruct.URL, bkmStruct.Title, bkmStruct.Note, bkmStruct.Keywords, bkmStruct.Category, bkmStruct.Archived, bkmStruct.SnapshotURL, bkmStruct.ThumbURL, bkmStruct.ByteThumbURL, bkmStruct.ID)
+    execResult, err := stmt.Exec(bkmStruct.URL, bkmStruct.Title, bkmStruct.Note, bkmStruct.Keywords, bkmStruct.Category, bkmStruct.Archived, bkmStruct.SnapshotURL, bkmStruct.ThumbURL, bkmStruct.ID)
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return
     }
+
+    go saveThumbLocally(execResult, bkmStruct.ThumbURL)
 }
 
 func updateCheck(database *sql.DB, bkmStruct setup.Bookmark) setup.Bookmark {
@@ -100,13 +104,11 @@ func RefetchThumbnail(database *sql.DB, id int, thumbnail []byte) error {
     }
 
     if thumbnail == nil {
-        bkmStruct.ThumbURL, bkmStruct.ByteThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
-        if err != nil || bkmStruct.ByteThumbURL == nil {
+        bkmStruct.ThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
+        if err != nil {
             logger.Error.Println("error getting webpage thumbnail. ERROR:", err)
             return err
         }
-    } else {
-        bkmStruct.ByteThumbURL = thumbnail
     }
 
     Update(database, bkmStruct, true)
@@ -124,6 +126,8 @@ func Remove(database *sql.DB, id int) {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return
     }
+
+    go removeThumbLocally(id)
 }
 
 func TotalPageCount(database *sql.DB) int {
@@ -162,7 +166,7 @@ func ViewAllWebUI(database *sql.DB, pageNo int) []setup.Bookmark {
 
     for rows.Next() {
         result = setup.Bookmark{}
-        rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
+        rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
         appendBookmarks(&results, result, modified)
     }
     return results
@@ -181,7 +185,7 @@ func ViewAll(database *sql.DB) []setup.Bookmark {
 
     for rows.Next() {
         result = setup.Bookmark{}
-        rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
+        rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
         appendBookmarks(&results, result, modified)
     }
     return results
@@ -200,7 +204,7 @@ func BackupViewAll(database *sql.DB) []setup.Bookmark {
 
     for rows.Next() {
         result = setup.Bookmark{}
-        rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
+        rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
         appendBookmarks(&results, result, modified)
     }
     return results
@@ -272,7 +276,7 @@ func SearchFor(database *sql.DB, searchType, searchTerm string, pageNumber int) 
 
     for rows.Next() {
         result = setup.Bookmark{}
-        rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &result.ByteThumbURL, &modified)
+        rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
         appendBookmarks(&results, result, modified)
     }
 
@@ -288,13 +292,13 @@ func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
         return rowResult, err
     }
 
-    execRes, err := stmt.Query(id)
+    execResult, err := stmt.Query(id)
     if err != nil {
         return rowResult, err
     }
 
-    for execRes.Next() {
-        if err = execRes.Scan(&rowResult.ID, &rowResult.URL, &rowResult.Title, &rowResult.Note, &rowResult.Keywords, &rowResult.Category, &rowResult.Archived, &rowResult.SnapshotURL, &rowResult.ThumbURL, &rowResult.ByteThumbURL, &modified); err != nil {
+    for execResult.Next() {
+        if err = execResult.Scan(&rowResult.ID, &rowResult.URL, &rowResult.Title, &rowResult.Note, &rowResult.Keywords, &rowResult.Category, &rowResult.Archived, &rowResult.SnapshotURL, &rowResult.ThumbURL, &modified); err != nil {
             return rowResult, err
         }
         rowResult.Modified = modified.Local().Format(constants.TIME_FORMAT)
@@ -319,13 +323,13 @@ func SearchByUrl(database *sql.DB, searchUrl string) (setup.Bookmark, error) {
         return urlResult, err
     }
 
-    execRes, err := stmt.Query(searchUrl)
+    execResult, err := stmt.Query(searchUrl)
     if err != nil {
         return urlResult, err
     }
 
-    for execRes.Next() {
-        if err = execRes.Scan(&urlResult.ID, &urlResult.URL, &urlResult.Title, &urlResult.Note, &urlResult.Keywords, &urlResult.Category, &urlResult.Archived, &urlResult.SnapshotURL, &urlResult.ThumbURL, &urlResult.ByteThumbURL, &urlResult.Modified); err != nil {
+    for execResult.Next() {
+        if err = execResult.Scan(&urlResult.ID, &urlResult.URL, &urlResult.Title, &urlResult.Note, &urlResult.Keywords, &urlResult.Category, &urlResult.Archived, &urlResult.SnapshotURL, &urlResult.ThumbURL, &urlResult.Modified); err != nil {
             return urlResult, err
         }
     }
