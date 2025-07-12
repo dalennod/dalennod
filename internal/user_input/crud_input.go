@@ -2,14 +2,15 @@ package user_input
 
 import (
     "bufio"
+    "fmt"
+    "os"
+    "strconv"
+
     "dalennod/internal/archive"
     "dalennod/internal/db"
     "dalennod/internal/logger"
     "dalennod/internal/setup"
     "dalennod/internal/thumb_url"
-    "fmt"
-    "os"
-    "strconv"
 )
 
 func addInput(bkmStruct setup.Bookmark, callToUpdate bool) {

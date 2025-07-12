@@ -162,4 +162,10 @@ func applyDBUpdates(database *sql.DB) {
         fmt.Println("needs manual intervention")
         return
     }
+
+    if _, err := database.Exec("VACUUM;"); err != nil {
+        fmt.Println("error running 'VACUUM;' to rebuild database file & reduce database size")
+        fmt.Println("does not need manual intervention, but recommended")
+        return
+    }
 }
