@@ -6,6 +6,7 @@ import (
     "os"
     "path/filepath"
     "strconv"
+    "strings"
     "time"
 
     "dalennod/internal/constants"
@@ -15,16 +16,19 @@ import (
 )
 
 func PrintRow(bookmarkRow setup.Bookmark) {
-    fmt.Printf("    #%d -- %s\nTitle:\t\t%s\nURL:\t\t%s\nNote:\t\t%s\nKeywords:\t%s\nCategory:\t\t%s\nArchived?:\t%t\nArchive URL:\t%s\n\n",
-        bookmarkRow.ID,
-        bookmarkRow.Modified,
-        bookmarkRow.Title,
-        bookmarkRow.URL,
-        bookmarkRow.Note,
-        bookmarkRow.Keywords,
-        bookmarkRow.Category,
-        bookmarkRow.Archived,
-        bookmarkRow.SnapshotURL)
+    sb := strings.Builder{}
+    sb.WriteString(fmt.Sprintf("  #%d | %s\n", bookmarkRow.ID, bookmarkRow.Modified))
+    sb.WriteString(fmt.Sprintf("Title       : %s\n", bookmarkRow.Title))
+    sb.WriteString(fmt.Sprintf("URL         : %s\n", bookmarkRow.URL))
+    sb.WriteString(fmt.Sprintf("Note        : %s\n", bookmarkRow.Note))
+    sb.WriteString(fmt.Sprintf("Keywords    : %s\n", bookmarkRow.Keywords))
+    sb.WriteString(fmt.Sprintf("Category    : %s\n", bookmarkRow.Category))
+    sb.WriteString(fmt.Sprintf("Archived?   : %t\n", bookmarkRow.Archived))
+    if bookmarkRow.Archived {
+        sb.WriteString(fmt.Sprintf("Archive URL : %s\n", bookmarkRow.SnapshotURL))
+    }
+
+    fmt.Println(sb.String())
 }
 
 func appendBookmarks(b *[]setup.Bookmark, info setup.Bookmark, modified time.Time) {

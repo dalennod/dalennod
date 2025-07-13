@@ -71,7 +71,7 @@ func checkUrlHandler(w http.ResponseWriter, r *http.Request) {
             logger.Error.Println(err)
         }
         w.Write([]byte(writeData))
-        db.AddToRecents(database, getData.ID);
+        db.AddToRecents(database, getData.ID)
     } else {
         internalServerErrorHandler(w, r)
     }
@@ -157,7 +157,7 @@ func pagesHandler(w http.ResponseWriter, r *http.Request) {
     if r.Method == http.MethodGet {
         fmt.Fprint(w, db.TotalPageCount(database))
     } else if r.Method == http.MethodPost {
-        fmt.Fprint(w, pageCountForSearch);
+        fmt.Fprint(w, pageCountForSearch)
     } else {
         internalServerErrorHandler(w, r)
     }
