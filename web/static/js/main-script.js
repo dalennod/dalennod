@@ -5,7 +5,7 @@ let root = "";
 
 const showImportPage = () => {
     window.location.href = root + "/import/";
-}
+};
 
 const categoriesOptions = async () => {
     const fetchURL = API + "categories/";
@@ -73,7 +73,7 @@ const updateEntry = async () => {
         keywords: document.querySelector("#update-keywords").value,
         category: document.querySelector("#update-category").value,
         archive: document.getElementById("update-archive").checked ? true : false
-    }
+    };
 
     if (newDataJSON.archive) {
         document.querySelector("#update-archive-warn").removeAttribute("hidden");
@@ -116,7 +116,7 @@ const addEntry = async () => {
         keywords: document.querySelector("#create-keywords").value,
         category: document.querySelector("#create-category").value,
         archive: document.getElementById("create-archive").checked ? true : false,
-    }
+    };
 
     if (dataJSON.archive) document.getElementById("create-archive-warn").removeAttribute("hidden");
 
@@ -168,7 +168,7 @@ const clearInputs = () => {
 };
 
 const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocation) => {
-    const params = new URLSearchParams(hrefLocation.search); // .search = +rw
+    const params = new URLSearchParams(hrefLocation.search);
     params.set("page", pageNumber);
 
     const pageNumberLink = document.createElement("a");
@@ -203,7 +203,7 @@ const updateNavATags = (current, totalPages, hrefParams) => {
 
 const updatePagination = async () => {
     const hrefLocation = new URL(location.href);
-    const hrefParams = hrefLocation.searchParams; // .searchParams = +r
+    const hrefParams = hrefLocation.searchParams;
     const fetchURL = API + "pages/";
     let res;
     if (hrefParams.get("search-type")) {
@@ -223,7 +223,6 @@ const updatePagination = async () => {
     const currentPage = Number(hrefParams.get("page"));
     updateNavATags(currentPage, totalPages, hrefParams);
 
-    // No pagination if there is only 1 page
     if (totalPages === 0) {
         const paginationFooter = document.querySelector(".pagination");
         paginationFooter.hidden = true;
@@ -256,7 +255,7 @@ const listenSearchInput = (searchBox) => {
             }
         }
     });
-}
+};
 
 const openSearchDialog = () => {
     const dialogSearch = document.querySelector(".dialog-search");
@@ -270,7 +269,7 @@ const openSearchDialog = () => {
     });
     const searchBox = document.getElementById("general-search-term");
     listenSearchInput(searchBox);
-}
+};
 
 let keyBuffer = "";
 document.addEventListener("keydown", (event) => {
@@ -307,7 +306,7 @@ const adjustTextarea = (tar) => {
 
 const homeButton = () => {
     window.location.href = root;
-}
+};
 
 window.onload = () => {
     root = new URL(location.href).origin;
