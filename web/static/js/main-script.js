@@ -223,7 +223,7 @@ const updatePagination = async () => {
     const currentPage = Number(hrefParams.get("page"));
     updateNavATags(currentPage, totalPages, hrefParams);
 
-    if (totalPages === 0) {
+    if (totalPages <= 0) {
         const paginationFooter = document.querySelector(".pagination");
         paginationFooter.hidden = true;
         return;
