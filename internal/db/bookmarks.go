@@ -137,11 +137,16 @@ func TotalPageCount(database *sql.DB) int {
         return -1
     }
 
-    var pageCount int
+    var rowCount int
     for rows.Next() {
-        rows.Scan(&pageCount)
+        rows.Scan(&rowCount)
     }
-    pageCount = pageCount / constants.PAGE_UPDATE_LIMIT
+
+    pageCount := rowCount / constants.PAGE_UPDATE_LIMIT
+    if rowCount % constants.PAGE_UPDATE_LIMIT == 0 {
+        pageCount -= 1
+    }
+
     return pageCount
 }
 
@@ -213,12 +218,18 @@ func BackupViewAll(database *sql.DB) []setup.Bookmark {
 func searchPageCount(database *sql.DB, query string, params []interface{}) int {
     updatedQuery := strings.Replace(query, "*", "COUNT(*)", 1)
     params[len(params)-1] = 0
+
     var count int
     if err := database.QueryRow(updatedQuery, params...).Scan(&count); err != nil {
         logger.Error.Println("error getting page count of search query. ERROR:", err)
     }
-    count = count / constants.PAGE_UPDATE_LIMIT
-    return count
+
+    pageCount := count / constants.PAGE_UPDATE_LIMIT
+    if count % constants.PAGE_UPDATE_LIMIT == 0 {
+        pageCount -= 1
+    }
+
+    return pageCount
 }
 
 func executeSearchQuery(database *sql.DB, searchType, searchTerm string, pageOffset int) (*sql.Rows, int, error) {
