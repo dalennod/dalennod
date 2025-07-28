@@ -243,32 +243,31 @@ const updatePagination = async () => {
     }
 };
 
-const listenSearchInput = (searchBox) => {
-    const searchButton = document.getElementById("search-button");
-    document.addEventListener("keydown", (event) => {
+const openSearchDialog = () => {
+    const dialogSearch = document.querySelector(".dialog-search");
+    dialogSearch.showModal();
+
+    dialogSearch.addEventListener("click", () => {
+        dialogSearch.close();
+    });
+
+    document.getElementById("dialog-search-div").addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
+
+    const searchBox = document.getElementById("general-search-term");
+    searchBox.focus();
+
+    searchBox.addEventListener("keydown", (event) => {
         if (event.key === "Enter") {
             const searchContent = searchBox.value;
             if (searchContent.startsWith("::import")) {
-                searchButton.disabled = true;
+                document.getElementById("search-button").disabled = true;
                 showImportPage();
                 return;
             }
         }
     });
-};
-
-const openSearchDialog = () => {
-    const dialogSearch = document.querySelector(".dialog-search");
-    dialogSearch.showModal();
-    dialogSearch.addEventListener("click", () => {
-        dialogSearch.close();
-    });
-    const divDialogSearch = document.getElementById("dialog-search-div");
-    divDialogSearch.addEventListener("click", (event) => {
-        event.stopPropagation();
-    });
-    const searchBox = document.getElementById("general-search-term");
-    listenSearchInput(searchBox);
 };
 
 let keyBuffer = "";
@@ -286,9 +285,9 @@ document.addEventListener("keydown", (event) => {
     }
 
     if (keyBuffer === ":s") {
-        openSearchDialog();
+        event.preventDefault();
         keyBuffer = "";
-        setTimeout(() => document.getElementById("general-search-term").value = "", 1);
+        openSearchDialog();
     }
 });
 
@@ -307,6 +306,18 @@ const adjustTextarea = (tar) => {
 const homeButton = () => {
     window.location.href = root;
 };
+
+// const observer = new IntersectionObserver((entries) => {
+//     entries.forEach((entry) => {
+//         if (entry.isIntersecting) {
+//             entry.target.classList.add("show");
+//         } else {
+//             entry.target.classList.remove("show");
+//         }
+//     })
+// }, {});
+// const gridChildren = document.querySelectorAll(".grid-child");
+// gridChildren.forEach(el => observer.observe(el));
 
 window.onload = () => {
     root = new URL(location.href).origin;
