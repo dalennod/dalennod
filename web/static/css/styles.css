@@ -1,13 +1,13 @@
 :root {
-    --light-mode-foreground             : #dddddd;
-    --light-mode-background             : 238, 238, 238;
-    --light-mode-text                   : 0, 0, 0;
-    --dark-mode-foreground              : #232323;
-    --dark-mode-background              : 19, 19, 19;
-    --dark-mode-text                    : var(--light-mode-background);
-    --global-border-color               : #aaaaaa;
-    --accent-color                      : #2f9df7;
-    --red-text                          : #ff3535;
+    --light-mode-foreground : #dddddd;
+    --light-mode-background : 238, 238, 238;
+    --light-mode-text       : 0, 0, 0;
+    --dark-mode-foreground  : #232323;
+    --dark-mode-background  : 19, 19, 19;
+    --dark-mode-text        : var(--light-mode-background);
+    --global-border-color   : #aaaaaa;
+    --accent-color          : #2f9df7;
+    --red-text              : #ff3535;
 }
 
 html {

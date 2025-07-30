@@ -307,6 +307,7 @@ const homeButton = () => {
     window.location.href = root;
 };
 
+/*
 // const observer = new IntersectionObserver((entries) => {
 //     entries.forEach((entry) => {
 //         if (entry.isIntersecting) {
@@ -318,6 +319,7 @@ const homeButton = () => {
 // }, {});
 // const gridChildren = document.querySelectorAll(".grid-child");
 // gridChildren.forEach(el => observer.observe(el));
+*/
 
 window.onload = () => {
     root = new URL(location.href).origin;
