@@ -1,13 +1,18 @@
 :root {
-    --light-mode-foreground : #dddddd;
-    --light-mode-background : 238, 238, 238;
-    --light-mode-text       : 0, 0, 0;
-    --dark-mode-foreground  : #232323;
-    --dark-mode-background  : 19, 19, 19;
-    --dark-mode-text        : var(--light-mode-background);
-    --global-border-color   : #aaaaaa;
-    --accent-color          : #2f9df7;
-    --red-text              : #ff3535;
+    --background          : 238, 238, 238;
+    --foreground          : 221, 221, 221;
+    --text                : 0, 0, 0;
+    --svg-fill            : invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
+    --global-border-color : 170, 170, 170;
+    --accent-color        : #1abbe9;
+    --red-text            : #ff3535;
+}
+
+[theme-mode="dark"] {
+    --background : 18, 18, 18;
+    --foreground : 35, 35, 35;
+    --text       : 238, 238, 238;
+    --svg-fill   : invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
 }
 
 html {
@@ -26,8 +31,8 @@ body * {
 body,
 dialog,
 .logTextArea {
-    background-color: rgb(var(--light-mode-background));
-    color: rgb(var(--light-mode-text));
+    background-color: rgb(var(--background));
+    color: rgb(var(--text))
 }
 
 /* Specficially for /import/ index.html */
@@ -39,7 +44,7 @@ dialog,
 }
 
 .drop-area {
-    border: 2px dashed var(--global-border-color);
+    border: 2px dashed rgb(var(--global-border-color));
     border-radius: 1%;
     padding: 20px;
 }
@@ -48,7 +53,7 @@ dialog,
     width: 100%;
     height: 200px;
     resize: none;
-    border: 1px solid var(--global-border-color);
+    border: 1px solid rgb(var(--global-border-color));
     border-radius: 1%;
     padding: 10px;
     outline: none;
@@ -77,8 +82,8 @@ textarea {
     position: absolute;
     top: 20px;
     left: 12px;
-    font-size: 1em;
-    color: rgba(var(--light-mode-text), 0.5);
+    font-size: 1rem;
+    color: rgba(var(--text), 0.5);
     transform-origin: 0 0;
     transform: translate3d(0, 0, 0);
     transition: all 0.2s ease;
@@ -91,7 +96,7 @@ textarea {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(var(--light-mode-text), 0.05);
+    background: rgba(var(--text), 0.05);
     z-index: -1;
     transform: scaleX(0);
     transform-origin: left;
@@ -104,10 +109,10 @@ textarea {
     border: 0;
     padding: 16px 12px 0 12px;
     height: 56px;
-    font-size: 1em;
-    background: rgba(var(--light-mode-text), 0.02);
-    box-shadow: inset 0 -1px 0 rgba(var(--light-mode-text), 0.3);
-    color: rgb(var(--light-mode-text));
+    font-size: 1rem;
+    background: rgba(var(--text), 0.02);
+    box-shadow: inset 0 -1px 0 rgba(var(--text), 0.3);
+    color: rgb(var(--text));
     transition: all 0.15s ease;
 }
 
@@ -117,19 +122,19 @@ textarea {
 
 .label-input input:hover,
 .label-input textarea:hover {
-    background: rgba(var(--light-mode-text), 0.04);
-    box-shadow: inset 0 -1px 0 rgba(var(--light-mode-text), 0.5);
+    background: rgba(var(--text), 0.04);
+    box-shadow: inset 0 -1px 0 rgba(var(--text), 0.5);
 }
 
 .label-input input:not(:placeholder-shown) + .input-placeholder,
 .label-input textarea:not(:placeholder-shown) + .input-placeholder {
-    color: rgba(var(--light-mode-text), 0.5);
+    color: rgba(var(--text), 0.5);
     transform: translate3d(0, -12px, 0) scale(0.75);
 }
 
 .label-input input:focus,
 .label-input textarea:focus {
-    background: rgba(var(--light-mode-text), 0.05);
+    background: rgba(var(--text), 0.05);
     outline: none;
     box-shadow: inset 0 -2px 0 var(--accent-color);
 }
@@ -160,7 +165,9 @@ textarea {
 .button-text {
     border-radius: 1%;
     cursor: pointer;
-    color: rgb(var(--light-mode-text));
+    color: #000000;
+    border-color: var(--accent-color);
+    background-color: var(--accent-color);
 }
 
 .button-hostname {
@@ -191,7 +198,7 @@ button:active {
 nav {
     width: 100%;
     padding: 10px;
-    background-color: var(--light-mode-foreground);
+    background-color: rgb(var(--foreground));
     border-radius: 1%;
     display: flex;
     align-items: center;
@@ -213,7 +220,7 @@ main {
 
 .grid-child,
 .dialog-inputs {
-    background-color: var(--light-mode-foreground);
+    background-color: rgb(var(--foreground));
 }
 
 .grid-child {
@@ -235,7 +242,7 @@ main {
 
 .grid-child a {
     text-decoration: none;
-    color: black;
+    color: rgb(var(--text));
 }
 
 .grid-child a:hover {
@@ -280,15 +287,16 @@ main {
 
 .grid-child .bkm-note {
     white-space: preserve;
-    padding: 0.5em;
+    padding: 0.5rem;
     /* box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px; */
-    background-color: rgba(var(--light-mode-background), 0.3);
+    background-color: rgba(var(--background), 0.3);
 }
 
 .grid-child .category {
-    border: 1px solid var(--global-border-color);
+    border: 1px solid rgb(var(--global-border-color));
     border-radius: 5%;
     padding: 3px;
+    color: rgb(var(--text));
 }
 
 .bkm-hostname,
@@ -296,7 +304,7 @@ main {
     font-family: monospace;
     opacity: 0.5;
     font-weight: bold;
-    font-size: 0.83em;
+    font-size: 0.83rem;
 }
 
 .pad-like-p {
@@ -308,7 +316,7 @@ main {
 }
 
 .keywords {
-    border-bottom: 1px solid var(--global-border-color);
+    border-bottom: 1px solid rgb(var(--global-border-color));
 }
 
 .footer-grid-child {
@@ -316,7 +324,7 @@ main {
     justify-content: space-between;
     align-items: center;
     margin-top: auto;
-    padding-top: 0.5em;
+    padding-top: 0.5rem;
 }
 
 .footer-grid-child .footer-buttons {
@@ -331,7 +339,7 @@ main {
 .svg-img {
     width: 1.5em;
     height: 1.5em;
-    filter: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
+    filter: var(--svg-fill);
 }
 
 .button-svg:hover {
@@ -383,7 +391,7 @@ body:has(dialog[open]) {
 }
 
 .input-search {
-    font-size: 1em;
+    font-size: 1rem;
 }
 
 .center-text {
@@ -408,7 +416,7 @@ body:has(dialog[open]) {
 }
 
 .pagination a:hover:not(.active) {
-    background-color: var(--light-mode-foreground);
+    background-color: rgb(var(--foreground));
 }
 
 @keyframes fade-in {
@@ -421,82 +429,6 @@ body:has(dialog[open]) {
         opacity: 1;
         transform: scaleY(1);
         display: block;
-    }
-}
-
-@media (prefers-color-scheme: dark) {
-    body,
-    dialog,
-    .logTextArea {
-        background-color: rgb(var(--dark-mode-background));
-        color: rgb(var(--dark-mode-text));
-    }
-
-    input,
-    textarea,
-    .grid-child .category,
-    .grid-child .keywords,
-    .grid-child a,
-    .pagination a {
-        color: rgb(var(--dark-mode-text));
-    }
-
-    .label-input .input-placeholder {
-        color: rgba(var(--dark-mode-text), 0.5);
-    }
-
-    .label-input .focus-bg {
-        background: rgba(var(--dark-mode-text), 0.05);
-    }
-
-    .label-input input,
-    .label-input textarea {
-        background: rgba(var(--dark-mode-text), 0.02);
-        box-shadow: inset 0 -1px 0 rgba(var(--dark-mode-text), 0.3);
-        color: rgb(var(--dark-mode-text));
-    }
-
-    .label-input input:hover,
-    .label-input textarea:hover {
-        background: rgba(var(--dark-mode-text), 0.04);
-        box-shadow: inset 0 -1px 0 rgba(var(--dark-mode-text), 0.5);
-    }
-
-    .label-input input:not(:placeholder-shown) + .input-placeholder,
-    .label-input textarea:not(:placeholder-shown) + .input-placeholder {
-        color: rgba(var(--dark-mode-text), 0.5);
-    }
-
-    .label-input input:focus,
-    .label-input textarea:focus {
-        background: rgba(var(--dark-mode-text), 0.05);
-    }
-
-    .pagination a:hover:not(.active) {
-        background-color: var(--dark-mode-foreground);
-    }
-
-    .button-text {
-        background-color: var(--accent-color);
-        border-color: var(--accent-color);
-    }
-
-    nav {
-        background-color: var(--dark-mode-foreground);
-    }
-
-    .grid-child,
-    .dialog-inputs,
-    .update-main div {
-        background-color: var(--dark-mode-foreground);
-    }
-
-    .grid-child .bkm-note {
-        background-color: rgba(var(--dark-mode-background), 0.3);
-    }
-
-    .svg-img {
-        filter: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
     }
 }
 
