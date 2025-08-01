@@ -270,7 +270,6 @@ const openSearchDialog = () => {
     });
 };
 
-let keyBuffer = "";
 document.addEventListener("keydown", (event) => {
     if (document.querySelector(".dialog-create").open ||
         document.querySelector(".dialog-update").open ||
@@ -279,14 +278,8 @@ document.addEventListener("keydown", (event) => {
         return;
     }
 
-    keyBuffer += event.key;
-    if (keyBuffer.length > 2) {
-        keyBuffer = keyBuffer.slice(-2);
-    }
-
-    if (keyBuffer === ":s") {
+    if (event.Key === "/" || event.code === "Slash") {
         event.preventDefault();
-        keyBuffer = "";
         openSearchDialog();
     }
 });
