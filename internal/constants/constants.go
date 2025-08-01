@@ -2,7 +2,7 @@ package constants
 
 const (
     NAME    string = "dalennod"
-    VERSION string = "0.11.3"
+    VERSION string = "0.12.1"
 
     LOGS_DIRNAME       string = "logs"
     LOGS_FILENAME      string = NAME + ".log"

@@ -348,13 +348,12 @@ const modeToggle = () => {
     localStorage.setItem(MODE_KEY, nextMode);
 }
 
-const initThemeMode = () => {
+const initThemeMode = (() => {
     const initialMode = getInitialMode();
     applyMode(initialMode);
-}
+})();
 
 window.onload = () => {
-    initThemeMode();
     root = new URL(location.href).origin;
     API = `${root}/api/`;
     updatePagination();
