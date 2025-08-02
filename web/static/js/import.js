@@ -1,13 +1,19 @@
 "use strict";
 
-const API_ENDPOINT = "http://localhost:41415/api/";
+let API = "";
+let root = "";
+
+window.onload = () => {
+    root = new URL(location.href).origin;
+    API = `${root}/api/`;
+};
 
 const handleFileSelect = async (event) => {
     event.preventDefault();
     const file = fileInput.files[0];
     updateLog("Selected file: " + file.name);
 
-    const url = API_ENDPOINT + "import-bookmark/";
+    const url = API + "import-bookmark/";
     const formData = new FormData();
     formData.append("importFile", file);
     formData.append("selectedBrowser", selectedBrowser.value);
