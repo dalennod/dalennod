@@ -7,7 +7,7 @@ const getInitialMode = () => {
 
     const colorScheme = window.matchMedia("(prefers-color-scheme:dark)");
     return colorScheme.matches ? "dark" : "light";
-}
+};
 
 const applyMode = (mode) => {
     const rootElement = document.documentElement;
@@ -16,14 +16,14 @@ const applyMode = (mode) => {
     } else {
         rootElement.removeAttribute("theme-mode");
     }
-}
+};
 
 const modeToggle = () => {
     const currentMode = document.documentElement.getAttribute("theme-mode") === "dark" ? "dark" : "light";
     const nextMode = currentMode === "dark" ? "light" : "dark";
     applyMode(nextMode);
     localStorage.setItem(MODE_KEY, nextMode);
-}
+};
 
 const initThemeMode = (() => {
     const initialMode = getInitialMode();
