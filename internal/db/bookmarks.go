@@ -143,7 +143,7 @@ func TotalPageCount(database *sql.DB) int {
     }
 
     pageCount := rowCount / constants.PAGE_UPDATE_LIMIT
-    if rowCount % constants.PAGE_UPDATE_LIMIT == 0 {
+    if rowCount%constants.PAGE_UPDATE_LIMIT == 0 {
         pageCount -= 1
     }
 
@@ -225,7 +225,7 @@ func searchPageCount(database *sql.DB, query string, params []interface{}) int {
     }
 
     pageCount := count / constants.PAGE_UPDATE_LIMIT
-    if count % constants.PAGE_UPDATE_LIMIT == 0 {
+    if count%constants.PAGE_UPDATE_LIMIT == 0 {
         pageCount -= 1
     }
 
@@ -292,6 +292,33 @@ func SearchFor(database *sql.DB, searchType, searchTerm string, pageNumber int) 
     }
 
     return results, count
+}
+
+func OpenSesame(database *sql.DB, searchTerm string) setup.Bookmark {
+    var result setup.Bookmark
+    var modified time.Time
+
+    if searchTerm == "" {
+        return result
+    }
+    searchTerm = "%" + searchTerm + "%"
+
+    stmt, err := database.Prepare("SELECT * FROM bookmarks WHERE keywords LIKE (?) ORDER BY id DESC LIMIT (?);")
+    if err != nil {
+        logger.Error.Println("ERROR: failed to prepare database query:", err)
+        return result
+    }
+
+    row, err := stmt.Query(searchTerm, 1)
+    if err != nil {
+        logger.Error.Println("ERROR: failed to query database:", err)
+        return result
+    }
+
+    for row.Next() {
+        row.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
+    }
+    return result
 }
 
 func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {

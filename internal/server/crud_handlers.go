@@ -2,10 +2,11 @@ package server
 
 import (
     "encoding/json"
+    "fmt"
     "html/template"
     "net/http"
     "strconv"
-    "fmt"
+    "strings"
 
     "dalennod/internal/archive"
     "dalennod/internal/db"
@@ -20,16 +21,16 @@ type GotURLParams struct {
 }
 
 func parseURLParams(r *http.Request) GotURLParams {
-    var gotURLParams GotURLParams;
-    err := r.ParseForm();
+    var gotURLParams GotURLParams
+    err := r.ParseForm()
     if err != nil {
-        logger.Error.Println("error parsing URL params. ERROR:", err);
-        return gotURLParams;
+        logger.Error.Println("error parsing URL params. ERROR:", err)
+        return gotURLParams
     }
-    gotURLParams.pageNumber = r.FormValue("page");
-    gotURLParams.searchType = r.FormValue("search-type");
-    gotURLParams.searchTerm = r.FormValue("search-term");
-    return gotURLParams;
+    gotURLParams.pageNumber = r.FormValue("page")
+    gotURLParams.searchType = r.FormValue("search-type")
+    gotURLParams.searchTerm = r.FormValue("search-term")
+    return gotURLParams
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
@@ -38,35 +39,44 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
         var bookmarks []setup.Bookmark
         var recentlyInteracted setup.RecentInteractions
 
-        gotURLParams := parseURLParams(r);
+        gotURLParams := parseURLParams(r)
         if gotURLParams.pageNumber != "" {
-            pageNoValid, err := strconv.Atoi(gotURLParams.pageNumber);
+            pageNoValid, err := strconv.Atoi(gotURLParams.pageNumber)
             if err != nil {
-                logger.Warn.Println("Invalid page number. Got:", gotURLParams.pageNumber);
+                logger.Warn.Println("Invalid page number. Got:", gotURLParams.pageNumber)
             }
-            pageCount = pageNoValid;
+            pageCount = pageNoValid
         }
         if gotURLParams.searchType != "" {
-            switch (gotURLParams.searchType) {
+            switch gotURLParams.searchType {
             case "general":
-                fallthrough;
+                openPrefix := "o "
+                searchTermAfter, prefixFound := strings.CutPrefix(gotURLParams.searchTerm, openPrefix)
+                if prefixFound && searchTermAfter != "" {
+                    gotURLParams.searchTerm = searchTermAfter
+                    bookmark := db.OpenSesame(database, gotURLParams.searchTerm)
+                    w.Header().Set("Content-Type", "application/json")
+                    json.NewEncoder(w).Encode(bookmark)
+                    return
+                }
+                fallthrough
             case "hostname":
-                fallthrough;
+                fallthrough
             case "keyword":
-                fallthrough;
+                fallthrough
             case "category":
-                bookmarks, pageCountForSearch = db.SearchFor(database, gotURLParams.searchType, gotURLParams.searchTerm, pageCount);
+                bookmarks, pageCountForSearch = db.SearchFor(database, gotURLParams.searchType, gotURLParams.searchTerm, pageCount)
             default:
-                w.WriteHeader(http.StatusBadRequest);
-                fmt.Fprint(w, "ERROR: Unrecognized search type");
-                logger.Error.Println("ERROR: Unrecognized search type. Got:", gotURLParams.searchType);
-                return;
+                w.WriteHeader(http.StatusBadRequest)
+                fmt.Fprint(w, "ERROR: Unrecognized search type")
+                logger.Error.Println("ERROR: Unrecognized search type. Got:", gotURLParams.searchType)
+                return
             }
         } else {
-            bookmarks = db.ViewAllWebUI(database, pageCount);
+            bookmarks = db.ViewAllWebUI(database, pageCount)
         }
         if gotURLParams.pageNumber == "" && gotURLParams.searchType == "" {
-            recentlyInteracted = db.RecentInteractions(database);
+            recentlyInteracted = db.RecentInteractions(database)
         }
 
         tmpl = template.Must(template.New("index").Funcs(tmplFuncMap).ParseFS(Web, "web/index.html"))

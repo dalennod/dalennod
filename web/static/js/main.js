@@ -257,14 +257,35 @@ const openSearchDialog = () => {
 
     const searchBox = document.getElementById("general-search-term");
     searchBox.focus();
+    searchBox.value = "";
 
-    searchBox.addEventListener("keydown", (event) => {
+    const openPrefix = "o ";
+    const formKeySearchType = "search-type";
+    const formKeySearchTerm = "search-term";
+    searchBox.addEventListener("keydown", async (event) => {
         if (event.key === "Enter") {
+            dialogSearch.close();
             const searchContent = searchBox.value;
             if (searchContent.startsWith("::import")) {
                 document.getElementById("search-button").disabled = true;
                 showImportPage();
                 return;
+            } else if (searchContent.startsWith(openPrefix)) {
+                event.preventDefault();
+                const searchForm = document.getElementById("search-form");
+                const searchFormData = new FormData(searchForm);
+                const fetchURL = `${root}/?${formKeySearchType}=${searchFormData.get(formKeySearchType)}&${formKeySearchTerm}=${searchContent}`;
+                const res = await fetch(fetchURL);
+                if (!res.ok) {
+                    console.error(res.status);
+                    return;
+                }
+                const responseData = await res.json();
+                if (responseData.id != 0) {
+                    window.open(responseData.url, "_blank");
+                } else {
+                    console.error("WARN: Did not find anything to open with input:", searchContent);
+                }
             }
         }
     });
