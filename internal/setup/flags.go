@@ -44,8 +44,8 @@ func ParseFlags() FlagValues {
 func cliFlags() {
     flag.Usage = func() {
         w := flag.CommandLine.Output()
-        fmt.Fprintln(w, "Usage of dalennod: dalennod [OPTION] ...")
-        fmt.Fprintln(w, "\nOptions:")
+        fmt.Fprintf(w, "Usage of dalennod (%s): dalennod [OPTION] ...\n\n", constants.VERSION)
+        fmt.Fprintln(w, "Options:")
         fmt.Fprintln(w, "  -s, --serve         Start webserver locally for Web UI & Extension")
         fmt.Fprintln(w, "  -a, --add           Add a bookmark entry to the database")
         fmt.Fprintln(w, "  -r, --remove [id]   Remove specific bookmark using its ID")

@@ -7,6 +7,10 @@ const showImportPage = () => {
     window.location.href = root + "/import/";
 };
 
+const homeButton = () => {
+    window.location.href = root;
+};
+
 const categoriesOptions = async () => {
     const fetchURL = API + "categories/";
     const res = await fetch(fetchURL);
@@ -178,7 +182,6 @@ const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocati
 
     if (pageNumber === current) pageNumberLink.classList.add("active");
     paginationNumbers.appendChild(pageNumberLink);
-    paginationNumbers.appendChild(document.createTextNode(" "));
 };
 
 const updateNavATags = (current, totalPages, hrefParams) => {
@@ -193,7 +196,9 @@ const updateNavATags = (current, totalPages, hrefParams) => {
         document.getElementById("last-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${totalPages}`;
 
         const allBookmarksList = document.getElementById("all-bookmarks-list");
-        searchType === "general" ? allBookmarksList.innerHTML = `<img class="svg-img" src="static/imgs/search_button.svg" alt="Search all bookmark icon" />All Bookmarks with '${searchTerm}'` : allBookmarksList.innerHTML = `<img class="svg-img" src="static/imgs/search_button.svg" alt="Search all bookmark icon" />Bookmarks with '${searchTerm}' in '${searchType}'`;
+        searchType === "general"
+            ? allBookmarksList.innerHTML = `<img class="svg-img" src="static/imgs/search_button.svg" alt="Search all bookmark icon" />All Bookmarks with '${searchTerm}'`
+            : allBookmarksList.innerHTML = `<img class="svg-img" src="static/imgs/search_button.svg" alt="Search all bookmark icon" />Bookmarks with '${searchTerm}' in '${searchType}'`;
     } else {
         document.getElementById("prev-page").href = `/?page=${prevPage}`;
         document.getElementById("next-page").href = `/?page=${nextPage}`;
@@ -307,12 +312,12 @@ document.addEventListener("keydown", (event) => {
 
 const adjustTextarea = (tar) => {
     tar.value.includes("\n")
-        ? tar.style.height = (tar.scrollHeight + 12) + "px"
+        ? tar.style.height = (tar.scrollHeight + 8) + "px"
         : tar.style.height = tar.scrollHeight + "px";
     tar.addEventListener("input", () => {
         tar.style.height = "auto";
         tar.value.includes("\n")
-            ? tar.style.height = (tar.scrollHeight + 12) + "px"
+            ? tar.style.height = (tar.scrollHeight + 8) + "px"
             : tar.style.height = tar.scrollHeight + "px";
     });
 };

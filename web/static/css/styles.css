@@ -80,8 +80,8 @@ textarea {
 
 .label-input .input-placeholder {
     position: absolute;
-    top: 20px;
-    left: 12px;
+    top: 16px;
+    left: 8px;
     font-size: 1rem;
     color: rgba(var(--text), 0.5);
     transform-origin: 0 0;
@@ -107,8 +107,8 @@ textarea {
     appearance: none;
     width: 100%;
     border: 0;
-    padding: 16px 12px 0 12px;
-    height: 56px;
+    padding: 12px 8px 0 8px;
+    height: 48px;
     font-size: 1rem;
     background: rgba(var(--text), 0.02);
     box-shadow: inset 0 -1px 0 rgba(var(--text), 0.3);
@@ -117,7 +117,7 @@ textarea {
 }
 
 .label-input textarea {
-    padding: 24px 12px 0px 12px;
+    padding: 16px 8px 0px 8px;
 }
 
 .label-input input:hover,
@@ -156,9 +156,25 @@ textarea {
     text-align: right;
 }
 
+.center-text {
+    text-align: center;
+}
+
+.svg-img {
+    width: 1.5em;
+    height: 1.5em;
+    filter: var(--svg-fill);
+}
+
 .button-svg {
     border: none;
     background-color: transparent;
+    cursor: pointer;
+}
+
+.button-svg:hover {
+    opacity: 0.5;
+    transition: all ease 0.3s;
     cursor: pointer;
 }
 
@@ -212,6 +228,11 @@ main {
     margin-top: 10px;
 }
 
+.special-bookmarks {
+    display: flex;
+    align-items: center;
+}
+
 .grid-view-list {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
@@ -226,19 +247,16 @@ main {
 .grid-child {
     display: flex;
     flex-direction: column;
-    padding: 10px;
     border-radius: 1%;
     /* opacity: 0; */
     /* transition: 0.5s ease; */
 }
 
-/* .show { */
-/*     opacity: 1; */
-/* } */
-
-.grid-child .bkm-info {
-    flex: 1;
-}
+/* CSS below for .show class and code above for opacity & transition is for the IntersectionObserver. */
+/* Currently not enabled. */
+/*.show {
+    opacity: 1;
+}*/
 
 .grid-child a {
     text-decoration: none;
@@ -250,65 +268,34 @@ main {
     color: var(--accent-color);
 }
 
-.thumbnail-image {
-    display: grid;
+.bkm-info {
+    flex: 1;
+    padding: 10px;
 }
 
-.thumbnail-image img,
-.thumbnail-image a {
-    grid-row: 1;
-    grid-column: 1;
+.thumbnail-image {
+    display: grid;
+    background-color: rgba(var(--background), 0.3);
 }
 
 .thumbnail-image img {
-    width: 100%;
-    height: 150px;
+    object-fit: contain;
     overflow: hidden;
-}
-
-.grid-child .default-thumburl {
     display: block;
     margin: auto;
+    width: 100%;
+    height: 150px;
+}
+
+.thumbnail-image .default-thumburl {
     width: 75px;
 }
 
-.grid-child .default-thumburl-bg,
-.grid-child .thumburl-bg {
-    object-fit: cover;
-    filter: blur(15px);
-    opacity: 0.05;
-}
-
-.grid-child .default-thumburl,
-.grid-child .thumburl {
-    object-fit: contain;
-    position: relative;
-}
-
-.grid-child .bkm-note {
+.bkm-note {
     white-space: preserve;
     padding: 0.5rem;
     /* box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px; */
     background-color: rgba(var(--background), 0.3);
-}
-
-.grid-child .category {
-    border: 1px solid rgb(var(--global-border-color));
-    border-radius: 5%;
-    padding: 3px;
-    color: rgb(var(--text));
-}
-
-.bkm-hostname,
-.id-modified {
-    font-family: monospace;
-    opacity: 0.5;
-    font-weight: bold;
-    font-size: 0.83rem;
-}
-
-.pad-like-p {
-    padding: 0.5em 0px;
 }
 
 .bkm-keywords {
@@ -320,33 +307,39 @@ main {
     color: rgb(var(--text));
 }
 
+.category {
+    border: 1px solid rgb(var(--global-border-color));
+    border-radius: 5%;
+    padding: 3px;
+    color: rgb(var(--text));
+}
+
+.bkm-category {
+    padding: 0 0 0.5rem 0.5rem;
+}
+
+.bkm-hostname,
+.id-modified {
+    font-family: monospace;
+    opacity: 0.5;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+.pad-like-p {
+    padding: 0.5em 0px;
+}
+
 .footer-grid-child {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-top: auto;
-    padding-top: 0.5rem;
+    padding: 0.5rem;
 }
 
 .footer-grid-child .footer-buttons {
     display: flex;
-}
-
-.special-bookmarks {
-    display: flex;
-    align-items: center;
-}
-
-.svg-img {
-    width: 1.5em;
-    height: 1.5em;
-    filter: var(--svg-fill);
-}
-
-.button-svg:hover {
-    opacity: 0.5;
-    transition: all ease 0.3s;
-    cursor: pointer;
 }
 
 .dialog-inputs {
@@ -368,7 +361,7 @@ dialog::backdrop {
 }
 
 dialog:open::backdrop {
-  background-color: rgba(0, 0, 0, 50%);
+    background-color: rgba(0, 0, 0, 50%);
 }
 
 body:has(dialog[open]) {
@@ -395,10 +388,6 @@ body:has(dialog[open]) {
     font-size: 1rem;
 }
 
-.center-text {
-    text-align: center;
-}
-
 .pagination {
     margin: 15px;
 }
@@ -409,6 +398,7 @@ body:has(dialog[open]) {
     text-decoration: none;
     transition: background-color 0.3s;
     border-radius: 10%;
+    margin: 1px;
 }
 
 .pagination a.active {

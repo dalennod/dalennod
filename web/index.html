@@ -14,20 +14,12 @@
   <body>
     <nav>
       <div class="nav-left">
-        <a href="/"><button class="button-svg" id="home-button" title="Root page">
-            <img class="svg-img" src="static/imgs/home-button.svg" alt="Home button" />
-        </button></a>
+        <button class="button-svg" id="home-button" title="Root page" onclick="homeButton();"><img class="svg-img" src="static/imgs/home-button.svg" alt="Home button" /></button>
       </div>
       <div class="nav-right">
-        <button class="button-svg" title="Light/Dark Mode" onclick="modeToggle();">
-          <img class="svg-img" src="static/imgs/mode-toggle.svg" alt="Mode toggle">
-        </button>
-        <button class="button-svg" title="Search" onclick="openSearchDialog();">
-          <img class="svg-img" src="static/imgs/search_button.svg" alt="Search button" />
-        </button>
-        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();">
-          <img class="svg-img" src="static/imgs/create_button.svg" alt="Create button" />
-        </button>
+        <button class="button-svg" title="Light/Dark Mode" onclick="modeToggle();"><img class="svg-img" src="static/imgs/mode-toggle.svg" alt="Mode toggle" /></button>
+        <button class="button-svg" title="Search" onclick="openSearchDialog();"><img class="svg-img" src="static/imgs/search_button.svg" alt="Search button" /></button>
+        <button class="button-svg" id="button-add-html" title="Create" onclick="showCreateDialog();"><img class="svg-img" src="static/imgs/create_button.svg" alt="Create button" /></button>
       </div>
     </nav>
 
@@ -39,7 +31,7 @@
       </div>
       {{ end }}
       <div id="all-bookmarks">
-        <h2 id="all-bookmarks-list" class="special-bookmarks"><img class="svg-img" src="static/imgs/bookmark-icon.svg" alt="All bookmark icon" />All Bookmarks</h2>
+        <h2 id="all-bookmarks-list" class="special-bookmarks"><img class="svg-img" src="static/imgs/bookmark-icon.svg" alt="All bookmarks icon" />All Bookmarks</h2>
         {{ block "all_bookmarks_list" . }} {{ end }}
       </div>
     </main>
@@ -71,29 +63,23 @@
 
 {{ define "bkm_card" }}
 <div class="grid-child" id="{{ .ID }}">
+  <div class="thumbnail-image">
+    {{ if .ThumbURL }}
+    <a href="{{ .URL }}" target="_blank"><img class="thumburl" src="{{ grabThumbnail .ID }}" alt="[couldn't load thumbnail]" loading="lazy" /></a>
+    {{ else }}
+    <a href="{{ .URL }}" target="_blank"><img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" /></a>
+    {{ end }}
+  </div>
+  <div class="center-text pad-like-p">
+    {{ $hostname := getHostname .URL }}
+    <form action="/" method="get">
+      <input hidden name="search-type" value="hostname" />
+      <input hidden name="search-term" value="{{ $hostname }}" />
+      <button type="submit" class="button-hostname bkm-hostname" title="Search host: '{{ $hostname }}'" tabindex="-1">{{ $hostname }}</button>
+    </form>
+  </div>
   <div class="bkm-info">
-    <div class="thumbnail-image">
-      {{ if .ThumbURL }}
-      <img class="thumburl-bg" src="{{ grabThumbnail .ID }}" alt="[couldn't load thumbnail]" loading="lazy" />
-      <a href="{{ .URL }}" target="_blank">
-        <img class="thumburl" src="{{ grabThumbnail .ID }}" alt="[couldn't load thumbnail]" loading="lazy" />
-      </a>
-      {{ else }}
-      <img class="default-thumburl-bg" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" />
-      <a href="{{ .URL }}" target="_blank">
-        <img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" />
-      </a>
-      {{ end }}
-    </div>
-    <div class="center-text pad-like-p">
-      {{ $hostname := getHostname .URL }}
-      <form action="/" method="get">
-        <input hidden name="search-type" value="hostname" />
-        <input hidden name="search-term" value="{{ $hostname }}" />
-        <button type="submit" class="button-hostname bkm-hostname" title="Search host: '{{ $hostname }}'" tabindex="-1">{{ $hostname }}</button>
-      </form>
-    </div>
-    <div class="pad-like-p">
+    <div class="bkm-title pad-like-p">
       {{ if .Title }}
       <a href="{{ .URL }}" target="_blank">{{ .Title }}</a>
       {{ else if not .Title }}
@@ -104,48 +90,38 @@
     <div class="bkm-note">{{ .Note }}</div>
     {{ end }}
     {{ if .Archived }}
-    <div class="pad-like-p">Archive: <a href="{{ .SnapshotURL }}" target="_blank" title="{{ .SnapshotURL }}">[click here]</a></div>
+    <div class="bkm-archive pad-like-p">Archive: <a href="{{ .SnapshotURL }}" target="_blank" title="{{ .SnapshotURL }}">[click here]</a></div>
     {{ end }}
     {{ if .Keywords }}
-    <div class="pad-like-p">
-      {{ $keywords := keywordSplit .Keywords "," }}
-      {{ range $_, $keyword := $keywords}}
-      <div class="bkm-keywords">
-        <form action="/" method="get">
-          <input hidden name="search-type" value="keyword" />
-          <input hidden name="search-term" value="{{ $keyword }}" />
-          <button class="button-svg" type="submit" title="Search keyword: '{{ $keyword }}'">
-            <span id="keywords" class="keywords">{{ $keyword }}</span>
-          </button>
-        </form>
-      </div>
-      {{ end }}
-    </div>
-    {{ end }}
-    {{ if .Category }}
-    <div class="pad-like-p">
+    {{ $keywords := keywordSplit .Keywords "," }}
+    {{ range $_, $keyword := $keywords}}
+    <div class="bkm-keywords">
       <form action="/" method="get">
-        <input hidden name="search-type" value="category" />
-        <input hidden name="search-term" value="{{ .Category }}" />
-        <button class="button-svg" type="submit" title="Search category: '{{ .Category }}'">
-          <span id="category" class="category">{{ .Category }}</span>
-        </button>
+        <input hidden name="search-type" value="keyword" />
+        <input hidden name="search-term" value="{{ $keyword }}" />
+        <button class="button-svg" type="submit" title="Search keyword: '{{ $keyword }}'"><span id="keywords" class="keywords">{{ $keyword }}</span></button>
       </form>
     </div>
     {{ end }}
+    {{ end }}
   </div>
+  {{ if .Category }}
+  <div class="bkm-category">
+    <form action="/" method="get">
+      <input hidden name="search-type" value="category" />
+      <input hidden name="search-term" value="{{ .Category }}" />
+      <button class="button-svg" type="submit" title="Search category: '{{ .Category }}'"><span id="category" class="category">{{ .Category }}</span></button>
+    </form>
+  </div>
+  {{ end }}
   <div class="footer-grid-child">
     <div class="id-modified">
-      <a href="/api/row/{{ .ID }}" target="_blank">[{{ .ID }}]</a>
+      <a href="/api/row/{{ .ID }}" target="_blank" title="Bookmark no. {{ .ID }}">[{{ .ID }}]</a>
       <span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span>
     </div>
     <div class="footer-buttons">
-      <button class="button-svg" id="button-update" title="Update" onclick="getOldData(this);">
-        <img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" />
-      </button>
-      <button class="button-svg" id="button-delete" title="Delete" ondblclick="deleteEntry(this);">
-        <img class="svg-img" src="static/imgs/delete_button.svg" alt="Delete button" />
-      </button>
+      <button class="button-svg" id="button-update" title="Update" onclick="getOldData(this);"><img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" /></button>
+      <button class="button-svg" id="button-delete" title="Delete" ondblclick="deleteEntry(this);"><img class="svg-img" src="static/imgs/delete_button.svg" alt="Delete button" /></button>
     </div>
   </div>
 </div>

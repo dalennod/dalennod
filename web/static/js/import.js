@@ -8,6 +8,10 @@ window.onload = () => {
     API = `${root}/api/`;
 };
 
+const homeButton = () => {
+    window.location.href = root;
+};
+
 const handleFileSelect = async (event) => {
     event.preventDefault();
     const file = fileInput.files[0];
