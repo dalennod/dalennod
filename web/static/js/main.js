@@ -43,12 +43,14 @@ document.querySelector(".dialog-update").addEventListener("close", () => {
     location.reload();
 });
 
-const getOldData = async (ele) => {
-    const entryID = ele.parentNode.parentNode.parentNode.id;
+const getOldData = async (e) => {
+    const entryID = e.parentNode.parentNode.parentNode.id;
     const fetchURL = API + "row/" + entryID;
     const res = await fetch(fetchURL);
     const oldData = await res.json();
-    if (typeof Storage !== "undefined") localStorage.setItem("oldData", JSON.stringify(oldData));
+    if (typeof Storage !== "undefined") {
+        localStorage.setItem("oldData", JSON.stringify(oldData));
+    }
     setOldData();
 };
 
@@ -184,16 +186,19 @@ const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocati
     paginationNumbers.appendChild(pageNumberLink);
 };
 
+const formKeySearchType = "search-type";
+const formKeySearchTerm = "search-term";
+
 const updateNavATags = (current, totalPages, hrefParams) => {
     const nextPage = current + 1;
     const prevPage = current - 1;
-    if (hrefParams.get("search-type")) {
-        const searchType = hrefParams.get("search-type");
-        const searchTerm = hrefParams.get("search-term");
-        document.getElementById("root-first-page").href = `/?search-type=${searchType}&search-term=${searchTerm}`;
-        document.getElementById("prev-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${prevPage}`;
-        document.getElementById("next-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${nextPage}`;
-        document.getElementById("last-page").href = `/?search-type=${searchType}&search-term=${searchTerm}&page=${totalPages}`;
+    if (hrefParams.get(formKeySearchType)) {
+        const searchType = hrefParams.get(formKeySearchType);
+        const searchTerm = hrefParams.get(formKeySearchTerm);
+        document.getElementById("root-first-page").href = `/?${formKeySearchType}=${searchType}&${formKeySearchTerm}=${searchTerm}`;
+        document.getElementById("prev-page").href = `/?${formKeySearchType}=${searchType}&${formKeySearchTerm}=${searchTerm}&page=${prevPage}`;
+        document.getElementById("next-page").href = `/?${formKeySearchType}=${searchType}&${formKeySearchTerm}=${searchTerm}&page=${nextPage}`;
+        document.getElementById("last-page").href = `/?${formKeySearchType}=${searchType}&${formKeySearchTerm}=${searchTerm}&page=${totalPages}`;
 
         const allBookmarksList = document.getElementById("all-bookmarks-list");
         searchType === "general"
@@ -211,7 +216,7 @@ const updatePagination = async () => {
     const hrefParams = hrefLocation.searchParams;
     const fetchURL = API + "pages/";
     let res;
-    if (hrefParams.get("search-type")) {
+    if (hrefParams.get(formKeySearchType)) {
         res = await fetch(fetchURL, {
             method: "POST",
         });
@@ -249,36 +254,31 @@ const updatePagination = async () => {
 };
 
 const openSearchDialog = () => {
-    const dialogSearch = document.querySelector(".dialog-search");
-    dialogSearch.showModal();
+    document.querySelector(".dialog-search").showModal();
 
-    dialogSearch.addEventListener("click", () => {
-        dialogSearch.close();
+    document.querySelector(".dialog-search").addEventListener("click", () => {
+        document.querySelector(".dialog-search").close();
     });
 
     document.getElementById("dialog-search-div").addEventListener("click", (event) => {
         event.stopPropagation();
     });
 
-    const searchBox = document.getElementById("general-search-term");
-    searchBox.focus();
-    searchBox.value = "";
+    document.getElementById("general-search-term").focus();
+    document.getElementById("general-search-term").value = "";
 
     const openPrefix = "o ";
-    const formKeySearchType = "search-type";
-    const formKeySearchTerm = "search-term";
-    searchBox.addEventListener("keydown", async (event) => {
+    document.getElementById("general-search-term").addEventListener("keydown", async (event) => {
         if (event.key === "Enter") {
-            dialogSearch.close();
-            const searchContent = searchBox.value;
+            document.querySelector(".dialog-search").close();
+            const searchContent = document.getElementById("general-search-term").value;
             if (searchContent.startsWith("::import")) {
                 document.getElementById("search-button").disabled = true;
                 showImportPage();
                 return;
             } else if (searchContent.startsWith(openPrefix)) {
                 event.preventDefault();
-                const searchForm = document.getElementById("search-form");
-                const searchFormData = new FormData(searchForm);
+                const searchFormData = new FormData(document.getElementById("search-form"));
                 const fetchURL = `${root}/?${formKeySearchType}=${searchFormData.get(formKeySearchType)}&${formKeySearchTerm}=${searchContent}`;
                 const res = await fetch(fetchURL);
                 if (!res.ok) {
@@ -291,6 +291,8 @@ const openSearchDialog = () => {
                 } else {
                     console.error("WARN: Did not find anything to open with input:", searchContent);
                 }
+            } else {
+                document.getElementById("search-form").submit();
             }
         }
     });
