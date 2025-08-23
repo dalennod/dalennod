@@ -39,6 +39,7 @@ func Start(data *sql.DB) {
     tmplFuncMap["keywordSplit"] = keywordSplit
     tmplFuncMap["grabThumbnail"] = grabThumbnail
     tmplFuncMap["webUIAddress"] = webUIAddress
+    tmplFuncMap["encapsulateURL"] = encapsulateURL
 
     mux.HandleFunc("/{$}", rootHandler)
     mux.HandleFunc("/import/", importHandler)

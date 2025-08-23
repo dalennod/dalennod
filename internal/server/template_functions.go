@@ -3,6 +3,7 @@ package server
 import (
     "fmt"
     "regexp"
+    "html/template"
 
     "dalennod/internal/constants"
 )
@@ -33,4 +34,8 @@ func keywordSplit(keywords string, delimiter string) []string {
 
 func grabThumbnail(id int) string {
     return fmt.Sprintf("http://localhost%s/thumbnail/%d", constants.SECONDARY_PORT, id)
+}
+
+func encapsulateURL(bkmURL string) template.URL {
+    return template.URL(bkmURL)
 }

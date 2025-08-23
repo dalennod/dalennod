@@ -65,9 +65,9 @@
 <div class="grid-child" id="{{ .ID }}">
   <div class="thumbnail-image">
     {{ if .ThumbURL }}
-    <a href="{{ .URL }}" target="_blank"><img class="thumburl" src="{{ grabThumbnail .ID }}" alt="[couldn't load thumbnail]" loading="lazy" /></a>
+    <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="thumburl" src="{{ grabThumbnail .ID }}" alt="[couldn't load thumbnail]" loading="lazy" /></a>
     {{ else }}
-    <a href="{{ .URL }}" target="_blank"><img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" /></a>
+    <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" /></a>
     {{ end }}
   </div>
   <div class="center-text pad-like-p">
@@ -81,9 +81,9 @@
   <div class="bkm-info">
     <div class="bkm-title pad-like-p">
       {{ if .Title }}
-      <a href="{{ .URL }}" target="_blank">{{ .Title }}</a>
+      <a href="{{ encapsulateURL .URL }}" target="_blank">{{ .Title }}</a>
       {{ else if not .Title }}
-      <a href="{{ .URL }}" target="_blank">{{ .URL }}</a>
+      <a href="{{ encapsulateURL .URL }}" target="_blank">{{ .URL }}</a>
       {{ end }}
     </div>
     {{ if .Note }}
