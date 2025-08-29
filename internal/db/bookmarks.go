@@ -33,7 +33,12 @@ func Add(database *sql.DB, bkmStruct setup.Bookmark) {
         return
     }
 
-    go saveThumbLocally(execResult, bkmStruct.ThumbURL)
+    lastInsertID, err := execResult.LastInsertId()
+    if err != nil {
+        logger.Warn.Println("could not get last insert ID. ERROR:", err)
+        return
+    }
+    go saveThumbLocally(lastInsertID, bkmStruct.ThumbURL)
 }
 
 // serverCall boolean explanation:
@@ -61,13 +66,13 @@ func Update(database *sql.DB, bkmStruct setup.Bookmark, serverCall bool) {
         return
     }
 
-    execResult, err := stmt.Exec(bkmStruct.URL, bkmStruct.Title, bkmStruct.Note, bkmStruct.Keywords, bkmStruct.Category, bkmStruct.Archived, bkmStruct.SnapshotURL, bkmStruct.ThumbURL, bkmStruct.ID)
+    _, err = stmt.Exec(bkmStruct.URL, bkmStruct.Title, bkmStruct.Note, bkmStruct.Keywords, bkmStruct.Category, bkmStruct.Archived, bkmStruct.SnapshotURL, bkmStruct.ThumbURL, bkmStruct.ID)
     if err != nil {
         logger.Error.Println("error executing database statement. ERROR:", err)
         return
     }
 
-    go saveThumbLocally(execResult, bkmStruct.ThumbURL)
+    go saveThumbLocally(bkmStruct.ID, bkmStruct.ThumbURL)
 }
 
 func updateCheck(database *sql.DB, bkmStruct setup.Bookmark) setup.Bookmark {
@@ -96,7 +101,7 @@ func updateCheck(database *sql.DB, bkmStruct setup.Bookmark) setup.Bookmark {
     return bkmStruct
 }
 
-func RefetchThumbnail(database *sql.DB, id int, thumbnail []byte) error {
+func RefetchThumbnail(database *sql.DB, id int64, thumbnail []byte) error {
     bkmStruct, err := ViewSingleRow(database, id)
     if err != nil {
         logger.Error.Printf("error getting bookmark row data at ID %d. ERROR: %v\n", id, err)
@@ -115,7 +120,7 @@ func RefetchThumbnail(database *sql.DB, id int, thumbnail []byte) error {
     return nil
 }
 
-func Remove(database *sql.DB, id int) {
+func Remove(database *sql.DB, id int64) {
     stmt, err := database.Prepare("DELETE FROM bookmarks WHERE id=(?);")
     if err != nil {
         logger.Error.Println("error preparing database statement. ERROR:", err)
@@ -321,7 +326,7 @@ func OpenSesame(database *sql.DB, searchTerm string) setup.Bookmark {
     return result
 }
 
-func ViewSingleRow(database *sql.DB, id int) (setup.Bookmark, error) {
+func ViewSingleRow(database *sql.DB, id int64) (setup.Bookmark, error) {
     var rowResult setup.Bookmark
     var modified time.Time
 

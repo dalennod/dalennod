@@ -32,7 +32,7 @@ func keywordSplit(keywords string, delimiter string) []string {
     return re.Split(keywords, -1)
 }
 
-func grabThumbnail(id int) string {
+func grabThumbnail(id int64) string {
     return fmt.Sprintf("http://localhost%s/thumbnail/%d", constants.SECONDARY_PORT, id)
 }
 

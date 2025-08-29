@@ -64,9 +64,16 @@ const setOldData = () => {
         document.querySelector("#update-note").value = oldData.note;
         document.querySelector("#update-keywords").value = oldData.keywords;
         document.querySelector("#update-category").value = oldData.category;
-        oldData.archive
-            ? document.querySelector("#update-archive-div").setAttribute("hidden", "")
-            : document.querySelector("#update-archive-div").removeAttribute("hidden");
+        if (oldData.archive) {
+            document.querySelector("#update-archive-div").setAttribute("hidden", "")
+            document.getElementById("update-snapshotURL").value = oldData.snapshotURL;
+        } else {
+            document.querySelector("#update-archive-div").removeAttribute("hidden");
+            document.getElementById("update-snapshotURL").value = "";
+        }
+        oldData.thumbURL
+            ? document.getElementById("update-thumbURL").value = oldData.thumbURL
+            : document.getElementById("update-thumbURL").value = "";
     }
     showUpdateDialog();
 };
@@ -78,14 +85,24 @@ const updateEntry = async () => {
         note: document.querySelector("#update-note").value,
         keywords: document.querySelector("#update-keywords").value,
         category: document.querySelector("#update-category").value,
-        archive: document.getElementById("update-archive").checked ? true : false
+        archive: document.getElementById("update-archive").checked ? true : false,
+        thumbURL: document.getElementById("update-thumbURL").value
     };
 
-    if (newDataJSON.archive) {
+    const updateSnapshotURL = document.getElementById("update-snapshotURL");
+
+    if (updateSnapshotURL.value != "") {
+        newDataJSON.archive = true;
+        newDataJSON.snapshotURL = updateSnapshotURL.value;
         document.querySelector("#update-archive-warn").removeAttribute("hidden");
+    } else if (updateSnapshotURL.value === "") {
+        newDataJSON.archive = false;
     } else if (!newDataJSON.archive && oldData.archive) {
         newDataJSON.archive = true;
         newDataJSON.snapshotURL = oldData.snapshotURL;
+        document.querySelector("#update-archive-warn").removeAttribute("hidden");
+    } else {
+        document.querySelector("#update-archive-warn").removeAttribute("hidden");
     }
 
     const updateButton = document.getElementById("button-update-req");
@@ -337,6 +354,13 @@ const adjustTextarea = (tar) => {
 // const gridChildren = document.querySelectorAll(".grid-child");
 // gridChildren.forEach(el => observer.observe(el));
 */
+
+const toggleMoreOptions = () => {
+    const updateMoreOptions = document.querySelectorAll(".update-more-options");
+    updateMoreOptions.forEach((updateOption) => {
+        updateOption.hidden = !updateOption.hidden;
+    });
+};
 
 window.onload = () => {
     root = new URL(location.href).origin;

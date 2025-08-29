@@ -1,7 +1,6 @@
 package db
 
 import (
-    "database/sql"
     "fmt"
     "os"
     "path/filepath"
@@ -46,25 +45,19 @@ func appendBookmarks(b *[]setup.Bookmark, info setup.Bookmark, modified time.Tim
     })
 }
 
-func saveThumbLocally(execResult sql.Result, thumbURL string) {
-    id, err := execResult.LastInsertId()
-    if err != nil {
-        logger.Warn.Println("could not get last insert ID. ERROR:", err)
-        return
-    }
-
+func saveThumbLocally(id int64, thumbURL string) {
     if thumbURL != "" {
         err := thumb_url.DownThumb(id, thumbURL)
         if err != nil {
-            logger.Warn.Println("could not save thumbnail locally. ERROR:", err)
+            logger.Warn.Println("could not save thumbnail locally:", err)
             return
         }
     }
 }
 
-func removeThumbLocally(id int) {
-    err := os.Remove(filepath.Join(constants.THUMBNAILS_PATH, strconv.Itoa(id)))
+func removeThumbLocally(id int64) {
+    err := os.Remove(filepath.Join(constants.THUMBNAILS_PATH, strconv.FormatInt(id, 10)))
     if err != nil {
-        logger.Warn.Printf("could not remove thumbnail locally from %s for ID %d. ERROR: %v", constants.THUMBNAILS_PATH, id, err)
+        logger.Warn.Printf("could not remove thumbnail locally from %s for ID %d: %v", constants.THUMBNAILS_PATH, id, err)
     }
 }

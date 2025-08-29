@@ -42,7 +42,7 @@ func sanitizeRecents(database *sql.DB) {
     }
 }
 
-func AddToRecents(database *sql.DB, bkmID int) {
+func AddToRecents(database *sql.DB, bkmID int64) {
     // Clean up recents table of extra rows 5 out of 100 times AddToRecents is called.
     // This function will be called quite often, but it is not necessary to remove
     // extra rows on every call. That will have noticeable degradation in performance.

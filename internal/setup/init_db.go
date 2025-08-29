@@ -4,12 +4,13 @@ import (
     "database/sql"
     "log"
     "path/filepath"
+    "fmt"
 
     "dalennod/internal/constants"
 )
 
 type Bookmark struct {
-    ID          int    `json:"id"`
+    ID          int64  `json:"id"`
     URL         string `json:"url"`
     Title       string `json:"title"`
     Note        string `json:"note"`
@@ -18,18 +19,20 @@ type Bookmark struct {
     Archived    bool   `json:"archive"`
     SnapshotURL string `json:"snapshotURL"`
     ThumbURL    string `json:"thumbURL"`
-    Modified string `json:"modified"`
+    Modified    string `json:"modified"`
 }
 
 type RecentInteractions struct {
     Bookmarks    []Bookmark `json:"bookmarks"`
-    ID           int        `json:"id"`
-    BookmarkID   int        `json:"bookmarkID"`
+    ID           int64      `json:"id"`
+    BookmarkID   int64      `json:"bookmarkID"`
     LastAccessed string     `json:"lastAccessed"`
 }
 
 func CreateDB(dbSavePath string) *sql.DB {
-    db, err := sql.Open("sqlite3", filepath.Join(dbSavePath, constants.DB_FILENAME)) // For CGo driver
+    dbWithConnStrings := fmt.Sprintf("%s?_foreign_keys=true", filepath.Join(dbSavePath, constants.DB_FILENAME))
+    db, err := sql.Open("sqlite3", dbWithConnStrings) // For CGo driver
+    // db, err := sql.Open("sqlite3", filepath.Join(dbSavePath, constants.DB_FILENAME)) // For CGo driver
     // db, err := sql.Open("sqlite", filepath.Join(dbSavePath, constants.DB_FILENAME)) // For CGo-free driver
     if err != nil {
         log.Fatalln("error opening database. ERROR:", err)

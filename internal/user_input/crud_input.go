@@ -102,7 +102,7 @@ func updateInput(updateID string) {
         scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
     )
 
-    idToINT, err := strconv.Atoi(updateID)
+    idToINT, err := strconv.ParseInt(updateID, 10, 64)
     if err != nil {
         fmt.Println("Invalid input")
         logger.Error.Println("error: invalid input on update")
@@ -140,7 +140,7 @@ func removeInput(removeID string) {
         scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
     )
 
-    idToINT, err := strconv.Atoi(removeID)
+    idToINT, err := strconv.ParseInt(removeID, 10, 64)
     if err != nil {
         logger.Error.Println("Invalid input")
         return
@@ -171,7 +171,7 @@ func removeInput(removeID string) {
 }
 
 func viewInput(viewID string) {
-    idToINT, err := strconv.Atoi(viewID)
+    idToINT, err := strconv.ParseInt(viewID, 10, 64)
     if err != nil {
         logger.Error.Println("Invalid input")
         return

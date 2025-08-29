@@ -21,7 +21,7 @@ func internalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
 
 func rowHandler(w http.ResponseWriter, r *http.Request) {
     if r.Method == http.MethodGet {
-        matchId, err := strconv.Atoi(r.PathValue("id"))
+        matchId, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
         if err != nil || matchId < 1 {
             http.NotFound(w, r)
             return
@@ -81,7 +81,7 @@ func refetchThumbnailHandler(w http.ResponseWriter, r *http.Request) {
     w.Header().Set("Access-Control-Allow-Origin", "*")
     w.Header().Set("Access-Control-Allow-Methods", "*")
     if r.Method == http.MethodGet {
-        matchId, err := strconv.Atoi(r.PathValue("id"))
+        matchId, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
         if err != nil || matchId < 1 {
             http.NotFound(w, r)
             return
@@ -95,7 +95,7 @@ func refetchThumbnailHandler(w http.ResponseWriter, r *http.Request) {
         w.WriteHeader(http.StatusOK)
         w.Write([]byte("Thumbnail updated"))
     } else if r.Method == http.MethodPost {
-        matchId, err := strconv.Atoi(r.PathValue("id"))
+        matchId, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
         if err != nil || matchId < 1 {
             http.NotFound(w, r)
             logger.Error.Println("incorrect bookmark id. ERROR:", err)
