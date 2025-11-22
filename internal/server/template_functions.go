@@ -1,41 +1,41 @@
 package server
 
 import (
-    "fmt"
-    "regexp"
-    "html/template"
+	"fmt"
+	"html/template"
+	"regexp"
 
-    "dalennod/internal/constants"
+	"dalennod/internal/constants"
 )
 
 func getHostname(input string) string {
-    // hostnamePattern := regexp.MustCompile(`(?i)(?:(?:https?|ftp):\/\/)?(?:www\.)?(?:[a-z0-9]([-a-z0-9]*[a-z0-9])?\.)+[a-z]{2,63}`)
-    hostnamePattern := regexp.MustCompile(`^(?:http(?:s?):\/\/(?:www\.)?)?([A-Za-z0-9_:.-]+)\/?`) // Will match localhost and ports too
-    matches := hostnamePattern.FindAllString(input, -1)
-    if len(matches) == 0 {
-        return ""
-    }
-    return matches[0]
+	// hostnamePattern := regexp.MustCompile(`(?i)(?:(?:https?|ftp):\/\/)?(?:www\.)?(?:[a-z0-9]([-a-z0-9]*[a-z0-9])?\.)+[a-z]{2,63}`)
+	hostnamePattern := regexp.MustCompile(`^(?:http(?:s?):\/\/(?:www\.)?)?([A-Za-z0-9_:.-]+)\/?`) // Will match localhost and ports too
+	matches := hostnamePattern.FindAllString(input, -1)
+	if len(matches) == 0 {
+		return ""
+	}
+	return matches[0]
 }
 
 func webUIAddress() string {
-    if constants.WEBUI_ADDR[0] == 58 { // ':'
-        return "http://localhost" + constants.WEBUI_ADDR
-    } else {
-        return "http://%s\n" + constants.WEBUI_ADDR
-    }
+	if constants.WEBUI_ADDR[0] == 58 { // ':'
+		return "http://localhost" + constants.WEBUI_ADDR
+	} else {
+		return "http://%s\n" + constants.WEBUI_ADDR
+	}
 }
 
 func keywordSplit(keywords string, delimiter string) []string {
-    // return strings.Split(keywords, delimiter)
-    re := regexp.MustCompile(`\s*,\s*`) // To accomplish whitespace trimming without additional loops
-    return re.Split(keywords, -1)
+	// return strings.Split(keywords, delimiter)
+	re := regexp.MustCompile(`\s*,\s*`) // To accomplish whitespace trimming without additional loops
+	return re.Split(keywords, -1)
 }
 
 func grabThumbnail(id int64) string {
-    return fmt.Sprintf("http://localhost%s/thumbnail/%d", constants.SECONDARY_PORT, id)
+	return fmt.Sprintf("http://localhost%s/thumbnail/%d", constants.SECONDARY_PORT, id)
 }
 
 func encapsulateURL(bkmURL string) template.URL {
-    return template.URL(bkmURL)
+	return template.URL(bkmURL)
 }
