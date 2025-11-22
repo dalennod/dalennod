@@ -69,16 +69,20 @@
     {{ else }}
     <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" /></a>
     {{ end }}
-  </div>
-  <div class="center-text pad-like-p">
-    {{ $hostname := getHostname .URL }}
-    <form action="/" method="get">
-      <input hidden name="search-type" value="hostname" />
-      <input hidden name="search-term" value="{{ $hostname }}" />
-      <button type="submit" class="button-hostname bkm-hostname" title="Search host: '{{ $hostname }}'" tabindex="-1">{{ $hostname }}</button>
-    </form>
+    <div class="id-modified pad-like-p">
+        <a href="/api/row/{{ .ID }}" target="_blank" title="Bookmark no. {{ .ID }}">[{{ .ID }}]</a>
+        <span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span>
+    </div>
   </div>
   <div class="bkm-info">
+    <div class="bkm-hostname">
+        {{ $hostname := getHostname .URL }}
+        <form action="/" method="get">
+            <input hidden name="search-type" value="hostname" />
+            <input hidden name="search-term" value="{{ $hostname }}" />
+            <button type="submit" class="button-hostname bkm-hostname" title="Search host: '{{ $hostname }}'" tabindex="-1">{{ $hostname }}</button>
+        </form>
+    </div>
     <div class="bkm-title pad-like-p">
       {{ if .Title }}
       <a href="{{ encapsulateURL .URL }}" target="_blank">{{ .Title }}</a>
@@ -95,7 +99,7 @@
     {{ if .Keywords }}
     {{ $keywords := keywordSplit .Keywords "," }}
     {{ range $_, $keyword := $keywords}}
-    <div class="bkm-keywords">
+    <div class="bkm-keywords pad-like-p">
       <form action="/" method="get">
         <input hidden name="search-type" value="keyword" />
         <input hidden name="search-term" value="{{ $keyword }}" />
@@ -104,21 +108,17 @@
     </div>
     {{ end }}
     {{ end }}
-  </div>
-  {{ if .Category }}
-  <div class="bkm-category">
-    <form action="/" method="get">
-      <input hidden name="search-type" value="category" />
-      <input hidden name="search-term" value="{{ .Category }}" />
-      <button class="button-svg" type="submit" title="Search category: '{{ .Category }}'"><span id="category" class="category">{{ .Category }}</span></button>
-    </form>
-  </div>
-  {{ end }}
-  <div class="footer-grid-child">
-    <div class="id-modified">
-      <a href="/api/row/{{ .ID }}" target="_blank" title="Bookmark no. {{ .ID }}">[{{ .ID }}]</a>
-      <span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span>
+    {{ if .Category }}
+    <div class="bkm-category pad-like-p">
+        <form action="/" method="get">
+        <input hidden name="search-type" value="category" />
+        <input hidden name="search-term" value="{{ .Category }}" />
+        <button class="button-svg" type="submit" title="Search category: '{{ .Category }}'"><span id="category" class="category">{{ .Category }}</span></button>
+        </form>
     </div>
+    {{ end }}
+  </div>
+  <div class="footer-grid-child">
     <div class="footer-buttons">
       <button class="button-svg" id="button-update" title="Update" onclick="getOldData(this);"><img class="svg-img" src="static/imgs/update_button.svg" alt="Update button" /></button>
       <button class="button-svg" id="button-delete" title="Delete" ondblclick="deleteEntry(this);"><img class="svg-img" src="static/imgs/delete_button.svg" alt="Delete button" /></button>
