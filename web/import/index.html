@@ -1,47 +1,40 @@
 {{ block "import" . }}
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html>
+
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" href="../static/imgs/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="../static/css/styles.css" />
     <script src="../static/js/import.js" type="text/javascript" defer></script>
     <script src="../static/js/theme-mode.js" type="text/javascript" defer></script>
     <title>Import // Dalennod</title>
-  </head>
+</head>
 
-  <body>
+<body>
     <nav>
-      <div class="nav-left">
-        <button class="button-svg" id="home-button" title="Root page" onclick="homeButton();">
-          <img class="svg-img" src="../static/imgs/home-button.svg" alt="Home button" />
-        </button>
-      </div>
-      <div class="nav-right">
-        <button class="button-svg" title="Light/Dark Mode" onclick="modeToggle();">
-          <img class="svg-img" src="../static/imgs/mode-toggle.svg" alt="Mode toggle">
-        </button>
-      </div>
+        <div class="nav-left"><button class="button-svg" id="home-button" title="Root page" onclick="homeButton();"><img class="svg-img" src="../static/imgs/home-button.svg" alt="Home button" /></button></div>
+        <div class="nav-right"><button class="button-svg" title="Light/Dark Mode" onclick="modeToggle();"><img class="svg-img" src="../static/imgs/mode-toggle.svg" alt="Mode toggle"></button></div>
     </nav>
-    <div style="padding: 20px">
-      <h2>Browser the bookmarks are being imported from:</h2>
-      <form id="browserForm">
-        <input type="radio" id="firefox" name="browser" value="Firefox" checked />
-        <label for="firefox">Firefox</label><br />
-        <input type="radio" id="chromium" name="browser" value="Chromium" />
-        <label for="chromium">Chromium</label><br />
-      </form>
-    </div>
-
-    <div class="container">
-      <form method="post" enctype="multipart/form-data">
-        <div id="dropArea" class="drop-area">
-          <input type="file" id="fileInput" name="fileInput" accept=".json" />
+    <div class="import-main">
+        <div>
+            <h2>Browser the bookmarks are being imported from:</h2>
+            <form id="browserForm">
+                <input type="radio" id="firefox" name="browser" value="Firefox" checked />
+                <label for="firefox">Firefox</label><br />
+                <input type="radio" id="chromium" name="browser" value="Chromium" />
+                <label for="chromium">Chromium</label><br />
+            </form>
         </div>
-      </form>
-      <h2>Import log:</h2>
-      <textarea id="logTextArea" class="logTextArea" readonly></textarea>
+        <div class="import-container">
+            <form method="post" enctype="multipart/form-data">
+                <div id="dropArea" class="drop-area"><input type="file" id="fileInput" name="fileInput" accept=".json" /></div>
+            </form>
+            <h2>Import log:</h2>
+            <textarea id="logTextArea" class="logTextArea" readonly></textarea>
+        </div>
     </div>
-  </body>
+</body>
+
 </html>
 {{ end }}

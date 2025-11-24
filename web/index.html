@@ -37,7 +37,7 @@
         </div>
     </main>
 
-    <footer class="pagination center-text">
+    <footer class="pagination center-text" id="pagination">
         <a id="root-first-page" href="/" title="Root page">&lt;&lt;</a><a id="prev-page" title="Previous page">&lt;</a><span id="pagination-numbers"></span><a id="next-page" title="Next page">&gt;</a><a id="last-page" title="Last page">&gt;&gt;</a>
     </footer>
 
@@ -110,7 +110,7 @@
     </div>
 </div>
 {{ end }} {{ define "dialogs" }}
-<dialog class="dialog-search">
+<dialog class="dialog-search" id="dialog-search">
     <div id="dialog-search-div">
         <form id="search-form" action="/" method="get">
         <label for="general-search-term" class="label-input">
@@ -124,7 +124,7 @@
     </div>
 </dialog>
 
-<dialog class="dialog-create">
+<dialog class="dialog-create" id="dialog-create">
     <div class="dialog-top">
         <span class="dialog-type">Create a new bookmark</span>
         <button onclick="closeCreateDialog();" class="button-svg" id="button-close" title="Close modal">
@@ -171,7 +171,7 @@
         <div class="pad-like-p">
             Archive?:
             <input type="checkbox" name="create-archive" id="create-archive" title="Check to archive" onclick="archiveCheckbox()" />
-            <label for="create-archive" class="create-archive-label" title="Check to archive">No</label>
+            <label for="create-archive" id="create-archive-label" title="Check to archive">No</label>
         </div>
         <p class="red-text">* required</p>
         <div class="center-text pad-like-p">
@@ -182,7 +182,7 @@
     </div>
 </dialog>
 
-<dialog class="dialog-update">
+<dialog class="dialog-update" id="dialog-update">
     <div class="dialog-top">
         <span class="dialog-type">Update a bookmark</span>
         <button onclick="closeUpdateDialog();" class="button-svg" id="button-close" title="Close modal">
@@ -230,7 +230,7 @@
         <div class="pad-like-p" id="update-archive-div">
             Archive?:
             <input type="checkbox" name="update-archive" id="update-archive" title="Check to archive" onclick="archiveCheckbox()" />
-            <label for="update-archive" class="update-archive-label" title="Check to archive">No</label>
+            <label for="update-archive" id="update-archive-label" title="Check to archive">No</label>
         </div>
         <div class="pad-like-p update-more-options" id="update-snapshotURL-div" hidden>
             <label for="update-snapshotURL" class="label-input">

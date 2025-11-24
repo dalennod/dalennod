@@ -37,15 +37,25 @@ dialog,
 
 /* Specficially for /import/ index.html */
 
-.container {
+.import-main {
+    background-color: rgb(var(--foreground));
+    width: 70%;
+    margin: 10px auto;
+    border-radius: 10px;
     padding: 20px;
-    width: 50%;
+}
+
+.import-main>div {
+    padding: 20px;
+}
+
+.import-container {
     text-align: center;
 }
 
 .drop-area {
     border: 2px dashed rgb(var(--global-border-color));
-    border-radius: 1%;
+    border-radius: 10px;
     padding: 20px;
 }
 
@@ -250,15 +260,7 @@ main {
     flex-direction: row;
     border-radius: 5px;
     margin-bottom: inherit;
-    /* opacity: 0; */
-    /* transition: 0.5s ease; */
 }
-
-/* CSS below for .show class and code above for opacity & transition is for the IntersectionObserver. */
-/* Currently not enabled. */
-/*.show {
-    opacity: 1;
-}*/
 
 .grid-child a {
     text-decoration: none;

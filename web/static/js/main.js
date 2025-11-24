@@ -18,28 +18,28 @@ const categoriesOptions = async () => {
 };
 
 const showCreateDialog = async () => {
-    document.querySelector(".dialog-create").showModal();
+    document.getElementById("dialog-create").showModal();
     const noteTextArea = document.getElementById("create-note");
     adjustTextarea(noteTextArea);
 
     const bookmarkCreateDatalist = document.getElementById("categories-list-create");
     bookmarkCreateDatalist.innerHTML = await categoriesOptions();
 };
-const closeCreateDialog = () => document.querySelector(".dialog-create").close();
-document.querySelector(".dialog-create").addEventListener("close", () => {
+const closeCreateDialog = () => document.getElementById("dialog-create").close();
+document.getElementById("dialog-create").addEventListener("close", () => {
     location.href = root;
 });
 
 const showUpdateDialog = async () => {
-    document.querySelector(".dialog-update").showModal();
+    document.getElementById("dialog-update").showModal();
     const noteTextArea = document.getElementById("update-note");
     adjustTextarea(noteTextArea);
 
     const bookmarkUpdateDatalist = document.getElementById("categories-list-update");
     bookmarkUpdateDatalist.innerHTML = await categoriesOptions();
 };
-const closeUpdateDialog = () => document.querySelector(".dialog-update").close();
-document.querySelector(".dialog-update").addEventListener("close", () => {
+const closeUpdateDialog = () => document.getElementById("dialog-update").close();
+document.getElementById("dialog-update").addEventListener("close", () => {
     location.reload();
 });
 
@@ -58,17 +58,17 @@ let oldData = "";
 const setOldData = () => {
     if (typeof Storage !== "undefined") {
         oldData = JSON.parse(localStorage.getItem("oldData"));
-        document.querySelector("#bkm-id").innerText = oldData.id;
-        document.querySelector("#update-url").value = oldData.url;
-        document.querySelector("#update-title").value = oldData.title;
-        document.querySelector("#update-note").value = oldData.note;
-        document.querySelector("#update-keywords").value = oldData.keywords;
-        document.querySelector("#update-category").value = oldData.category;
+        document.getElementById("bkm-id").innerText = oldData.id;
+        document.getElementById("update-url").value = oldData.url;
+        document.getElementById("update-title").value = oldData.title;
+        document.getElementById("update-note").value = oldData.note;
+        document.getElementById("update-keywords").value = oldData.keywords;
+        document.getElementById("update-category").value = oldData.category;
         if (oldData.archive) {
-            document.querySelector("#update-archive-div").setAttribute("hidden", "")
+            document.getElementById("update-archive-div").setAttribute("hidden", "")
             document.getElementById("update-snapshotURL").value = oldData.snapshotURL;
         } else {
-            document.querySelector("#update-archive-div").removeAttribute("hidden");
+            document.getElementById("update-archive-div").removeAttribute("hidden");
             document.getElementById("update-snapshotURL").value = "";
         }
         oldData.thumbURL
@@ -80,11 +80,11 @@ const setOldData = () => {
 
 const updateEntry = async () => {
     const newDataJSON = {
-        url: document.querySelector("#update-url").value,
-        title: document.querySelector("#update-title").value,
-        note: document.querySelector("#update-note").value,
-        keywords: document.querySelector("#update-keywords").value,
-        category: document.querySelector("#update-category").value,
+        url: document.getElementById("update-url").value,
+        title: document.getElementById("update-title").value,
+        note: document.getElementById("update-note").value,
+        keywords: document.getElementById("update-keywords").value,
+        category: document.getElementById("update-category").value,
         archive: document.getElementById("update-archive").checked ? true : false,
         thumbURL: document.getElementById("update-thumbURL").value
     };
@@ -94,21 +94,21 @@ const updateEntry = async () => {
     if (updateSnapshotURL.value != "") {
         newDataJSON.archive = true;
         newDataJSON.snapshotURL = updateSnapshotURL.value;
-        document.querySelector("#update-archive-warn").removeAttribute("hidden");
+        document.getElementById("update-archive-warn").removeAttribute("hidden");
     } else if (updateSnapshotURL.value === "") {
         newDataJSON.archive = false;
     } else if (!newDataJSON.archive && oldData.archive) {
         newDataJSON.archive = true;
         newDataJSON.snapshotURL = oldData.snapshotURL;
-        document.querySelector("#update-archive-warn").removeAttribute("hidden");
+        document.getElementById("update-archive-warn").removeAttribute("hidden");
     } else {
-        document.querySelector("#update-archive-warn").removeAttribute("hidden");
+        document.getElementById("update-archive-warn").removeAttribute("hidden");
     }
 
     const updateButton = document.getElementById("button-update-req");
     updateButton.disabled = true;
 
-    const dataID = document.querySelector("#bkm-id").innerText;
+    const dataID = document.getElementById("bkm-id").innerText;
     const fetchURL = API + "update/" + dataID;
     const res = await fetch(fetchURL, {
         method: "POST",
@@ -120,24 +120,24 @@ const updateEntry = async () => {
 
     if (res.ok) {
         updateButton.disabled = false;
-        document.querySelector("#update-archive-warn").setAttribute("hidden", "");
-        document.querySelector("#update-checkmark").removeAttribute("hidden");
-        setTimeout(() => document.querySelector("#update-checkmark").setAttribute("hidden", ""), 1000);
+        document.getElementById("update-archive-warn").setAttribute("hidden", "");
+        document.getElementById("update-checkmark").removeAttribute("hidden");
+        setTimeout(() => document.getElementById("update-checkmark").setAttribute("hidden", ""), 1000);
     }
 };
 
 const addEntry = async () => {
-    if (document.querySelector("#create-url").value === "") {
+    if (document.getElementById("create-url").value === "") {
         alert("ERROR: an URL is required");
         return;
     }
 
     const dataJSON = {
-        url: document.querySelector("#create-url").value,
-        title: document.querySelector("#create-title").value,
-        note: document.querySelector("#create-note").value,
-        keywords: document.querySelector("#create-keywords").value,
-        category: document.querySelector("#create-category").value,
+        url: document.getElementById("create-url").value,
+        title: document.getElementById("create-title").value,
+        note: document.getElementById("create-note").value,
+        keywords: document.getElementById("create-keywords").value,
+        category: document.getElementById("create-category").value,
         archive: document.getElementById("create-archive").checked ? true : false,
     };
 
@@ -158,9 +158,9 @@ const addEntry = async () => {
     if (res.ok) {
         clearInputs();
         addButton.disabled = false;
-        document.querySelector("#create-archive-warn").setAttribute("hidden", "");
-        document.querySelector("#create-checkmark").removeAttribute("hidden");
-        setTimeout(() => document.querySelector("#create-checkmark").setAttribute("hidden", ""), 1000);
+        document.getElementById("create-archive-warn").setAttribute("hidden", "");
+        document.getElementById("create-checkmark").removeAttribute("hidden");
+        setTimeout(() => document.getElementById("create-checkmark").setAttribute("hidden", ""), 1000);
     }
 };
 
@@ -177,9 +177,9 @@ const deleteEntry = async (element) => {
 
 const archiveCheckbox = () => {
     const createArchive = document.getElementById("create-archive");
-    const createArchiveLabel = document.querySelector(".create-archive-label");
+    const createArchiveLabel = document.getElementById("create-archive-label");
     const updateArchive = document.getElementById("update-archive");
-    const updateArchiveLabel = document.querySelector(".update-archive-label");
+    const updateArchiveLabel = document.getElementById("update-archive-label");
     createArchive.checked ? createArchiveLabel.innerText = "Yes" : createArchiveLabel.innerText = "No";
     updateArchive.checked ? updateArchiveLabel.innerText = "Yes" : updateArchiveLabel.innerText = "No";
 };
@@ -251,7 +251,7 @@ const updatePagination = async () => {
     updateNavATags(currentPage, totalPages, hrefParams);
 
     if (totalPages <= 0) {
-        const paginationFooter = document.querySelector(".pagination");
+        const paginationFooter = document.getElementById("pagination");
         paginationFooter.hidden = true;
         return;
     }
@@ -271,10 +271,10 @@ const updatePagination = async () => {
 };
 
 const openSearchDialog = () => {
-    document.querySelector(".dialog-search").showModal();
+    document.getElementById("dialog-search").showModal();
 
-    document.querySelector(".dialog-search").addEventListener("click", () => {
-        document.querySelector(".dialog-search").close();
+    document.getElementById("dialog-search").addEventListener("click", () => {
+        document.getElementById("dialog-search").close();
     });
 
     document.getElementById("dialog-search-div").addEventListener("click", (event) => {
@@ -287,7 +287,7 @@ const openSearchDialog = () => {
     const openPrefix = "o ";
     document.getElementById("general-search-term").addEventListener("keydown", async (event) => {
         if (event.key === "Enter") {
-            document.querySelector(".dialog-search").close();
+            document.getElementById("dialog-search").close();
             const searchContent = document.getElementById("general-search-term").value;
             if (searchContent.startsWith("::import")) {
                 document.getElementById("search-button").disabled = true;
@@ -316,9 +316,9 @@ const openSearchDialog = () => {
 };
 
 document.addEventListener("keydown", (event) => {
-    if (document.querySelector(".dialog-create").open ||
-        document.querySelector(".dialog-update").open ||
-        document.querySelector(".dialog-search").open ||
+    if (document.getElementById("dialog-create").open ||
+        document.getElementById("dialog-update").open ||
+        document.getElementById("dialog-search").open ||
         event.ctrlKey || event.altKey || event.metaKey) {
         return;
     }
@@ -340,20 +340,6 @@ const adjustTextarea = (tar) => {
             : tar.style.height = tar.scrollHeight + "px";
     });
 };
-
-/*
-// const observer = new IntersectionObserver((entries) => {
-//     entries.forEach((entry) => {
-//         if (entry.isIntersecting) {
-//             entry.target.classList.add("show");
-//         } else {
-//             entry.target.classList.remove("show");
-//         }
-//     })
-// }, {});
-// const gridChildren = document.querySelectorAll(".grid-child");
-// gridChildren.forEach(el => observer.observe(el));
-*/
 
 const toggleMoreOptions = () => {
     const updateMoreOptions = document.querySelectorAll(".update-more-options");
