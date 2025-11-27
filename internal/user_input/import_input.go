@@ -3,14 +3,15 @@ package user_input
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"encoding/json"
+	"fmt"
+	"log"
+	"os"
+
 	"dalennod/internal/backup"
 	"dalennod/internal/bookmark_import"
 	"dalennod/internal/db"
-	"dalennod/internal/logger"
 	"dalennod/internal/setup"
-	"encoding/json"
-	"fmt"
-	"os"
 )
 
 func importDalennodInput(file string) {
@@ -19,24 +20,21 @@ func importDalennodInput(file string) {
 	if setup.FlagVals.Crypt {
 		fContent, err = os.ReadFile(file)
 		if err != nil {
-			fmt.Println("error reading file. ERROR:", err)
-			logger.Error.Fatalln("error reading file. ERROR:", err)
+			log.Fatalln("ERROR: reading import file:", err)
 		}
 		key := backup.GetKey()
 		fContent = decryptAES(fContent, key)
 	} else {
 		fContent, err = os.ReadFile(file)
 		if err != nil {
-			fmt.Println("error reading file. ERROR:", err)
-			logger.Error.Fatalln("error reading file. ERROR:", err)
+			log.Fatalln("ERROR: reading import file:", err)
 		}
 	}
 
 	var importedBookmarks []setup.Bookmark
 	err = json.Unmarshal(fContent, &importedBookmarks)
 	if err != nil {
-		fmt.Println("error with json unmarshal. ERROR:", err)
-		logger.Error.Fatalln("error with json unmarshal. ERROR:", err)
+		log.Fatalln("ERROR: failed to unmarshal:", err)
 	}
 	importedBookmarksCount := len(importedBookmarks)
 	for i, importedData := range importedBookmarks {
@@ -49,13 +47,11 @@ func importDalennodInput(file string) {
 func decryptAES(data, key []byte) []byte {
 	cipherBlock, err := aes.NewCipher(key)
 	if err != nil {
-		fmt.Println("error getting cipher block. ERROR:", err)
-		logger.Error.Fatalln("error getting cipher block. ERROR:", err)
+		log.Fatalln("ERROR: could not get cipher block:", err)
 	}
 
 	if len(data) < aes.BlockSize {
-		fmt.Println("ERROR: cipher text too short")
-		logger.Error.Fatalln("cipher text too short to import")
+		log.Fatalln("ERROR: cipher text too short")
 	}
 
 	iv := data[:aes.BlockSize]
@@ -69,14 +65,12 @@ func decryptAES(data, key []byte) []byte {
 func importFirefoxInput(file string) {
 	readFile, err := os.Open(file)
 	if err != nil {
-		logger.Error.Printf("couldn't open file. ERROR: %v", err)
+		log.Printf("couldn't open file. ERROR: %v\n", err)
 	}
 
 	firefoxBookmarks := &bookmark_import.Item{}
 	if err := json.NewDecoder(readFile).Decode(firefoxBookmarks); err != nil {
-		logger.Error.Println(err)
-		fmt.Println(err)
-		return
+		log.Fatalln("ERROR: failed to decode input file:", err)
 	}
 
 	parsedBookmarks := bookmark_import.ParseFirefox(firefoxBookmarks, "")
@@ -92,13 +86,12 @@ func importFirefoxInput(file string) {
 func importChromiumInput(file string) {
 	readFile, err := os.Open(file)
 	if err != nil {
-		logger.Error.Printf("couldn't open file. ERROR: %v", err)
+		log.Println("ERROR: could not open file:", err)
 	}
 
 	var chromiumBookmarks bookmark_import.ChromiumItem
 	if err := json.NewDecoder(readFile).Decode(&chromiumBookmarks); err != nil {
-		logger.Error.Println(err)
-		fmt.Println(err)
+		log.Fatalln("ERROR: failed to decode input file:", err)
 		return
 	}
 

@@ -1,18 +1,22 @@
 package user_input
 
 import (
+	"bufio"
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 
+	"dalennod/internal/archive"
 	"dalennod/internal/backup"
 	"dalennod/internal/constants"
 	"dalennod/internal/db"
 	"dalennod/internal/server"
 	"dalennod/internal/setup"
+	"dalennod/internal/thumb_url"
 )
 
 var database *sql.DB
@@ -104,10 +108,6 @@ func switchProfile(profileName string) {
 	}
 
 	currentProfileDir := constants.CONFIG_PATH
-	if err != nil {
-		fmt.Println("error getting current profile directory. ERROR:", err)
-		return
-	}
 
 	var userInput string
 	fmt.Printf("Final rename will be \"%s.{your_input}\"\nRename current profile to: ", constants.NAME)
@@ -133,7 +133,6 @@ func switchProfile(profileName string) {
 
 func whereConfigLog() {
 	fmt.Printf("Database and config directory: %s\n", constants.CONFIG_PATH)
-	fmt.Printf("Error logs directory: %s\n", constants.LOGS_PATH)
 }
 
 func applyDBUpdates(database *sql.DB) {
@@ -167,5 +166,184 @@ func applyDBUpdates(database *sql.DB) {
 		fmt.Println("error running 'VACUUM;' to rebuild database file & reduce database size")
 		fmt.Println("does not need manual intervention, but recommended")
 		return
+	}
+}
+
+func addInput(bkmStruct setup.Bookmark, callToUpdate bool) {
+	var archiveUrl string
+	bkmStruct, archiveUrl = getBKMInfo(bkmStruct)
+
+	if !callToUpdate {
+		addBKM(bkmStruct, archiveUrl)
+	} else {
+		updateBKM(bkmStruct, archiveUrl)
+	}
+}
+
+func getBKMInfo(bkmStruct setup.Bookmark) (setup.Bookmark, string) {
+	var scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
+	var err error
+
+	fmt.Print("URL to save: ")
+	scanner.Scan()
+	bkmStruct.URL = scanner.Text()
+
+	bkmStruct.ThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
+	if err != nil {
+		bkmStruct.ThumbURL = bkmStruct.URL
+	}
+
+	fmt.Print("Title for the bookmark: ")
+	scanner.Scan()
+	bkmStruct.Title = scanner.Text()
+
+	fmt.Print("Notes/log reason for bookmark: ")
+	scanner.Scan()
+	bkmStruct.Note = scanner.Text()
+
+	fmt.Print("Keywords for searching later: ")
+	scanner.Scan()
+	bkmStruct.Keywords = scanner.Text()
+
+	fmt.Print("Category to store the bookmark into: ")
+	scanner.Scan()
+	bkmStruct.Category = scanner.Text()
+
+	fmt.Print("Archive URL? (y/N): ")
+	scanner.Scan()
+	var archiveUrl string = scanner.Text()
+
+	return bkmStruct, archiveUrl
+}
+
+func updateBKM(bkmStruct setup.Bookmark, archiveUrl string) {
+	switch archiveUrl {
+	case "y", "Y":
+		bkmStruct.Archived, bkmStruct.SnapshotURL = archive.SendSnapshot(bkmStruct.URL)
+		if bkmStruct.Archived {
+			db.Update(database, bkmStruct, false)
+		} else {
+			log.Println("WARN: snapshot failed")
+			db.Update(database, bkmStruct, false)
+		}
+	case "n", "N", "":
+		db.Update(database, bkmStruct, false)
+	default:
+		db.Update(database, bkmStruct, false)
+		log.Println("WARN: invalid input for archive request. URL has not been archived. got input:", archiveUrl)
+	}
+}
+
+func addBKM(bkmStruct setup.Bookmark, archiveUrl string) {
+	switch archiveUrl {
+	case "y", "Y":
+		bkmStruct.Archived, bkmStruct.SnapshotURL = archive.SendSnapshot(bkmStruct.URL)
+		if bkmStruct.Archived {
+			db.Add(database, bkmStruct)
+		} else {
+			log.Println("WARN: snapshot failed")
+			db.Add(database, bkmStruct)
+		}
+	case "n", "N", "":
+		db.Add(database, bkmStruct)
+	default:
+		db.Add(database, bkmStruct)
+		log.Println("WARN: invalid input for archive request. URL has not been archived. got input:", archiveUrl)
+	}
+}
+
+func updateInput(updateID string) {
+	var (
+		confirm string
+		scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
+	)
+
+	idToINT, err := strconv.ParseInt(updateID, 10, 64)
+	if err != nil {
+		log.Println("WARN: invalid bookmark ID:", err)
+		return
+	}
+
+	bkmAtID, err := db.ViewSingleRow(database, idToINT)
+	if err != nil {
+		log.Printf("WARN: could not get record for bookmark id: %s: %v\n", updateID, err)
+		return
+	}
+	db.PrintRow(bkmAtID)
+
+	fmt.Print("Update this entry? (Y/n): ")
+	scanner.Scan()
+	confirm = scanner.Text()
+
+	switch confirm {
+	case "y", "Y", "":
+		fmt.Println("Leave empty to retain old information")
+		addInput(bkmAtID, true)
+	case "n", "N":
+		return
+	default:
+		log.Println("WARN: invalid input:", confirm)
+		return
+	}
+}
+
+func removeInput(removeID string) {
+	var (
+		confirm string
+		scanner *bufio.Scanner = bufio.NewScanner(os.Stdin)
+	)
+
+	idToINT, err := strconv.ParseInt(removeID, 10, 64)
+	if err != nil {
+		log.Println("WARN: Invalid input:", err)
+		return
+	}
+
+	bkmAtID, err := db.ViewSingleRow(database, idToINT)
+	if err != nil {
+		log.Printf("WARN: could not get record for bookmark id: %s: %v\n", removeID, err)
+		return
+	}
+	db.PrintRow(bkmAtID)
+
+	fmt.Print("Remove this entry? (Y/n): ")
+	scanner.Scan()
+	confirm = scanner.Text()
+
+	switch confirm {
+	case "y", "Y", "":
+		db.Remove(database, idToINT)
+	case "n", "N":
+		return
+	default:
+		log.Println("WARN: invalid input:", confirm)
+		return
+	}
+}
+
+func viewInput(viewID string) {
+	idToINT, err := strconv.ParseInt(viewID, 10, 64)
+	if err != nil {
+		log.Println("Invalid input")
+		return
+	}
+
+	bkmAtID, err := db.ViewSingleRow(database, idToINT)
+	if err != nil {
+		log.Printf("WARN: could not get record for bookmark id: %s: %v\n", viewID, err)
+		return
+	}
+
+	db.PrintRow(bkmAtID)
+}
+
+func viewAllInput(bookmarks []setup.Bookmark) {
+	if len(bookmarks) == 0 {
+		log.Println("WARN: database empty when trying to view all")
+		return
+	}
+
+	for _, bookmark := range bookmarks {
+		db.PrintRow(bookmark)
 	}
 }

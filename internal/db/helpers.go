@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -9,7 +10,6 @@ import (
 	"time"
 
 	"dalennod/internal/constants"
-	"dalennod/internal/logger"
 	"dalennod/internal/setup"
 	"dalennod/internal/thumb_url"
 )
@@ -49,7 +49,7 @@ func saveThumbLocally(id int64, thumbURL string) {
 	if thumbURL != "" {
 		err := thumb_url.DownThumb(id, thumbURL)
 		if err != nil {
-			logger.Warn.Println("could not save thumbnail locally:", err)
+			log.Println("WARN: could not save thumbnail locally:", err)
 			return
 		}
 	}
@@ -58,6 +58,6 @@ func saveThumbLocally(id int64, thumbURL string) {
 func removeThumbLocally(id int64) {
 	err := os.Remove(filepath.Join(constants.THUMBNAILS_PATH, strconv.FormatInt(id, 10)))
 	if err != nil {
-		logger.Warn.Printf("could not remove thumbnail locally from %s for ID %d: %v", constants.THUMBNAILS_PATH, id, err)
+		log.Printf("WARN: could not remove thumbnail locally from %s for bookmark ID %d: %v\n", constants.THUMBNAILS_PATH, id, err)
 	}
 }

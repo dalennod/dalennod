@@ -7,26 +7,22 @@ import (
 	"runtime"
 
 	"dalennod/internal/constants"
-	"dalennod/internal/logger"
 )
 
 func setupDirectories() string {
 	if _, err := configDir(); err != nil {
-		log.Fatalln("error getting config directory. ERROR:", err)
+		log.Fatalln("ERROR: getting config directory:", err)
 	}
 	databaseDir()
-	if _, err := cacheDir(); err != nil {
-		log.Fatalln("error getting logs directory. ERROR:", err)
-	}
 	thumbnailDataDir()
 
 	goos := runtime.GOOS
 	switch goos {
 	case "linux", "darwin":
-		createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH, constants.THUMBNAILS_PATH)
+		createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.THUMBNAILS_PATH)
 		defer SetCompletion()
 	case "windows":
-		createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.LOGS_PATH, constants.THUMBNAILS_PATH)
+		createDir(constants.CONFIG_PATH, constants.DB_PATH, constants.THUMBNAILS_PATH)
 	default:
 		log.Fatalln("ERROR: unrecognized OS:", goos)
 	}
@@ -38,7 +34,7 @@ func setupDirectories() string {
 
 func InitLocalDirs() string {
 	if _, err := configDir(); err != nil {
-		log.Fatalln("error getting config directory. ERROR:", err)
+		log.Fatalln("ERROR: getting config directory:", err)
 	}
 
 	databaseDir()
@@ -47,20 +43,12 @@ func InitLocalDirs() string {
 	} else {
 		readConfig, err := readCfg()
 		if err != nil {
-			log.Fatalln("error reading config. ERROR:", err)
+			log.Fatalln("ERROR: reading config:", err)
 		}
 		if readConfig.FirstRun {
 			writeCfg(false, readConfig.Host, readConfig.Port)
 		}
 	}
-
-	if _, err := cacheDir(); err != nil {
-		log.Fatalln("error getting cache directory. ERROR:", err)
-	}
-	if _, err := os.Stat(constants.LOGS_PATH); os.IsNotExist(err) {
-		setupDirectories()
-	}
-
 	thumbnailDataDir()
 	if _, err := os.Stat(constants.THUMBNAILS_PATH); os.IsNotExist(err) {
 		setupDirectories()
@@ -68,26 +56,15 @@ func InitLocalDirs() string {
 
 	readConfig, err := readCfg()
 	if err != nil {
-		log.Fatalln("error reading config. ERROR:", err)
+		log.Fatalln("ERROR: reading config:", err)
 	}
 
 	constants.WEBUI_ADDR = readConfig.Host + readConfig.Port
 	if len(constants.WEBUI_ADDR) == 0 {
-		log.Fatalf("Improper config. Expected Host and Port information. Got '%s'\n", constants.WEBUI_ADDR)
+		log.Fatalln("ERROR: Improper config. Expected Host and Port information. Got:", constants.WEBUI_ADDR)
 	}
-
-	enableLogs(readConfig.FirstRun)
 
 	return constants.DB_PATH
-}
-
-func enableLogs(firstRun bool) {
-	logger.Enable()
-
-	if firstRun {
-		logger.Info.Printf("Database and config directory: %s\n", constants.CONFIG_PATH)
-		logger.Info.Printf("Error logs directory: %s\n", constants.LOGS_PATH)
-	}
 }
 
 func configDir() (string, error) {
@@ -97,15 +74,6 @@ func configDir() (string, error) {
 	}
 	constants.CONFIG_PATH = filepath.Join(cfgDir, constants.NAME)
 	return constants.CONFIG_PATH, nil
-}
-
-func cacheDir() (string, error) {
-	cacheDir, err := os.UserCacheDir()
-	if err != nil {
-		return "", err
-	}
-	constants.LOGS_PATH = filepath.Join(cacheDir, constants.NAME, constants.LOGS_DIRNAME)
-	return constants.LOGS_PATH, nil
 }
 
 func databaseDir() string {

@@ -1,8 +1,9 @@
 package default_client
 
 import (
-	"dalennod/internal/constants"
 	"net/http"
+
+	"dalennod/internal/constants"
 )
 
 func HttpDefaultClientDo(method, url string) (*http.Response, error) {

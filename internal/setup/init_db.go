@@ -31,9 +31,7 @@ type RecentInteractions struct {
 
 func CreateDB(dbSavePath string) *sql.DB {
 	dbWithConnStrings := fmt.Sprintf("%s?_foreign_keys=true", filepath.Join(dbSavePath, constants.DB_FILENAME))
-	db, err := sql.Open("sqlite3", dbWithConnStrings) // For CGo driver
-	// db, err := sql.Open("sqlite3", filepath.Join(dbSavePath, constants.DB_FILENAME)) // For CGo driver
-	// db, err := sql.Open("sqlite", filepath.Join(dbSavePath, constants.DB_FILENAME)) // For CGo-free driver
+	db, err := sql.Open("sqlite3", dbWithConnStrings)
 	if err != nil {
 		log.Fatalln("error opening database. ERROR:", err)
 	}

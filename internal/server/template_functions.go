@@ -9,8 +9,7 @@ import (
 )
 
 func getHostname(input string) string {
-	// hostnamePattern := regexp.MustCompile(`(?i)(?:(?:https?|ftp):\/\/)?(?:www\.)?(?:[a-z0-9]([-a-z0-9]*[a-z0-9])?\.)+[a-z]{2,63}`)
-	hostnamePattern := regexp.MustCompile(`^(?:http(?:s?):\/\/(?:www\.)?)?([A-Za-z0-9_:.-]+)\/?`) // Will match localhost and ports too
+	hostnamePattern := regexp.MustCompile(`^(?:http(?:s?):\/\/(?:www\.)?)?([A-Za-z0-9_:.-]+)\/?`)
 	matches := hostnamePattern.FindAllString(input, -1)
 	if len(matches) == 0 {
 		return ""
@@ -27,7 +26,6 @@ func webUIAddress() string {
 }
 
 func keywordSplit(keywords string, delimiter string) []string {
-	// return strings.Split(keywords, delimiter)
 	re := regexp.MustCompile(`\s*,\s*`) // To accomplish whitespace trimming without additional loops
 	return re.Split(keywords, -1)
 }
