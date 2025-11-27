@@ -268,6 +268,7 @@ main {
 }
 
 .grid-child a:hover {
+    transition: ease-in 0.3s;
     text-decoration: underline;
     color: var(--accent-color);
 }
@@ -282,20 +283,27 @@ main {
     background-color: rgba(var(--background), 0.3);
 }
 
-.thumbnail-image img {
+.default-thumburl {
     object-fit: contain;
-    overflow: hidden;
     display: block;
     margin: 5px auto;
-    width: 100px;
+    width: 75px;
     height: 100%;
+}
+
+.thumburl {
+    object-fit: contain;
+    display: block;
+    margin: 5px auto;
+    width: 150px;
+    height: 100px;
 }
 
 .bkm-note {
     white-space: preserve;
     padding: 0.5rem;
     border-radius: 5px;
-    /* box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px; */
+    /*box-shadow: rgba(0, 0, 0, 0.25) 0px 4px 12px;*/
     background-color: rgba(var(--background), 0.3);
 }
 
