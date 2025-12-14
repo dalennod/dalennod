@@ -44,33 +44,28 @@ func ParseFlags() FlagValues {
 func cliFlags() {
 	flag.Usage = func() {
 		w := flag.CommandLine.Output()
-		fmt.Fprintf(w, "Usage of dalennod (%s): dalennod [OPTION] ...\n\n", constants.VERSION)
+		fmt.Fprintf(w, "Usage of %s (%s): %s [OPTION] ...\n\n", constants.NAME, constants.VERSION, constants.NAME)
 		fmt.Fprintln(w, "Options:")
-		fmt.Fprintln(w, "  -s, --serve         Start webserver locally for Web UI & Extension")
-		fmt.Fprintln(w, "  -a, --add           Add a bookmark entry to the database")
-		fmt.Fprintln(w, "  -r, --remove [id]   Remove specific bookmark using its ID")
-		fmt.Fprintln(w, "  -u, --update [id]   Update specific bookmark using its ID")
-		fmt.Fprintln(w, "  -v, --view   [id]   View specific bookmark using its ID")
-		fmt.Fprintln(w, "  -V, --view-all      View all bookmarks")
-		fmt.Fprintln(w, "  -i, --import        Import bookmarks from a browser")
-		fmt.Fprintln(w, "  --firefox  [file]   Import bookmarks from Firefox")
-		fmt.Fprintln(w, "                        Must use alongside -i, --import option")
-		fmt.Fprintln(w, "  --chromium [file]   Import bookmarks from Chromium")
-		fmt.Fprintln(w, "                        Must use alongside -i, --import option")
-		fmt.Fprintln(w, "  --dalennod [file]   Import bookmarks from exported Dalennod JSON")
-		fmt.Fprintln(w, "                        Must use alongside -i, --import option")
-		fmt.Fprintln(w, "  -b, --backup        Start backup process")
-		fmt.Fprintln(w, "  --json              Dump entire DB in JSON")
-		fmt.Fprintln(w, "                        Use alongside -b, --backup flag")
-		fmt.Fprintln(w, "  --crypt             Encrypt/decrypt the JSON backup")
-		fmt.Fprintln(w, "                        Use alongside --json flag to encrypt")
-		fmt.Fprintln(w, "                        Use alongside --import --dalennod to decrypt")
-		fmt.Fprintln(w, "  --where             Print config and logs directory location")
-		fmt.Fprintln(w, "  --redo-completion   Set command line completion again")
-		fmt.Fprintln(w, "  --profile           Show profile names found in local directory")
-		fmt.Fprintln(w, "  --switch [profile]  Switch profiles")
-		fmt.Fprintln(w, "                        Must use alongside --profile flag")
-		fmt.Fprintln(w, "  -h, --help          Shows this help message")
+		fmt.Fprintln(w, "  -s, --serve             Start webserver locally for Web UI & Extension")
+		fmt.Fprintln(w, "  -a, --add               Add a bookmark entry to the database")
+		fmt.Fprintln(w, "  -r, --remove [id]       Remove specific bookmark using its ID")
+		fmt.Fprintln(w, "  -u, --update [id]       Update specific bookmark using its ID")
+		fmt.Fprintln(w, "  -v, --view   [id]       View specific bookmark using its ID")
+		fmt.Fprintln(w, "  -V, --view-all          View all bookmarks")
+		fmt.Fprintln(w, "  -i, --import            Import bookmarks from a browser")
+		fmt.Fprintln(w, "      --firefox  [file]     Import bookmarks from Firefox")
+		fmt.Fprintln(w, "      --chromium [file]     Import bookmarks from Chromium")
+		fmt.Fprintln(w, "      --dalennod [file]     Import bookmarks from exported Dalennod JSON")
+		fmt.Fprintln(w, "  -b, --backup            Start backup process")
+		fmt.Fprintln(w, "      --json                Dump entire DB in JSON")
+		fmt.Fprintln(w, "  --crypt                 Encrypt/decrypt the JSON backup")
+		fmt.Fprintln(w, "                            Use alongside --json flag to encrypt")
+		fmt.Fprintln(w, "                            Use alongside --import --dalennod [file] to decrypt")
+		fmt.Fprintln(w, "  --where                 Print config and logs directory location")
+		fmt.Fprintln(w, "  --redo-completion       Set command line completion again")
+		fmt.Fprintln(w, "  --profile               Show profile names found in local directory")
+		fmt.Fprintln(w, "    --switch [profile]      Switch profiles")
+		fmt.Fprintln(w, "  -h, --help              Shows this help message")
 	}
 
 	flag.BoolVar(&FlagVals.StartServer, "s", false, "Start webserver locally for Web UI & Extension")
@@ -127,14 +122,14 @@ func SetCompletion() {
 func fishCompletion() {
 	cachePath, err := os.UserCacheDir()
 	if err != nil {
-		log.Println("error finding home directory. ERROR:", err)
+		log.Println("WARN: error finding home directory:", err)
 		return
 	}
 
 	fishLocalPath := filepath.Join(cachePath, "fish", "generated_completions")
 	fishLocalStat, err := os.Stat(fishLocalPath)
 	if err != nil {
-		log.Println("error getting fish shell local directory info. ERROR", err)
+		log.Println("WARN: error getting fish shell local directory info:", err)
 		return
 	}
 
@@ -145,7 +140,7 @@ func fishCompletion() {
 	fishCompletionPath := filepath.Join(fishLocalPath, "dalennod.fish")
 	fishCompletionFile, err := os.Create(fishCompletionPath)
 	if err != nil {
-		log.Println("error creating fish completion file. ERROR:", err)
+		log.Println("WARN: error creating fish completion file:", err)
 	}
 	defer fishCompletionFile.Close()
 
@@ -173,10 +168,10 @@ func fishCompletion() {
 	sb.WriteString("complete -c dalennod -l dalennod -d 'Import bookmarks from exported Dalennod JSON. Must use alongside -i, --import option'\n")
 
 	if _, err := fishCompletionFile.WriteString(sb.String()); err != nil {
-		log.Println("error writing to fish completion file. ERROR:", err)
+		log.Println("WARN: error writing to fish completion file:", err)
 		return
 	}
-	fmt.Println("Created and set file for command line completion on fish shell.")
+	log.Println("INFO: Created and set file for command line completion on fish shell.")
 }
 
 func bashCompletion() {
@@ -216,7 +211,7 @@ func bashCompletion() {
 	if _, err := bashrcFile.WriteString(sb.String()); err != nil {
 		log.Fatalln("error writing to .bashrc. ERROR:", err)
 	}
-	fmt.Println("Lines appended. Reload .bashrc for command line completion.")
+	log.Println("INFO: Lines appended. Reload .bashrc for command line completion.")
 }
 
 func zshCompletion() {
@@ -287,7 +282,7 @@ func zshCompletion() {
 	if _, err := zshrcFile.WriteString(sb.String()); err != nil {
 		log.Println("error writing into .zshrc. ERROR:", err)
 	}
-	fmt.Println("Lines appended. Reload .zshrc or shell for command line completion.")
+	log.Println("INFO: Lines appended. Reload .zshrc or shell for command line completion.")
 }
 
 func askUserConfirmation(ask string) bool {

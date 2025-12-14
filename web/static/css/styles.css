@@ -283,6 +283,10 @@ main {
     background-color: rgba(var(--background), 0.3);
 }
 
+.thumbnail-image a {
+    width: 150px;
+}
+
 .default-thumburl {
     object-fit: contain;
     display: block;
@@ -333,6 +337,7 @@ main {
     font-weight: bold;
     font-size: 0.85rem;
     margin: 0px 5px;
+    text-align: center;
 }
 
 .pad-like-p {

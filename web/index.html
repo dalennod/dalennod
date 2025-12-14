@@ -62,8 +62,8 @@
         <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" /></a>
         {{ end }}
         <div class="id-modified pad-like-p">
-            <a href="/api/row/{{ .ID }}" target="_blank" title="Bookmark no. {{ .ID }}">[{{ .ID }}]</a>
-            <span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span>
+            <div><a href="/api/row/{{ .ID }}" target="_blank" title="Bookmark no. {{ .ID }}">[{{ .ID }}]</a></div>
+            <div><span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span></div>
         </div>
     </div>
     <div class="bkm-info">
@@ -113,7 +113,7 @@
 <dialog class="dialog-search" id="dialog-search">
     <div id="dialog-search-div">
         <form id="search-form" action="/" method="get">
-        <label for="general-search-term" class="label-input">
+            <label for="general-search-term" class="label-input">
             <input type="text" name="search-type" value="general" hidden />
             <input type="text" name="search-term" id="general-search-term" class="input-search" placeholder="&nbsp;" />
             <span class="input-placeholder">Search for a bookmark...</span>

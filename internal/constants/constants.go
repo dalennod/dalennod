@@ -2,10 +2,8 @@ package constants
 
 const (
 	NAME    string = "dalennod"
-	VERSION string = "0.16.2"
+	VERSION string = "0.16.3"
 
-	// LOGS_DIRNAME       string = "logs"
-	// LOGS_FILENAME      string = NAME + ".log"
 	DB_DIRNAME         string = "db"
 	DB_FILENAME        string = NAME + "." + DB_DIRNAME
 	THUMBNAILS_DIRNAME string = "thumbnails"
@@ -13,7 +11,7 @@ const (
 
 	WEBUI_PORT          string = ":41415"
 	SECONDARY_PORT      string = ":41417"
-	TIME_FORMAT         string = "2006-01-02 15:04:05"
+	TIME_FORMAT         string = "2006-01-02 15:04"
 	PAGE_UPDATE_LIMIT   int    = 60
 	RECENT_ENGAGE_LIMIT int    = PAGE_UPDATE_LIMIT >> 2
 
