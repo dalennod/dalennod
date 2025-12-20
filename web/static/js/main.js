@@ -288,6 +288,7 @@ const openSearchDialog = () => {
     document.getElementById("general-search-term").addEventListener("keydown", async (event) => {
         if (event.key === "Enter") {
             document.getElementById("dialog-search").close();
+            event.preventDefault();
             const searchContent = document.getElementById("general-search-term").value;
             if (searchContent.startsWith("::import")) {
                 document.getElementById("search-button").disabled = true;
