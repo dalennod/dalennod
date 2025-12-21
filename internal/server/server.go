@@ -26,6 +26,7 @@ var (
 	database           *sql.DB
 	tmpl               *template.Template
 	Web                embed.FS
+	WebPageTitle       string
 )
 
 type GotURLParams struct {
@@ -53,15 +54,21 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		var bookmarks []setup.Bookmark
 		var recentlyInteracted setup.RecentInteractions
 
+		WebPageTitle = "Dalennod"
+
 		gotURLParams := parseURLParams(r)
+
 		if gotURLParams.pageNumber != "" {
+			WebPageTitle = fmt.Sprintf("Page %s | Dalennod", gotURLParams.pageNumber)
 			pageNoValid, err := strconv.Atoi(gotURLParams.pageNumber)
 			if err != nil {
 				log.Println("WARN: Invalid page number. Got:", gotURLParams.pageNumber)
 			}
 			pageCount = pageNoValid
 		}
+
 		if gotURLParams.searchType != "" {
+			WebPageTitle = "Search | Dalennod"
 			switch gotURLParams.searchType {
 			case "general":
 				openPrefix := "o "
@@ -89,6 +96,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			bookmarks = db.ViewAllWebUI(database, pageCount)
 		}
+
 		if gotURLParams.pageNumber == "" && gotURLParams.searchType == "" {
 			recentlyInteracted = db.RecentInteractions(database)
 		}
@@ -358,6 +366,7 @@ func Start(data *sql.DB) {
 	tmplFuncMap["keywordSplit"] = keywordSplit
 	tmplFuncMap["grabThumbnail"] = grabThumbnail
 	tmplFuncMap["webUIAddress"] = webUIAddress
+	tmplFuncMap["PageTitle"] = pageTitle
 	tmplFuncMap["encapsulateURL"] = encapsulateURL
 
 	mux.HandleFunc("/{$}", rootHandler)

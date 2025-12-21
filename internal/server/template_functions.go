@@ -25,6 +25,10 @@ func webUIAddress() string {
 	}
 }
 
+func pageTitle() string {
+	return WebPageTitle
+}
+
 func keywordSplit(keywords string, delimiter string) []string {
 	re := regexp.MustCompile(`\s*,\s*`) // To accomplish whitespace trimming without additional loops
 	return re.Split(keywords, -1)
