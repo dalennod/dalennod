@@ -349,8 +349,34 @@ const toggleMoreOptions = () => {
     });
 };
 
+const recentlyInteractedHiddenKey = "recentlyInteractedHidden";
+
+const toggleRecentlyInteracted = (e) => {
+    const hiddenText = " (Hidden)";
+    const gridViewList = e.parentElement.getElementsByClassName("grid-view-list")[0];
+    if (gridViewList.style.display == "none") {
+        gridViewList.style.display = "";
+        e.innerHTML = e.innerHTML.slice(0, -(hiddenText.length));
+        e.outerHTML = e.outerHTML.replace("h5", "h2");
+        localStorage.setItem(recentlyInteractedHiddenKey, false);
+    } else {
+        gridViewList.style.display = "none";
+        e.innerHTML = e.innerHTML + hiddenText;
+        e.outerHTML = e.outerHTML.replace("h2", "h5");
+        localStorage.setItem(recentlyInteractedHiddenKey, true);
+    }
+};
+
+const checkRecentlyInteractedVisibility = () => {
+    const recentlyInteractedHiddenState = JSON.parse(localStorage.getItem(recentlyInteractedHiddenKey));
+    if (recentlyInteractedHiddenState) {
+        toggleRecentlyInteracted(document.getElementById("special-bookmarks"));
+    }
+};
+
 window.onload = () => {
     root = new URL(location.href).origin;
     API = `${root}/api/`;
     updatePagination();
+    checkRecentlyInteractedVisibility();
 };

@@ -27,12 +27,12 @@
     <main>
         {{ if .RecentBookmarks }}
         <div id="special-category-bookmarks">
-            <h2 class="special-bookmarks"><img class="svg-img" src="static/imgs/recent-icon.svg" alt="Recently interacted bookmarks icon" />Recently Interacted</h2>
+            <h2 id="special-bookmarks" class="special-bookmarks" onclick="toggleRecentlyInteracted(this);"><img class="svg-img" src="static/imgs/recent-icon.svg" alt="Recently interacted bookmarks icon" />Recently Interacted</h2>
             {{ block "recent_bookmarks_list" . }} {{ end }}
         </div>
         {{ end }}
         <div id="all-bookmarks">
-            <h2 id="all-bookmarks-list" class="special-bookmarks"><img class="svg-img" src="static/imgs/bookmark-icon.svg" alt="All bookmarks icon" />All Bookmarks</h2>
+            <h2 id="all-bookmarks-list"><img class="svg-img" src="static/imgs/bookmark-icon.svg" alt="All bookmarks icon" />All Bookmarks</h2>
             {{ block "all_bookmarks_list" . }} {{ end }}
         </div>
     </main>
@@ -45,15 +45,21 @@
 </body>
 
 </html>
-{{ end }} {{ define "all_bookmarks_list" }}
+{{ end }}
+
+{{ define "all_bookmarks_list" }}
 <div class="grid-view-list">
     {{ range .AllBookmarks }} {{ template "bkm_card" . }} {{ end }}
 </div>
-{{ end }} {{ define "recent_bookmarks_list" }}
+{{ end }}
+
+{{ define "recent_bookmarks_list" }}
 <div class="grid-view-list">
     {{ range .RecentBookmarks }} {{ template "bkm_card" . }} {{ end }}
 </div>
-{{ end }} {{ define "bkm_card" }}
+{{ end }}
+
+{{ define "bkm_card" }}
 <div class="grid-child" id="{{ .ID }}">
     <div class="thumbnail-image">
         {{ if .ThumbURL }}
@@ -109,7 +115,9 @@
         </div>
     </div>
 </div>
-{{ end }} {{ define "dialogs" }}
+{{ end }}
+
+{{ define "dialogs" }}
 <dialog class="dialog-search" id="dialog-search">
     <div id="dialog-search-div">
         <form id="search-form" action="/" method="get">

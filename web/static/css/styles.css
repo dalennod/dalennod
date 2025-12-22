@@ -239,7 +239,8 @@ main {
     margin-top: 10px;
 }
 
-.special-bookmarks {
+.special-bookmarks,
+#all-bookmarks-list {
     display: flex;
     align-items: center;
 }
