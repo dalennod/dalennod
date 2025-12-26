@@ -14,11 +14,11 @@ import (
 
 func Add(database *sql.DB, bkmStruct setup.Bookmark) {
 	if bkmStruct.ThumbURL == "" {
-		var err error
-		bkmStruct.ThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
+		pageThumbURL, err := thumb_url.GetPageThumb(bkmStruct.URL)
 		if err != nil {
-			log.Printf("WARN: could not get webpage thumbnail for: %s: %v:\n", bkmStruct.URL, err)
+			log.Printf("WARN: could not get web page thumbnail for: %s: %v:\n", bkmStruct.URL, err)
 		}
+		bkmStruct.ThumbURL = pageThumbURL
 	}
 
 	stmt, err := database.Prepare("INSERT INTO bookmarks (url, title, note, keywords, category, archived, snapshotURL, thumbURL) VALUES (?, ?, ?, ?, ?, ?, ?, ?);")
@@ -54,11 +54,11 @@ func Update(database *sql.DB, bkmStruct setup.Bookmark, serverCall bool) {
 	}
 
 	if bkmStruct.ThumbURL == "" {
-		var err error
-		bkmStruct.ThumbURL, err = thumb_url.GetPageThumb(bkmStruct.URL)
+		pageThumbURL, err := thumb_url.GetPageThumb(bkmStruct.URL)
 		if err != nil {
-			log.Printf("WARN: could not get webpage thumbnail for: %d: %v:\n", bkmStruct.ID, err)
+			log.Printf("WARN: could not get web page thumbnail for: %d: %v:\n", bkmStruct.ID, err)
 		}
+		bkmStruct.ThumbURL = pageThumbURL
 	}
 
 	stmt, err := database.Prepare("UPDATE bookmarks SET url=(?), title=(?), note=(?), keywords=(?), category=(?), archived=(?), snapshotURL=(?), thumbURL=(?), modified=CURRENT_TIMESTAMP WHERE id=(?);")

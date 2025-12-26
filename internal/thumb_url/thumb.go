@@ -1,12 +1,17 @@
-// This code was inspired by and is a simplified version of Vitali Deatlov's opengraph package.
+// This code was inspired by and is a simplified version of Vitali Deatlov's opengraph package. Thank you
 // pkg: https://pkg.go.dev/github.com/dyatlov/go-opengraph/opengraph
+//
+// This code was inspired by and is a version of Adam Presley's Go Favicon Grabber. Thank you
+// repo: https://github.com/adampresley/gofavigrab
 
 package thumb_url
 
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -54,16 +59,84 @@ func GetPageThumb(url string) (string, error) {
 		return "", err
 	}
 
-	if len(og.Images) == 0 {
-		return "", fmt.Errorf("did not find any thumbnail in webpage")
+	if len(og.Images) > 0 && og.Images[0].URL != "" {
+		thumbURL := og.Images[0].URL
+		return thumbURL, nil
 	}
 
-	var thumbURL string = og.Images[0].URL
-	if thumbURL == "" {
-		return thumbURL, fmt.Errorf("webpage thumbnail is empty")
+	rawFaviconURL, err := GetPageFavicon(string(pageHtml))
+	if err != nil {
+		return "", err
 	}
 
-	return thumbURL, nil
+	resolvedFaviconURL, err := normalizeFaviconURL(url, rawFaviconURL)
+	if err != nil {
+		return "", fmt.Errorf("did not find any thumbnail or favicon in webpage")
+	}
+
+	return resolvedFaviconURL, nil
+}
+
+func normalizeFaviconURL(baseURL, rawURL string) (string, error) {
+	result := ""
+
+	parsedBase, err := url.Parse(baseURL)
+	if err != nil {
+		return result, err
+	}
+
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return result, err
+	}
+
+	resolvedURL := parsedBase.ResolveReference(parsedURL)
+	result = resolvedURL.String()
+
+	return result, nil
+}
+
+func GetPageFavicon(url string) (string, error) {
+	tokenizer := html.NewTokenizer(strings.NewReader(url))
+
+	var tokenType html.TokenType
+	var hasAttributes bool
+
+	var attributeKey []byte
+	var attributeValue []byte
+	var hasMoreAttributes bool
+
+	hasFavicon := false
+
+	for {
+		tokenType = tokenizer.Next()
+		if tokenType == html.ErrorToken {
+			log.Println("WARN: error while parsing HTML:", tokenizer.Err())
+			break
+		}
+		if tokenType == html.StartTagToken || tokenType == html.SelfClosingTagToken {
+			_, hasAttributes = tokenizer.TagName()
+			if hasAttributes {
+				for {
+					attributeKey, attributeValue, hasMoreAttributes = tokenizer.TagAttr()
+					if string(attributeKey) == "ref" || string(attributeKey) == "rel" {
+						if strings.Contains(string(attributeValue), "shortcut") || strings.Contains(string(attributeValue), "icon") {
+							hasFavicon = true
+						}
+					}
+					if string(attributeKey) == "href" && hasFavicon {
+						// This only returns the raw value. Need to account for non-normalized URLs
+						return string(attributeValue), nil
+					}
+					if !hasMoreAttributes {
+						break
+					}
+				}
+			}
+		}
+	}
+
+	return "", fmt.Errorf("URL not found")
 }
 
 func DownThumb(id int64, thumbURL string) error {
@@ -134,8 +207,8 @@ func (og *OGData) readMeta(metaAttributes map[string]string) {
 		og.Images = addImageUrl(og.Images, metaAttributes["content"])
 	case "og:image:secure_url":
 		og.Images = addImageSecureUrl(og.Images, metaAttributes["content"])
-	case "og:image:type":
-		og.Images = addImageType(og.Images, metaAttributes["content"])
+	// case "og:image:type":
+	// 	og.Images = addImageType(og.Images, metaAttributes["content"])
 	default:
 		return
 	}
@@ -162,8 +235,8 @@ func ensureHasImage(images []*Images) []*Images {
 	return images
 }
 
-func addImageType(images []*Images, v string) []*Images {
-	images = ensureHasImage(images)
-	images[len(images)-1].Type = v
-	return images
-}
+// func addImageType(images []*Images, v string) []*Images {
+// 	images = ensureHasImage(images)
+// 	images[len(images)-1].Type = v
+// 	return images
+// }

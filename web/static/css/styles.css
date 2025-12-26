@@ -245,6 +245,10 @@ main {
     align-items: center;
 }
 
+.special-bookmarks {
+    cursor: pointer;
+}
+
 .grid-view-list {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

@@ -58,6 +58,6 @@ func saveThumbLocally(id int64, thumbURL string) {
 func removeThumbLocally(id int64) {
 	err := os.Remove(filepath.Join(constants.THUMBNAILS_PATH, strconv.FormatInt(id, 10)))
 	if err != nil {
-		log.Printf("WARN: could not remove thumbnail locally from %s for bookmark ID %d: %v\n", constants.THUMBNAILS_PATH, id, err)
+		log.Printf("WARN: could not remove thumbnail locally from for bookmark ID %d: %v\n", id, err)
 	}
 }

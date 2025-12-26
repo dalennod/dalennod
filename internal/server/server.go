@@ -39,7 +39,7 @@ func parseURLParams(r *http.Request) GotURLParams {
 	var gotURLParams GotURLParams
 	err := r.ParseForm()
 	if err != nil {
-		log.Println("ERROR: parsing URL params:", err)
+		log.Println("WARN: error parsing URL params:", err)
 		return gotURLParams
 	}
 	gotURLParams.pageNumber = r.FormValue("page")
