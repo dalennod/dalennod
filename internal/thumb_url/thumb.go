@@ -64,7 +64,7 @@ func GetPageThumb(url string) (string, error) {
 		return thumbURL, nil
 	}
 
-	rawFaviconURL, err := GetPageFavicon(string(pageHtml))
+	rawFaviconURL, err := getPageFavicon(string(pageHtml))
 	if err != nil {
 		return "", err
 	}
@@ -93,10 +93,14 @@ func normalizeFaviconURL(baseURL, rawURL string) (string, error) {
 	resolvedURL := parsedBase.ResolveReference(parsedURL)
 	result = resolvedURL.String()
 
+	if strings.Contains(result, ".svg") {
+		return "", fmt.Errorf("SVG favicon is not supported")
+	}
+
 	return result, nil
 }
 
-func GetPageFavicon(url string) (string, error) {
+func getPageFavicon(url string) (string, error) {
 	tokenizer := html.NewTokenizer(strings.NewReader(url))
 
 	var tokenType html.TokenType

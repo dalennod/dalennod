@@ -377,6 +377,6 @@ const checkRecentlyInteractedVisibility = () => {
 window.onload = () => {
     root = new URL(location.href).origin;
     API = `${root}/api/`;
-    updatePagination();
     checkRecentlyInteractedVisibility();
+    updatePagination();
 };

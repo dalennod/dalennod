@@ -25,8 +25,8 @@ var (
 	bookmarksMap       map[string][]setup.Bookmark = make(map[string][]setup.Bookmark)
 	database           *sql.DB
 	tmpl               *template.Template
+	webPageTitle       string
 	Web                embed.FS
-	WebPageTitle       string
 )
 
 type GotURLParams struct {
@@ -54,12 +54,12 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		var bookmarks []setup.Bookmark
 		var recentlyInteracted setup.RecentInteractions
 
-		WebPageTitle = "Dalennod"
+		webPageTitle = "Dalennod"
 
 		gotURLParams := parseURLParams(r)
 
 		if gotURLParams.pageNumber != "" {
-			WebPageTitle = fmt.Sprintf("Page %s | Dalennod", gotURLParams.pageNumber)
+			webPageTitle = fmt.Sprintf("Page %s | Dalennod", gotURLParams.pageNumber)
 			pageNoValid, err := strconv.Atoi(gotURLParams.pageNumber)
 			if err != nil {
 				log.Println("WARN: Invalid page number. Got:", gotURLParams.pageNumber)
@@ -68,7 +68,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if gotURLParams.searchType != "" {
-			WebPageTitle = "Search | Dalennod"
+			webPageTitle = "Search | Dalennod"
 			switch gotURLParams.searchType {
 			case "general":
 				openPrefix := "o "

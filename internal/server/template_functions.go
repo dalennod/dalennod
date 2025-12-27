@@ -26,7 +26,7 @@ func webUIAddress() string {
 }
 
 func pageTitle() string {
-	return WebPageTitle
+	return webPageTitle
 }
 
 func keywordSplit(keywords string, delimiter string) []string {
