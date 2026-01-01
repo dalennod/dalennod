@@ -53,8 +53,8 @@ func UserInput(bookmark_database *sql.DB) {
 		importChromiumInput(setup.FlagVals.Chromium)
 	case setup.FlagVals.Import && setup.FlagVals.Dalennod != "":
 		importDalennodInput(setup.FlagVals.Dalennod)
-	case setup.FlagVals.FixDB:
-		applyDBUpdates(database)
+	// case setup.FlagVals.FixDB:
+	// 	applyDBUpdates(database)
 	}
 }
 
@@ -135,39 +135,39 @@ func whereConfigLog() {
 	fmt.Printf("Database and config directory: %s\n", constants.CONFIG_PATH)
 }
 
-func applyDBUpdates(database *sql.DB) {
-	rows, err := database.Query("SELECT id, byteThumbURL from bookmarks WHERE byteThumbURL NOT NULL;")
-	if err != nil {
-		fmt.Println("error querying database. ERROR:", err)
-		return
-	}
+// func applyDBUpdates(database *sql.DB) {
+// 	rows, err := database.Query("SELECT id, byteThumbURL from bookmarks WHERE byteThumbURL NOT NULL;")
+// 	if err != nil {
+// 		fmt.Println("error querying database. ERROR:", err)
+// 		return
+// 	}
 
-	var id int
-	var thumb []byte
+// 	var id int
+// 	var thumb []byte
 
-	for rows.Next() {
-		rows.Scan(&id, &thumb)
+// 	for rows.Next() {
+// 		rows.Scan(&id, &thumb)
 
-		writeFilePath := filepath.Join(constants.THUMBNAILS_PATH, strconv.Itoa(id))
-		err := os.WriteFile(writeFilePath, thumb, 0644)
-		if err != nil {
-			fmt.Printf("failed to create local thumbnail for ID %d. ERROR: %v\n", id, err)
-			continue
-		}
-	}
+// 		writeFilePath := filepath.Join(constants.THUMBNAILS_PATH, strconv.Itoa(id))
+// 		err := os.WriteFile(writeFilePath, thumb, 0644)
+// 		if err != nil {
+// 			fmt.Printf("failed to create local thumbnail for ID %d. ERROR: %v\n", id, err)
+// 			continue
+// 		}
+// 	}
 
-	if _, err := database.Exec("ALTER TABLE bookmarks DROP COLUMN byteThumbURL;"); err != nil {
-		fmt.Println("failed to drop column byteThumbURL. ERROR:", err)
-		fmt.Println("needs manual intervention")
-		return
-	}
+// 	if _, err := database.Exec("ALTER TABLE bookmarks DROP COLUMN byteThumbURL;"); err != nil {
+// 		fmt.Println("failed to drop column byteThumbURL. ERROR:", err)
+// 		fmt.Println("needs manual intervention")
+// 		return
+// 	}
 
-	if _, err := database.Exec("VACUUM;"); err != nil {
-		fmt.Println("error running 'VACUUM;' to rebuild database file & reduce database size")
-		fmt.Println("does not need manual intervention, but recommended")
-		return
-	}
-}
+// 	if _, err := database.Exec("VACUUM;"); err != nil {
+// 		fmt.Println("error running 'VACUUM;' to rebuild database file & reduce database size")
+// 		fmt.Println("does not need manual intervention, but recommended")
+// 		return
+// 	}
+// }
 
 func addInput(bkmStruct setup.Bookmark, callToUpdate bool) {
 	var archiveUrl string

@@ -353,7 +353,13 @@ const recentlyInteractedHiddenKey = "recentlyInteractedHidden";
 
 const toggleRecentlyInteracted = (e) => {
     const hiddenText = " (Hidden)";
-    const gridViewList = e.parentElement.getElementsByClassName("grid-view-list")[0];
+    let gridViewList;
+    try {
+        gridViewList = e.parentElement.getElementsByClassName("grid-view-list")[0];
+    } catch (e) {
+        console.log("WARN: caught error:", e.message);
+        return;
+    }
     if (gridViewList.style.display == "none") {
         gridViewList.style.display = "";
         e.innerHTML = e.innerHTML.slice(0, -(hiddenText.length));
