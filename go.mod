@@ -3,9 +3,9 @@ module dalennod
 go 1.25.0
 
 require (
-	github.com/mattn/go-sqlite3 v1.14.32
+	github.com/mattn/go-sqlite3 v1.14.33
 	golang.org/x/net v0.48.0
-	golang.org/x/term v0.38.0
+	golang.org/x/term v0.39.0
 )
 
-require golang.org/x/sys v0.39.0 // indirect
+require golang.org/x/sys v0.40.0 // indirect
