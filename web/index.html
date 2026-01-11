@@ -60,12 +60,14 @@
 
 {{ define "bkm_card" }}
 <div class="grid-child" id="{{ .ID }}">
-    <div class="thumbnail-image">
-        {{ if .ThumbURL }}
-        <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="thumburl" src="{{ grabThumbnail .ID }}" alt="[couldn't load thumbnail]" loading="lazy" /></a>
-        {{ else }}
-        <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" /></a>
-        {{ end }}
+    <div class="bkm-thumb-id">
+        <div class="thumbnail-image">
+            {{ if .ThumbURL }}
+            <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="thumburl" src="{{ grabThumbnail .ID }}" alt="[couldn't load thumbnail]" loading="lazy" /></a>
+            {{ else }}
+            <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" /></a>
+            {{ end }}
+        </div>
         <div class="id-modified pad-like-p">
             <div><a href="/api/row/{{ .ID }}" target="_blank" title="Bookmark no. {{ .ID }}">[{{ .ID }}]</a></div>
             <div><span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span></div>
