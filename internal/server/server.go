@@ -365,7 +365,6 @@ func Start(data *sql.DB) {
 	tmplFuncMap["getHostname"] = getHostname
 	tmplFuncMap["keywordSplit"] = keywordSplit
 	tmplFuncMap["grabThumbnail"] = grabThumbnail
-	tmplFuncMap["webUIAddress"] = webUIAddress
 	tmplFuncMap["PageTitle"] = pageTitle
 	tmplFuncMap["encapsulateURL"] = encapsulateURL
 
@@ -383,12 +382,7 @@ func Start(data *sql.DB) {
 
 	go secondaryServer()
 
-	if constants.WEBUI_ADDR[0] == 58 { // ':'
-		log.Printf("INFO: Web-server starting at: http://localhost%s\n", constants.WEBUI_ADDR)
-	} else {
-		log.Printf("INFO: Web-server starting at: http://%s\n", constants.WEBUI_ADDR)
-	}
-
+	log.Println("INFO: Web-server starting at:", constants.WEBUI_ADDR)
 	if err := http.ListenAndServe(constants.WEBUI_ADDR, mux); err != nil {
 		log.Fatalln("ERROR: could not start web UI server:", err)
 	}

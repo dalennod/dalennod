@@ -2,12 +2,11 @@ package constants
 
 const (
 	NAME    string = "dalennod"
-	VERSION string = "0.16.10"
+	VERSION string = "0.17.0"
 
 	DB_DIRNAME         string = "db"
 	DB_FILENAME        string = NAME + "." + DB_DIRNAME
 	THUMBNAILS_DIRNAME string = "thumbnails"
-	CONFIG_FILENAME    string = "config.json"
 
 	WEBUI_PORT          string = ":41415"
 	SECONDARY_PORT      string = ":41417"
@@ -22,9 +21,8 @@ const (
 )
 
 var (
+	DATA_PATH       string
 	DB_PATH         string
-	CONFIG_PATH     string
 	THUMBNAILS_PATH string
-
-	WEBUI_ADDR string
+	WEBUI_ADDR      string
 )

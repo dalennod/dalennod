@@ -53,26 +53,19 @@ func UserInput(bookmark_database *sql.DB) {
 		importChromiumInput(setup.FlagVals.Chromium)
 	case setup.FlagVals.Import && setup.FlagVals.Dalennod != "":
 		importDalennodInput(setup.FlagVals.Dalennod)
-	// case setup.FlagVals.FixDB:
-	// 	applyDBUpdates(database)
 	}
 }
 
 func showProfiles() {
-	osConfigDir, err := os.UserConfigDir()
-	if err != nil {
-		fmt.Println("error getting config directory. ERROR:", err)
-		return
-	}
-
-	openConfigDir, err := os.Open(osConfigDir)
+	upDataPath := filepath.Dir(constants.DATA_PATH)
+	openDataDir, err := os.Open(upDataPath)
 	if err != nil {
 		fmt.Println("error opening config dir. ERROR:", err)
 		return
 	}
-	defer openConfigDir.Close()
+	defer openDataDir.Close()
 
-	dirEntries, err := openConfigDir.Readdir(-1)
+	dirEntries, err := openDataDir.Readdir(-1)
 	if err != nil {
 		fmt.Println("error reading directory entries. ERROR:", err)
 		return
@@ -88,36 +81,30 @@ func showProfiles() {
 
 func printProfileNames(profileName []string) string {
 	if len(profileName) > 1 {
-		return "  " + profileName[1]
+		return fmt.Sprintf("  %s", profileName[1])
 	} else {
 		return "* current"
 	}
 }
 
 func switchProfile(profileName string) {
-	osConfigDir, err := os.UserConfigDir()
-	if err != nil {
-		fmt.Println("error getting config directory. ERROR:", err)
-		return
-	}
-
-	switchProfilePath := filepath.Join(osConfigDir, constants.NAME+"."+profileName)
+	upDataPath := filepath.Dir(constants.DATA_PATH)
+	switchProfilePath := filepath.Join(upDataPath, constants.NAME+"."+profileName)
 	if _, err := os.Stat(switchProfilePath); os.IsNotExist(err) {
-		fmt.Printf("profile \"%s\" does not exist. ERROR: %v\n", profileName, err)
+		fmt.Printf("WARN: profile \"%s\" does not exist: %v\n", profileName, err)
 		return
 	}
 
-	currentProfileDir := constants.CONFIG_PATH
+	currentProfileDir := constants.DATA_PATH
 
 	var userInput string
 	fmt.Printf("Final rename will be \"%s.{your_input}\"\nRename current profile to: ", constants.NAME)
-	_, err = fmt.Scanln(&userInput)
-	if err != nil {
+	if _, err := fmt.Scanln(&userInput); err != nil {
 		fmt.Println("error reading input. ERROR:", err)
 		return
 	}
 
-	currentRename := filepath.Join(osConfigDir, constants.NAME+"."+userInput)
+	currentRename := filepath.Join(upDataPath, constants.NAME+"."+userInput)
 	if err := os.Rename(currentProfileDir, currentRename); err != nil {
 		fmt.Println("error renaming current profile. ERROR:", err)
 		return
@@ -132,42 +119,9 @@ func switchProfile(profileName string) {
 }
 
 func whereConfigLog() {
-	fmt.Printf("Database and config directory: %s\n", constants.CONFIG_PATH)
+	fmt.Println("Database directory:  ", constants.DB_PATH)
+	fmt.Println("Thumbnails directory:", constants.THUMBNAILS_PATH)
 }
-
-// func applyDBUpdates(database *sql.DB) {
-// 	rows, err := database.Query("SELECT id, byteThumbURL from bookmarks WHERE byteThumbURL NOT NULL;")
-// 	if err != nil {
-// 		fmt.Println("error querying database. ERROR:", err)
-// 		return
-// 	}
-
-// 	var id int
-// 	var thumb []byte
-
-// 	for rows.Next() {
-// 		rows.Scan(&id, &thumb)
-
-// 		writeFilePath := filepath.Join(constants.THUMBNAILS_PATH, strconv.Itoa(id))
-// 		err := os.WriteFile(writeFilePath, thumb, 0644)
-// 		if err != nil {
-// 			fmt.Printf("failed to create local thumbnail for ID %d. ERROR: %v\n", id, err)
-// 			continue
-// 		}
-// 	}
-
-// 	if _, err := database.Exec("ALTER TABLE bookmarks DROP COLUMN byteThumbURL;"); err != nil {
-// 		fmt.Println("failed to drop column byteThumbURL. ERROR:", err)
-// 		fmt.Println("needs manual intervention")
-// 		return
-// 	}
-
-// 	if _, err := database.Exec("VACUUM;"); err != nil {
-// 		fmt.Println("error running 'VACUUM;' to rebuild database file & reduce database size")
-// 		fmt.Println("does not need manual intervention, but recommended")
-// 		return
-// 	}
-// }
 
 func addInput(bkmStruct setup.Bookmark, callToUpdate bool) {
 	var archiveUrl string

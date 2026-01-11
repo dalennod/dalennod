@@ -103,8 +103,6 @@ func cliFlags() {
 
 	flag.BoolVar(&FlagVals.Profile, "profile", false, "Show profile names found in local directory")
 	flag.StringVar(&FlagVals.Switch, "switch", "", "Switch profiles. Must use alongside --profile flag")
-
-	// flag.BoolVar(&FlagVals.FixDB, "fix-db", false, "Apply appropriate database fixes and updates")
 }
 
 func SetCompletion() {
@@ -220,7 +218,7 @@ func zshCompletion() {
 		log.Println("error finding home directory. ERROR:", err)
 	}
 
-	compdefPath := filepath.Join(constants.CONFIG_PATH, "zsh-completion")
+	compdefPath := filepath.Join(constants.DATA_PATH, "zsh-completion")
 	err = os.MkdirAll(compdefPath, 0755)
 	if err != nil {
 		log.Println("error creating zsh-completion directory inside config dir. ERROR:", err)

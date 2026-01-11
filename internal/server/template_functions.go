@@ -17,14 +17,6 @@ func getHostname(input string) string {
 	return matches[0]
 }
 
-func webUIAddress() string {
-	if constants.WEBUI_ADDR[0] == 58 { // ':'
-		return "http://localhost" + constants.WEBUI_ADDR
-	} else {
-		return "http://%s\n" + constants.WEBUI_ADDR
-	}
-}
-
 func pageTitle() string {
 	return webPageTitle
 }
