@@ -52,10 +52,18 @@ func checkDirsExistence(dirPaths ...string) {
 }
 
 func checkSetEnvVar() {
-	constants.WEBUI_ADDR = os.Getenv("DALENNOD_ADDR")
-	if constants.WEBUI_ADDR == "" {
+	dalennodAddr := os.Getenv("DALENNOD_ADDR")
+	if dalennodAddr == "" {
 		constants.WEBUI_ADDR = constants.WEBUI_PORT
+		return
 	}
+	if dalennodAddr == constants.SECONDARY_PORT {
+		log.Printf("WARN: %s is reserved for secondary server that serves thumbnails\n", dalennodAddr)
+		log.Println("INFO: using default:", constants.WEBUI_PORT)
+		constants.WEBUI_ADDR = constants.WEBUI_PORT
+		return
+	}
+	constants.WEBUI_ADDR = dalennodAddr
 }
 
 func databaseDir() string {
