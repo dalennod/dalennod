@@ -2,7 +2,7 @@ package constants
 
 const (
 	NAME    string = "dalennod"
-	VERSION string = "0.17.2"
+	VERSION string = "0.17.3"
 
 	DB_DIRNAME         string = "db"
 	DB_FILENAME        string = NAME + "." + DB_DIRNAME

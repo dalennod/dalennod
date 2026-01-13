@@ -15,19 +15,30 @@ import (
 )
 
 func PrintRow(bookmarkRow setup.Bookmark) {
-	sb := strings.Builder{}
-	sb.WriteString(fmt.Sprintf("  #%d | %s\n", bookmarkRow.ID, bookmarkRow.Modified))
-	sb.WriteString(fmt.Sprintf("Title       : %s\n", bookmarkRow.Title))
-	sb.WriteString(fmt.Sprintf("URL         : %s\n", bookmarkRow.URL))
-	sb.WriteString(fmt.Sprintf("Note        : %s\n", bookmarkRow.Note))
-	sb.WriteString(fmt.Sprintf("Keywords    : %s\n", bookmarkRow.Keywords))
-	sb.WriteString(fmt.Sprintf("Category    : %s\n", bookmarkRow.Category))
-	sb.WriteString(fmt.Sprintf("Archived?   : %t\n", bookmarkRow.Archived))
-	if bookmarkRow.Archived {
-		sb.WriteString(fmt.Sprintf("Archive URL : %s\n", bookmarkRow.SnapshotURL))
+	fmt.Printf("  #%d | %s\n", bookmarkRow.ID, bookmarkRow.Modified)
+	fmt.Println("Title       : ", bookmarkRow.Title)
+	fmt.Println("URL         : ", bookmarkRow.URL)
+	if strings.Contains(bookmarkRow.Note, "\n") {
+		bkmNoteNewlineSplit := strings.Split(bookmarkRow.Note, "\n")
+		for i, n := range bkmNoteNewlineSplit {
+			if i == 0 {
+				fmt.Println("Note        : ", n)
+				continue
+			}
+			if n == "\n" || n == "" {
+				continue
+			}
+			fmt.Println("            : ", n)
+		}
+	} else {
+		fmt.Println("Note        : ", bookmarkRow.Note)
 	}
-
-	fmt.Println(sb.String())
+	fmt.Println("Keywords    : ", bookmarkRow.Keywords)
+	fmt.Println("Category    : ", bookmarkRow.Category)
+	fmt.Println("Archived?   : ", bookmarkRow.Archived)
+	if bookmarkRow.Archived {
+		fmt.Println("Archive URL : ", bookmarkRow.SnapshotURL)
+	}
 }
 
 func appendBookmarks(b *[]setup.Bookmark, info setup.Bookmark, modified time.Time) {
