@@ -41,7 +41,7 @@ func PrintRow(bookmarkRow setup.Bookmark) {
 	}
 }
 
-func appendBookmarks(b *[]setup.Bookmark, info setup.Bookmark, modified time.Time) {
+func appendBookmarks(b *[]setup.Bookmark, info setup.Bookmark, modified time.Time, timeFormat string) {
 	*b = append(*b, setup.Bookmark{
 		ID:          info.ID,
 		URL:         info.URL,
@@ -52,7 +52,7 @@ func appendBookmarks(b *[]setup.Bookmark, info setup.Bookmark, modified time.Tim
 		Archived:    info.Archived,
 		SnapshotURL: info.SnapshotURL,
 		ThumbURL:    info.ThumbURL,
-		Modified:    modified.Local().Format(constants.TIME_FORMAT),
+		Modified:    modified.Local().Format(timeFormat),
 	})
 }
 

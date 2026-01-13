@@ -1,18 +1,20 @@
 :root {
-    --background          : 238, 238, 238;
-    --foreground          : 221, 221, 221;
-    --text                : 0, 0, 0;
-    --svg-fill            : invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
-    --global-border-color : 170, 170, 170;
-    --accent-color        : #1abbe9;
-    --red-text            : #ff3535;
+    --background: 238, 238, 238;
+    --foreground: 221, 221, 221;
+    --text: 0, 0, 0;
+    --svg-fill: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg)
+        brightness(104%) contrast(89%);
+    --global-border-color: 170, 170, 170;
+    --accent-color: #1abbe9;
+    --red-text: #ff3535;
 }
 
 [theme-mode="dark"] {
-    --background : 18, 18, 18;
-    --foreground : 35, 35, 35;
-    --text       : 238, 238, 238;
-    --svg-fill   : invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
+    --background: 18, 18, 18;
+    --foreground: 35, 35, 35;
+    --text: 238, 238, 238;
+    --svg-fill: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg)
+        brightness(112%) contrast(84%);
 }
 
 html {
@@ -32,7 +34,7 @@ body,
 dialog,
 .logTextArea {
     background-color: rgb(var(--background));
-    color: rgb(var(--text))
+    color: rgb(var(--text));
 }
 
 /* Specficially for /import/ index.html */
@@ -45,7 +47,7 @@ dialog,
     padding: 20px;
 }
 
-.import-main>div {
+.import-main > div {
     padding: 20px;
 }
 
@@ -212,9 +214,15 @@ button:disabled {
 }
 
 @keyframes pop {
-    0% { opacity: 0; }
-    75% { opacity: 1; }
-    100% { transform: scale(1.2); }
+    0% {
+        opacity: 0;
+    }
+    75% {
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1.2);
+    }
 }
 
 input[type="checkbox"]:checked,
@@ -285,6 +293,7 @@ main {
 
 .bkm-thumb-id {
     background-color: rgba(var(--background), 0.3);
+    display: grid;
 }
 
 .thumbnail-image a {
@@ -343,7 +352,7 @@ main {
     opacity: 0.5;
     font-weight: bold;
     font-size: 0.85rem;
-    margin: 0px 5px;
+    margin: auto;
     text-align: center;
 }
 

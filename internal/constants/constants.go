@@ -2,7 +2,7 @@ package constants
 
 const (
 	NAME    string = "dalennod"
-	VERSION string = "0.17.3"
+	VERSION string = "0.17.4"
 
 	DB_DIRNAME         string = "db"
 	DB_FILENAME        string = NAME + "." + DB_DIRNAME
@@ -10,7 +10,7 @@ const (
 
 	WEBUI_PORT          string = ":41415"
 	SECONDARY_PORT      string = ":41417"
-	TIME_FORMAT         string = "2006-01-02 15:04"
+	TIME_FORMAT_STAMP   string = "2006 Jan 02 15:04"
 	PAGE_UPDATE_LIMIT   int    = 60
 	RECENT_ENGAGE_LIMIT int    = PAGE_UPDATE_LIMIT >> 2
 

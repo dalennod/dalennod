@@ -178,7 +178,7 @@ func ViewAllWebUI(database *sql.DB, pageNo int) []setup.Bookmark {
 	for rows.Next() {
 		result = setup.Bookmark{}
 		rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
-		appendBookmarks(&results, result, modified)
+		appendBookmarks(&results, result, modified, constants.TIME_FORMAT_STAMP)
 	}
 	return results
 }
@@ -197,7 +197,7 @@ func ViewAll(database *sql.DB) []setup.Bookmark {
 	for rows.Next() {
 		result = setup.Bookmark{}
 		rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
-		appendBookmarks(&results, result, modified)
+		appendBookmarks(&results, result, modified, constants.TIME_FORMAT_STAMP)
 	}
 	return results
 }
@@ -216,7 +216,7 @@ func BackupViewAll(database *sql.DB) []setup.Bookmark {
 	for rows.Next() {
 		result = setup.Bookmark{}
 		rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
-		appendBookmarks(&results, result, modified)
+		appendBookmarks(&results, result, modified, time.RFC3339)
 	}
 	return results
 }
@@ -294,7 +294,7 @@ func SearchFor(database *sql.DB, searchType, searchTerm string, pageNumber int) 
 	for rows.Next() {
 		result = setup.Bookmark{}
 		rows.Scan(&result.ID, &result.URL, &result.Title, &result.Note, &result.Keywords, &result.Category, &result.Archived, &result.SnapshotURL, &result.ThumbURL, &modified)
-		appendBookmarks(&results, result, modified)
+		appendBookmarks(&results, result, modified, constants.TIME_FORMAT_STAMP)
 	}
 
 	return results, count
@@ -345,7 +345,7 @@ func ViewSingleRow(database *sql.DB, id int64) (setup.Bookmark, error) {
 		if err = execResult.Scan(&rowResult.ID, &rowResult.URL, &rowResult.Title, &rowResult.Note, &rowResult.Keywords, &rowResult.Category, &rowResult.Archived, &rowResult.SnapshotURL, &rowResult.ThumbURL, &modified); err != nil {
 			return rowResult, err
 		}
-		rowResult.Modified = modified.Local().Format(constants.TIME_FORMAT)
+		rowResult.Modified = modified.Local().Format(time.DateTime)
 	}
 
 	if rowResult.URL == "" {
