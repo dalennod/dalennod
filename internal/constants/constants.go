@@ -2,7 +2,7 @@ package constants
 
 const (
 	NAME    string = "dalennod"
-	VERSION string = "0.17.4"
+	VERSION string = "0.18.0"
 
 	DB_DIRNAME         string = "db"
 	DB_FILENAME        string = NAME + "." + DB_DIRNAME
@@ -14,10 +14,11 @@ const (
 	PAGE_UPDATE_LIMIT   int    = 60
 	RECENT_ENGAGE_LIMIT int    = PAGE_UPDATE_LIMIT >> 2
 
+	THUMBNAIL_WIDTH     int   = 300      // double the max-width of 150px in web UI
 	THUMBNAIL_FILE_SIZE int64 = 10 << 19 // ~5.24MB limit on thumbnail file size
 	IMPORT_FILE_SIZE    int64 = 10 << 21 // 10<<21 = 10*(2^21) = 20,971,520 = ~20.9MB limit on import file size
 
-	COMMON_USERAGENT string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36"
+	COMMON_USERAGENT string = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36"
 )
 
 var (

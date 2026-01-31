@@ -146,7 +146,7 @@ func getPageFavicon(url string) (string, error) {
 	return "", fmt.Errorf("URL not found")
 }
 
-func adjustDownloadedThumbnailSize(sourceFilePath, bookmarkID string, width int) error {
+func adjustDownloadedThumbnailSize(sourceFilePath string, width int) error {
 	inputSource, err := os.Open(sourceFilePath)
 	if err != nil {
 		return err
@@ -231,7 +231,7 @@ func DownThumb(id int64, thumbURL string) error {
 		return err
 	}
 
-	if err := adjustDownloadedThumbnailSize(outputFilePath, bookmarkIDStr, 300); err != nil {
+	if err := adjustDownloadedThumbnailSize(outputFilePath, 300); err != nil {
 		return err
 	}
 
