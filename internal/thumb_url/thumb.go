@@ -8,8 +8,12 @@ package thumb_url
 
 import (
 	"fmt"
+	"image"
+	"image/jpeg"
+	"image/png"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"net/url"
 	"os"
@@ -17,6 +21,7 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/image/draw"
 	"golang.org/x/net/html"
 	"golang.org/x/net/html/atom"
 
@@ -78,20 +83,18 @@ func GetPageThumb(url string) (string, error) {
 }
 
 func normalizeFaviconURL(baseURL, rawURL string) (string, error) {
-	result := ""
-
 	parsedBase, err := url.Parse(baseURL)
 	if err != nil {
-		return result, err
+		return "", err
 	}
 
 	parsedURL, err := url.Parse(rawURL)
 	if err != nil {
-		return result, err
+		return "", err
 	}
 
 	resolvedURL := parsedBase.ResolveReference(parsedURL)
-	result = resolvedURL.String()
+	result := resolvedURL.String()
 
 	if strings.Contains(result, ".svg") {
 		return "", fmt.Errorf("SVG favicon is not supported")
@@ -143,8 +146,75 @@ func getPageFavicon(url string) (string, error) {
 	return "", fmt.Errorf("URL not found")
 }
 
+func adjustDownloadedThumbnailSize(sourceFilePath, bookmarkID string, width int) error {
+	inputSource, err := os.Open(sourceFilePath)
+	if err != nil {
+		return err
+	}
+	defer inputSource.Close()
+
+	bytes, err := io.ReadAll(inputSource)
+	if err != nil {
+		return err
+	}
+	mimetype := http.DetectContentType(bytes)
+	inputSource.Seek(0, 0)
+
+	var source image.Image
+
+	switch mimetype {
+	case "image/png":
+		source, err = png.Decode(inputSource)
+	case "image/jpeg":
+		source, err = jpeg.Decode(inputSource)
+	default:
+		log.Printf("INFO: Will not resize because the image type is %s: which is unsupported\n", mimetype)
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+
+	sourceBounds := source.Bounds()
+	sourceW := sourceBounds.Dx()
+	if sourceW <= width {
+		log.Printf("INFO: Image size already at or below width: %d\n", width)
+		return nil
+	}
+
+	ratio := (float64)(sourceBounds.Max.Y) / (float64)(sourceBounds.Max.X)
+	height := int(math.Round(float64(width) * ratio))
+	dest := image.NewRGBA(image.Rect(0, 0, width, height))
+	draw.NearestNeighbor.Scale(dest, dest.Rect, source, sourceBounds, draw.Over, nil)
+
+	resizedImagePath := sourceFilePath+"_resized"
+	resizedImage, err := os.Create(resizedImagePath)
+	if err != nil {
+		return err
+	}
+
+	switch mimetype {
+	case "image/png":
+		err = png.Encode(resizedImage, dest)
+	case "image/jpeg":
+		err = jpeg.Encode(resizedImage, dest, nil)
+	}
+
+	if err != nil {
+		os.Remove(resizedImagePath)
+		return err
+	}
+
+	os.Remove(sourceFilePath)
+	os.Rename(resizedImagePath, sourceFilePath)
+
+	return nil
+}
+
 func DownThumb(id int64, thumbURL string) error {
-	outFile, err := os.Create(filepath.Join(constants.THUMBNAILS_PATH, strconv.FormatInt(id, 10))) // 10 = base 10
+	bookmarkIDStr := strconv.FormatInt(id, 10)
+	outputFilePath := filepath.Join(constants.THUMBNAILS_PATH, bookmarkIDStr)
+	outFile, err := os.Create(outputFilePath)
 	if err != nil {
 		return err
 	}
@@ -160,6 +230,11 @@ func DownThumb(id int64, thumbURL string) error {
 	if err != nil {
 		return err
 	}
+
+	if err := adjustDownloadedThumbnailSize(outputFilePath, bookmarkIDStr, 300); err != nil {
+		return err
+	}
+
 	return nil
 }
 

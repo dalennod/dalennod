@@ -63,9 +63,9 @@
     <div class="bkm-thumb-id">
         <div class="thumbnail-image">
             {{ if .ThumbURL }}
-            <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="thumburl" src="{{ grabThumbnail .ID }}" alt="[couldn't load thumbnail]" loading="lazy" /></a>
+            <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="thumburl" src="{{ grabThumbnail .ID }}" alt="[could not load thumbnail]" loading="lazy" /></a>
             {{ else }}
-            <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="default-thumburl" src="static/imgs/41415.png" alt="[couldn't load thumbnail]" loading="lazy" /></a>
+            <a href="{{ encapsulateURL .URL }}" target="_blank"><img class="default-thumburl" src="static/imgs/41415.png" alt="[could not load thumbnail]" loading="lazy" /></a>
             {{ end }}
         </div>
         <div class="id-modified pad-like-p">

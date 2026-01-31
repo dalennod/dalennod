@@ -12,7 +12,7 @@ func HttpDefaultClientDo(method, url string) (*http.Response, error) {
 		return nil, err
 	}
 	req.Header.Add("User-Agent", constants.COMMON_USERAGENT)
-	req.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/png,image/jpeg,image/svg+xml,*/*;q=0.8")
+	req.Header.Add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/png,image/jpeg,image/avif,image/webp,image/svg+xml,*/*;q=0.8")
 	req.Header.Add("Accept-Language", "en-US,en;q=0.5,*;q=0.5")
 	req.Header.Add("Accept-Encoding", "*")
 	req.Header.Add("Dnt", "1")

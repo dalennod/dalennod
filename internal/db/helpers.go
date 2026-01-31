@@ -57,12 +57,13 @@ func appendBookmarks(b *[]setup.Bookmark, info setup.Bookmark, modified time.Tim
 }
 
 func saveThumbLocally(id int64, thumbURL string) {
-	if thumbURL != "" {
-		err := thumb_url.DownThumb(id, thumbURL)
-		if err != nil {
-			log.Println("WARN: could not save thumbnail locally:", err)
-			return
-		}
+	if thumbURL == "" {
+		log.Println("WARN: empty thumbURL")
+		return
+	}
+	if err := thumb_url.DownThumb(id, thumbURL); err != nil {
+		log.Println("WARN: could not save thumbnail locally:", err)
+		return
 	}
 }
 

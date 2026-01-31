@@ -17,6 +17,7 @@ import (
 var web embed.FS
 
 func init() {
+	// log.SetFlags(log.Ldate | log.Lmicroseconds | log.Lshortfile)
 	log.SetFlags(log.Ldate | log.Lmicroseconds)
 	server.Web = web
 	setup.ParseFlags()

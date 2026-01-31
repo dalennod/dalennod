@@ -23,6 +23,7 @@ html {
 
 body {
     font-family: system-ui, Arial, sans-serif;
+    cursor: default;
 }
 
 body * {
@@ -317,6 +318,7 @@ main {
     width: auto;
     height: auto;
     object-fit: contain;
+    text-align: center;
 }
 
 .bkm-note {
