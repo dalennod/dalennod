@@ -231,7 +231,7 @@ func DownThumb(id int64, thumbURL string) error {
 		return err
 	}
 
-	if err := adjustDownloadedThumbnailSize(outputFilePath, 300); err != nil {
+	if err := adjustDownloadedThumbnailSize(outputFilePath, constants.THUMBNAIL_WIDTH); err != nil {
 		return err
 	}
 
