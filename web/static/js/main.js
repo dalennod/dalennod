@@ -17,10 +17,27 @@ const categoriesOptions = async () => {
     return await res.text();
 };
 
+const adjustTextarea = (tar) => {
+    tar.style.height = (tar.scrollHeight + 4) + "px";
+    tar.addEventListener("input", (v) => {
+        if (tar.classList.contains("textarea-no-resize") && v.inputType === "insertLineBreak") {
+            const pos = tar.selectionStart;
+            const value = tar.value;
+            const newValue = value.replace(/[\r\n]+/g, '');
+            tar.value = newValue;
+            const newPos = Math.max(0, pos - 1);
+            tar.setSelectionRange(newPos, newPos);
+        }
+        tar.style.height = "auto";
+        tar.style.height = (tar.scrollHeight + 4) + "px";
+    });
+};
+
 const showCreateDialog = async () => {
     document.getElementById("dialog-create").showModal();
-    const noteTextArea = document.getElementById("create-note");
-    adjustTextarea(noteTextArea);
+
+    const allTextarea = document.querySelectorAll(".dialog-create textarea");
+    allTextarea.forEach((ta) => adjustTextarea(ta));
 
     const bookmarkCreateDatalist = document.getElementById("categories-list-create");
     bookmarkCreateDatalist.innerHTML = await categoriesOptions();
@@ -32,8 +49,10 @@ document.getElementById("dialog-create").addEventListener("close", () => {
 
 const showUpdateDialog = async () => {
     document.getElementById("dialog-update").showModal();
-    const noteTextArea = document.getElementById("update-note");
-    adjustTextarea(noteTextArea);
+
+    const allTextarea = document.querySelectorAll(".dialog-update textarea");
+    allTextarea.forEach((ta) => adjustTextarea(ta));
+    toggleMoreOptions();
 
     const bookmarkUpdateDatalist = document.getElementById("categories-list-update");
     bookmarkUpdateDatalist.innerHTML = await categoriesOptions();
@@ -190,6 +209,97 @@ const clearInputs = () => {
     for (let i = 0; i < input.length; ++i) input[i].value = "";
 };
 
+const openSearchDialog = () => {
+    document.getElementById("dialog-search").showModal();
+
+    document.getElementById("dialog-search").addEventListener("click", () => {
+        document.getElementById("dialog-search").close();
+    });
+
+    document.getElementById("dialog-search-div").addEventListener("click", (event) => {
+        event.stopPropagation();
+    });
+
+    document.getElementById("general-search-term").focus();
+    document.getElementById("general-search-term").value = "";
+
+    const openPrefix = "o ";
+    document.getElementById("general-search-term").addEventListener("keydown", async (event) => {
+        if (event.key === "Enter") {
+            document.getElementById("dialog-search").close();
+            event.preventDefault();
+            const searchContent = document.getElementById("general-search-term").value;
+            if (searchContent.startsWith("::import")) {
+                document.getElementById("search-button").disabled = true;
+                showImportPage();
+                return;
+            } else if (searchContent.startsWith(openPrefix)) {
+                event.preventDefault();
+                const searchFormData = new FormData(document.getElementById("search-form"));
+                const fetchURL = `${root}/?${formKeySearchType}=${searchFormData.get(formKeySearchType)}&${formKeySearchTerm}=${searchContent}`;
+                const res = await fetch(fetchURL);
+                if (!res.ok) {
+                    console.error(res.status);
+                    return;
+                }
+                const responseData = await res.json();
+                if (responseData.id != 0) {
+                    window.open(responseData.url, "_blank");
+                } else {
+                    console.error("WARN: Did not find anything to open with input:", searchContent);
+                }
+            } else {
+                document.getElementById("search-form").submit();
+            }
+        }
+    });
+};
+
+document.addEventListener("keydown", (event) => {
+    if (document.getElementById("dialog-create").open ||
+        document.getElementById("dialog-update").open ||
+        document.getElementById("dialog-search").open ||
+        event.ctrlKey || event.altKey || event.metaKey) {
+        return;
+    }
+
+    if (event.Key === "/" || event.code === "Slash") {
+        event.preventDefault();
+        openSearchDialog();
+    }
+});
+
+const toggleMoreOptions = () => {
+    const updateMoreOptions = document.querySelectorAll(".update-more-options");
+    updateMoreOptions.forEach((updateOption) => {
+        updateOption.hidden = !updateOption.hidden;
+    });
+};
+
+const recentlyInteractedHiddenKey = "recentlyInteractedHidden";
+
+const toggleRecentlyInteracted = (e) => {
+    const hiddenText = " (Hidden)";
+    let gridViewList;
+    try {
+        gridViewList = e.parentElement.getElementsByClassName("grid-view-list")[0];
+    } catch (e) {
+        console.log("WARN: caught error:", e.message);
+        return;
+    }
+    if (gridViewList.style.display == "none") {
+        gridViewList.style.display = "";
+        e.innerHTML = e.innerHTML.slice(0, -(hiddenText.length));
+        e.outerHTML = e.outerHTML.replace("h5", "h2");
+        localStorage.setItem(recentlyInteractedHiddenKey, false);
+    } else {
+        gridViewList.style.display = "none";
+        e.innerHTML = e.innerHTML + hiddenText;
+        e.outerHTML = e.outerHTML.replace("h2", "h5");
+        localStorage.setItem(recentlyInteractedHiddenKey, true);
+    }
+};
+
 const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocation) => {
     const params = new URLSearchParams(hrefLocation.search);
     params.set("page", pageNumber);
@@ -267,109 +377,6 @@ const updatePagination = async () => {
 
     for (let i = start; i <= end; ++i) {
         createPaginationLink(i, currentPage, paginationNumbers, hrefLocation);
-    }
-};
-
-const openSearchDialog = () => {
-    document.getElementById("dialog-search").showModal();
-
-    document.getElementById("dialog-search").addEventListener("click", () => {
-        document.getElementById("dialog-search").close();
-    });
-
-    document.getElementById("dialog-search-div").addEventListener("click", (event) => {
-        event.stopPropagation();
-    });
-
-    document.getElementById("general-search-term").focus();
-    document.getElementById("general-search-term").value = "";
-
-    const openPrefix = "o ";
-    document.getElementById("general-search-term").addEventListener("keydown", async (event) => {
-        if (event.key === "Enter") {
-            document.getElementById("dialog-search").close();
-            event.preventDefault();
-            const searchContent = document.getElementById("general-search-term").value;
-            if (searchContent.startsWith("::import")) {
-                document.getElementById("search-button").disabled = true;
-                showImportPage();
-                return;
-            } else if (searchContent.startsWith(openPrefix)) {
-                event.preventDefault();
-                const searchFormData = new FormData(document.getElementById("search-form"));
-                const fetchURL = `${root}/?${formKeySearchType}=${searchFormData.get(formKeySearchType)}&${formKeySearchTerm}=${searchContent}`;
-                const res = await fetch(fetchURL);
-                if (!res.ok) {
-                    console.error(res.status);
-                    return;
-                }
-                const responseData = await res.json();
-                if (responseData.id != 0) {
-                    window.open(responseData.url, "_blank");
-                } else {
-                    console.error("WARN: Did not find anything to open with input:", searchContent);
-                }
-            } else {
-                document.getElementById("search-form").submit();
-            }
-        }
-    });
-};
-
-document.addEventListener("keydown", (event) => {
-    if (document.getElementById("dialog-create").open ||
-        document.getElementById("dialog-update").open ||
-        document.getElementById("dialog-search").open ||
-        event.ctrlKey || event.altKey || event.metaKey) {
-        return;
-    }
-
-    if (event.Key === "/" || event.code === "Slash") {
-        event.preventDefault();
-        openSearchDialog();
-    }
-});
-
-const adjustTextarea = (tar) => {
-    tar.value.includes("\n")
-        ? tar.style.height = (tar.scrollHeight + 8) + "px"
-        : tar.style.height = tar.scrollHeight + "px";
-    tar.addEventListener("input", () => {
-        tar.style.height = "auto";
-        tar.value.includes("\n")
-            ? tar.style.height = (tar.scrollHeight + 8) + "px"
-            : tar.style.height = tar.scrollHeight + "px";
-    });
-};
-
-const toggleMoreOptions = () => {
-    const updateMoreOptions = document.querySelectorAll(".update-more-options");
-    updateMoreOptions.forEach((updateOption) => {
-        updateOption.hidden = !updateOption.hidden;
-    });
-};
-
-const recentlyInteractedHiddenKey = "recentlyInteractedHidden";
-
-const toggleRecentlyInteracted = (e) => {
-    const hiddenText = " (Hidden)";
-    let gridViewList;
-    try {
-        gridViewList = e.parentElement.getElementsByClassName("grid-view-list")[0];
-    } catch (e) {
-        console.log("WARN: caught error:", e.message);
-        return;
-    }
-    if (gridViewList.style.display == "none") {
-        gridViewList.style.display = "";
-        e.innerHTML = e.innerHTML.slice(0, -(hiddenText.length));
-        e.outerHTML = e.outerHTML.replace("h5", "h2");
-        localStorage.setItem(recentlyInteractedHiddenKey, false);
-    } else {
-        gridViewList.style.display = "none";
-        e.innerHTML = e.innerHTML + hiddenText;
-        e.outerHTML = e.outerHTML.replace("h2", "h5");
-        localStorage.setItem(recentlyInteractedHiddenKey, true);
     }
 };
 

@@ -345,7 +345,7 @@ func ViewSingleRow(database *sql.DB, id int64) (setup.Bookmark, error) {
 		if err = execResult.Scan(&rowResult.ID, &rowResult.URL, &rowResult.Title, &rowResult.Note, &rowResult.Keywords, &rowResult.Category, &rowResult.Archived, &rowResult.SnapshotURL, &rowResult.ThumbURL, &modified); err != nil {
 			return rowResult, err
 		}
-		rowResult.Modified = modified.Local().Format(time.DateTime)
+		rowResult.Modified = modified.Local().Format(constants.TIME_FORMAT_STAMP)
 	}
 
 	if rowResult.URL == "" {
