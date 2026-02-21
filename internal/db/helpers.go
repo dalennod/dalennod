@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -58,11 +59,11 @@ func appendBookmarks(b *[]setup.Bookmark, info setup.Bookmark, modified time.Tim
 
 func saveThumbLocally(id int64, thumbURL string) {
 	if thumbURL == "" {
-		log.Println("WARN: empty thumbURL")
+		log.Println("WARN: empty thumbURL on bookmark ID:", id)
 		return
 	}
 	if err := thumb_url.DownThumb(id, thumbURL); err != nil {
-		log.Println("WARN: could not save thumbnail locally:", err)
+		log.Printf("WARN: could not save thumbnail locally for bookmark ID: %d: %v:\n", id, err)
 		return
 	}
 }
@@ -72,4 +73,9 @@ func removeThumbLocally(id int64) {
 	if err != nil {
 		log.Printf("WARN: could not remove thumbnail locally from for bookmark ID %d: %v\n", id, err)
 	}
+}
+
+func checkLocalThumbnailExists(id int64) bool {
+	_, err := os.Stat(filepath.Join(constants.THUMBNAILS_PATH, strconv.FormatInt(id, 10)))
+	return !errors.Is(err, os.ErrNotExist)
 }

@@ -49,8 +49,26 @@ func Add(database *sql.DB, bkmStruct setup.Bookmark) {
 // replace the empty input, thus if not serverCall then get old data and
 // replace the empty input with old data.
 func Update(database *sql.DB, bkmStruct setup.Bookmark, serverCall bool) {
-	if !serverCall {
-		bkmStruct = updateCheck(database, bkmStruct)
+	oldBKMData, err := ViewSingleRow(database, bkmStruct.ID)
+	if err == nil && !serverCall {
+		bkmStruct = updateCheck(bkmStruct, oldBKMData)
+	}
+	if err != nil {
+		log.Printf("WARN: could not get bookmark row data at ID %d: %v\n", bkmStruct.ID, err)
+	}
+
+	userForcedThumbnailUpdate := bkmStruct.ThumbURL != ""
+
+	parsedModifiedTime, err := time.ParseInLocation(constants.TIME_FORMAT_STAMP, oldBKMData.Modified, time.Local)
+	var timePassedHours float64
+	if err == nil {
+		timePassedHours = time.Since(parsedModifiedTime).Hours()
+		if timePassedHours <= constants.HOURS_UNTIL_THUMBNAIL && oldBKMData.ThumbURL != "" && !userForcedThumbnailUpdate {
+			bkmStruct.ThumbURL = oldBKMData.ThumbURL
+		}
+	}
+	if err != nil {
+		log.Println("WARN: Failed to parse stored modified time:", err)
 	}
 
 	if bkmStruct.ThumbURL == "" {
@@ -73,16 +91,12 @@ func Update(database *sql.DB, bkmStruct setup.Bookmark, serverCall bool) {
 		return
 	}
 
-	go saveThumbLocally(bkmStruct.ID, bkmStruct.ThumbURL)
+	if timePassedHours >= constants.HOURS_UNTIL_THUMBNAIL || !checkLocalThumbnailExists(bkmStruct.ID) || userForcedThumbnailUpdate {
+		go saveThumbLocally(bkmStruct.ID, bkmStruct.ThumbURL)
+	}
 }
 
-func updateCheck(database *sql.DB, bkmStruct setup.Bookmark) setup.Bookmark {
-	oldBKMData, err := ViewSingleRow(database, bkmStruct.ID)
-	if err != nil {
-		log.Printf("WARN: could not get bookmark row data at ID %d: %v\n", bkmStruct.ID, err)
-		return bkmStruct
-	}
-
+func updateCheck(bkmStruct, oldBKMData setup.Bookmark) setup.Bookmark {
 	if bkmStruct.URL == "" {
 		bkmStruct.URL = oldBKMData.URL
 	}
