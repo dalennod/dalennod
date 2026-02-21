@@ -18,6 +18,7 @@ const categoriesOptions = async () => {
 };
 
 const adjustTextarea = (tar) => {
+    tar.style.height = "auto";
     tar.style.height = (tar.scrollHeight + 4) + "px";
     tar.addEventListener("input", (v) => {
         if (tar.classList.contains("textarea-no-resize") && v.inputType === "insertLineBreak") {
