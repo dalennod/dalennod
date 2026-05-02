@@ -210,16 +210,9 @@ const clearInputs = () => {
     for (let i = 0; i < input.length; ++i) input[i].value = "";
 };
 
+const closeSearchDialog = () => document.getElementById("dialog-search").close();
 const openSearchDialog = () => {
     document.getElementById("dialog-search").showModal();
-
-    document.getElementById("dialog-search").addEventListener("click", () => {
-        document.getElementById("dialog-search").close();
-    });
-
-    document.getElementById("dialog-search-div").addEventListener("click", (event) => {
-        event.stopPropagation();
-    });
 
     document.getElementById("general-search-term").focus();
     document.getElementById("general-search-term").value = "";

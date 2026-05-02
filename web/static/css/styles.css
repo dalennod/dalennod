@@ -2,8 +2,7 @@
     --background: 238, 238, 238;
     --foreground: 221, 221, 221;
     --text: 0, 0, 0;
-    --svg-fill: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg)
-        brightness(104%) contrast(89%);
+    --svg-fill: invert(8%) sepia(19%) saturate(21%) hue-rotate(320deg) brightness(104%) contrast(89%);
     --global-border-color: 170, 170, 170;
     --accent-color: #1abbe9;
     --red-text: #ff3535;
@@ -13,8 +12,7 @@
     --background: 18, 18, 18;
     --foreground: 35, 35, 35;
     --text: 238, 238, 238;
-    --svg-fill: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg)
-        brightness(112%) contrast(84%);
+    --svg-fill: invert(100%) sepia(46%) saturate(149%) hue-rotate(217deg) brightness(112%) contrast(84%);
 }
 
 html {
@@ -48,7 +46,7 @@ dialog,
     padding: 20px;
 }
 
-.import-main > div {
+.import-main>div {
     padding: 20px;
 }
 
@@ -87,93 +85,46 @@ textarea {
     resize: none;
 }
 
-.label-input {
-    display: grid;
-    position: relative;
+/* Thanks: https://uiverse.io/kamehame-ha/lovely-fly-87 */
+.fieldinput {
+    display: flex;
+    flex-direction: column;
     width: 100%;
-    border-radius: 5px;
-    overflow: hidden;
+    position: static;
 }
 
-.label-input .input-placeholder {
-    position: absolute;
-    top: 16px;
-    left: 8px;
-    font-size: 1rem;
-    color: rgba(var(--text), 0.5);
-    transform-origin: 0 0;
-    transform: translate3d(0, 0, 0);
-    transition: all 0.2s ease;
-    pointer-events: none;
-}
-
-.label-input .focus-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(var(--text), 0.05);
-    z-index: -1;
-    transform: scaleX(0);
-    transform-origin: left;
-}
-
-.label-input input,
-.label-input textarea {
-    appearance: none;
-    width: 100%;
-    border: 0;
-    height: 50px;
-    font-size: 1rem;
-    background: rgba(var(--text), 0.02);
-    box-shadow: inset 0 -1px 0 rgba(var(--text), 0.3);
+.fieldinput label.label-input {
+    font-size: 0.85rem;
     color: rgb(var(--text));
-    transition: all 0.15s ease;
+    font-weight: bold;
+    position: relative;
+    top: 0.5rem;
+    margin: 0 0 0 7px;
+    padding: 0 3px;
+    background: rgb(var(--foreground));
+    width: fit-content;
 }
 
-.label-input input {
-    padding: 16px 8px 0px 8px;
+.fieldinput input,
+.fieldinput textarea {
+    padding: 8px;
+    font-size: 1rem;
+    border: 2px rgba(var(--text), 0.3) solid;
+    border-radius: 5px;
+    background: rgb(var(--foreground));
+    color: rgb(var(--text));
 }
 
-.label-input textarea {
-    padding: 20px 10px 0px 10px;
-}
-
-.label-input input:hover,
-.label-input textarea:hover {
-    background: rgba(var(--text), 0.04);
-    box-shadow: inset 0 -1px 0 rgba(var(--text), 0.5);
-}
-
-.label-input input:not(:placeholder-shown) + .input-placeholder,
-.label-input textarea:not(:placeholder-shown) + .input-placeholder {
-    color: rgba(var(--text), 0.5);
-    transform: translate3d(0, -12px, 0) scale(0.75);
-}
-
-.label-input input:focus,
-.label-input textarea:focus {
-    background: rgba(var(--text), 0.05);
+.fieldinput input:focus,
+.fieldinput textarea:focus {
     outline: none;
-    box-shadow: inset 0 -2px 0 var(--accent-color);
-}
-
-.label-input input:focus + .input-placeholder,
-.label-input textarea:focus + .input-placeholder {
-    color: var(--accent-color);
-    transform: translate3d(0, -12px, 0) scale(0.75);
-}
-
-.label-input input:focus + .input-placeholder + .focus-bg,
-.label-input textarea:focus + .input-placeholder + .focus-bg {
-    transform: scaleX(1);
-    transition: all 0.1s ease;
+    border: 2px var(--accent-color) solid;
 }
 
 .red-text {
     color: var(--red-text);
     text-align: right;
+    font-weight: bold;
 }
 
 .center-text {
@@ -225,9 +176,11 @@ button:disabled {
     0% {
         opacity: 0;
     }
+
     75% {
         opacity: 1;
     }
+
     100% {
         transform: scale(1.2);
     }
@@ -419,10 +372,6 @@ body:has(dialog[open]) {
     flex: 1;
 }
 
-.dialog-search {
-    padding: 0;
-}
-
 .input-search {
     font-size: 1rem;
 }
@@ -455,6 +404,7 @@ body:has(dialog[open]) {
         transform: scaleY(0);
         display: none;
     }
+
     100% {
         opacity: 1;
         transform: scaleY(1);

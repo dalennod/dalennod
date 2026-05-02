@@ -120,62 +120,48 @@
 
 {{ define "dialogs" }}
 <dialog class="dialog-search" id="dialog-search">
-    <div id="dialog-search-div">
-        <form id="search-form" action="/" method="get">
-            <label for="general-search-term" class="label-input">
+    <div class="dialog-top">
+        <span class="dialog-type">Search for a bookmark</span>
+        <button onclick="closeSearchDialog();" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" /></button>
+    </div>
+    <div id="dialog-search-div" class="dialog-inputs">
+        <form id="search-form" class="fieldinput" action="/" method="get">
+            <label for="general-search-term" class="label-input">Search term</label>
             <input type="text" name="search-type" value="general" hidden />
             <input type="text" name="search-term" id="general-search-term" class="input-search" placeholder="&nbsp;" />
-            <span class="input-placeholder">Search for a bookmark...</span>
-            <span class="focus-bg"></span>
-        </label>
-        <button class="button-svg" id="search-button" type="submit" title="Search" hidden></button>
         </form>
+        <div class="center-text pad-like-p">
+            <button class="button-text" id="search-button" type="submit" title="Search">Search</button>
+        </div>
     </div>
 </dialog>
 
 <dialog class="dialog-create" id="dialog-create">
     <div class="dialog-top">
         <span class="dialog-type">Create a new bookmark</span>
-        <button onclick="closeCreateDialog();" class="button-svg" id="button-close" title="Close modal">
-      <img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" />
-    </button>
+        <button onclick="closeCreateDialog();" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" /></button>
     </div>
     <div class="dialog-inputs">
-        <div class="pad-like-p">
-            <label for="create-url" class="label-input">
-                <textarea autofocus class="textarea-no-resize uac-input" id="create-url" placeholder="&nbsp;" rows="1" required></textarea>
-                <span class="input-placeholder">URL<span class="red-text">*</span><br /></span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="create-url" class="label-input">URL<span class="red-text">*</span></label>
+            <textarea autofocus class="textarea-no-resize uac-input" id="create-url" rows="1" required></textarea>
         </div>
-        <div class="pad-like-p">
-            <label for="create-title" class="label-input">
-                <textarea class="textarea-no-resize uac-input" id="create-title" placeholder="&nbsp;" rows="1"></textarea>
-                <span class="input-placeholder">Title</span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="create-title" class="label-input">Title</label>
+            <textarea class="textarea-no-resize uac-input" id="create-title" rows="1"></textarea>
         </div>
-        <div class="pad-like-p">
-            <label for="create-note" class="label-input">
-                <textarea class="uac-input" id="create-note" placeholder="&nbsp;" rows="1"></textarea>
-                <span class="input-placeholder">Log notes</span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="create-note" class="label-input">Notes</label>
+            <textarea class="uac-input" id="create-note" rows="1"></textarea>
         </div>
-        <div class="pad-like-p">
-            <label for="create-keywords" class="label-input">
-                <textarea class="textarea-no-resize uac-input" id="create-keywords" placeholder="&nbsp;" rows="1"></textarea>
-                <span class="input-placeholder">Keywords, to, search, bookmark</span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="create-keywords" class="label-input">Keywords, to, search, bookmark</label>
+            <textarea class="textarea-no-resize uac-input" id="create-keywords" rows="1"></textarea>
         </div>
-        <div class="pad-like-p">
-            <label for="create-category" class="label-input">
-                <datalist id="categories-list-create"></datalist>
-                <input type="text" class="uac-input" id="create-category" placeholder="&nbsp;" list="categories-list-create" />
-                <span class="input-placeholder">Bookmark Category</span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="create-category" class="label-input">Category</label>
+            <datalist id="categories-list-create"></datalist>
+            <input type="text" class="uac-input" id="create-category" list="categories-list-create" />
         </div>
         <div class="pad-like-p">
             Archive?:
@@ -200,41 +186,26 @@
     </div>
     <div class="dialog-inputs">
         <span id="bkm-id" hidden></span>
-        <div class="pad-like-p">
-            <label for="update-url" class="label-input">
-                <textarea class="textarea-no-resize uac-input" id="update-url" placeholder="&nbsp;" rows="1" required></textarea>
-                <span class="input-placeholder">URL<span class="red-text">*</span></span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="update-url" class="label-input">URL<span class="red-text">*</span></label>
+            <textarea class="textarea-no-resize uac-input" id="update-url" placeholder="&nbsp;" rows="1" required></textarea>
         </div>
-        <div class="pad-like-p">
-            <label for="update-title" class="label-input">
-                <textarea class="textarea-no-resize uac-input" id="update-title" placeholder="&nbsp;" rows="1"></textarea>
-                <span class="input-placeholder">Title</span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="update-title" class="label-input">Title</label>
+            <textarea class="textarea-no-resize uac-input" id="update-title" placeholder="&nbsp;" rows="1"></textarea>
         </div>
-        <div class="pad-like-p">
-            <label for="update-note" class="label-input">
-                <textarea class="uac-input" id="update-note" autofocus placeholder="&nbsp;" rows="1"></textarea>
-                <span class="input-placeholder">Logged notes</span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="update-note" class="label-input">Notes</label>
+            <textarea class="uac-input" id="update-note" autofocus placeholder="&nbsp;" rows="1"></textarea>
         </div>
-        <div class="pad-like-p">
-            <label for="update-keywords" class="label-input">
-                <textarea class="textarea-no-resize uac-input" id="update-keywords" placeholder="&nbsp;" rows="1"></textarea>
-                <span class="input-placeholder">Keywords, to, search, bookmark</span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="update-keywords" class="label-input">Keywords, to, search, bookmark</label>
+            <textarea class="textarea-no-resize uac-input" id="update-keywords" placeholder="&nbsp;" rows="1"></textarea>
         </div>
-        <div class="pad-like-p">
-            <label for="update-category" class="label-input">
-                <datalist id="categories-list-update"></datalist>
-                <input type="text" class="uac-input" id="update-category" placeholder="&nbsp;" list="categories-list-update" />
-                <span class="input-placeholder">Category</span>
-                <span class="focus-bg"></span>
-            </label>
+        <div class="fieldinput">
+            <label for="update-category" class="label-input">Category</label>
+            <datalist id="categories-list-update"></datalist>
+            <input type="text" class="uac-input" id="update-category" placeholder="&nbsp;" list="categories-list-update" />
         </div>
         <div class="pad-like-p" id="update-archive-div">
             Archive?:
