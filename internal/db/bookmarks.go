@@ -309,9 +309,6 @@ func executeSearchQuery(database *sql.DB, urlParams GotURLParams, pageOffset int
 		return nil, count, fmt.Errorf("unrecognized search type: %s", urlParams.SearchType)
 	}
 
-	log.Println("INFO: built query :", query)
-	log.Println("INFO: built params:", params)
-
 	stmt, err := database.Prepare(query)
 	if err != nil {
 		return nil, count, err
