@@ -9,12 +9,12 @@ import (
 )
 
 func getHostname(input string) string {
-	hostnamePattern := regexp.MustCompile(`^(?:http(?:s?):\/\/(?:www\.)?)?([A-Za-z0-9_:.-]+)\/?`)
-	matches := hostnamePattern.FindAllString(input, -1)
-	if len(matches) == 0 {
-		return ""
+	hostnamePattern := regexp.MustCompile(`^https?:\/\/([^\/]+)`)
+	matches := hostnamePattern.FindStringSubmatch(input)
+	if len(matches) > 1 {
+		return matches[1]
 	}
-	return matches[0]
+	return ""
 }
 
 func pageTitle() string {

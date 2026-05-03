@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -252,26 +254,63 @@ func searchPageCount(database *sql.DB, query string, params []any) int {
 	return pageCount
 }
 
-func executeSearchQuery(database *sql.DB, searchType, searchTerm string, pageOffset int) (*sql.Rows, int, error) {
+func executeSearchQuery(database *sql.DB, urlParams GotURLParams, pageOffset int) (*sql.Rows, int, error) {
 	var query string
 	var params []any
 	count := -1
-	switch searchType {
+	switch urlParams.SearchType {
 	case "general":
-		query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) OR category LIKE (?) OR note LIKE (?) OR title LIKE (?) OR url LIKE (?) OR id LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
-		params = []any{searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
+		var conditions []string
+
+		if urlParams.SearchTerm != "" {
+			conditions = append(conditions, "(note LIKE (?) OR title LIKE (?))")
+			params = append(params, urlParams.SearchTerm)
+			params = append(params, urlParams.SearchTerm)
+		}
+
+		if urlParams.ExcludeSearchCategory != "" {
+			conditions = append(conditions, "category != (?)")
+			params = append(params, urlParams.SearchCategory)
+		} else if urlParams.SearchCategory != "" {
+			conditions = append(conditions, "category = (?)")
+			params = append(params, urlParams.SearchCategory)
+		}
+
+		if urlParams.ExcludeSearchKeyword != "" {
+			conditions = append(conditions, "keywords NOT LIKE (?)")
+			params = append(params, "%"+urlParams.SearchKeyword+"%")
+		} else if urlParams.SearchKeyword != "" {
+			conditions = append(conditions, "keywords LIKE (?)")
+			params = append(params, "%"+urlParams.SearchKeyword+"%")
+		}
+
+		if urlParams.ExcludeSearchHostname != "" {
+			conditions = append(conditions, "url NOT LIKE (?)")
+			params = append(params, "%"+urlParams.SearchHostname+"%")
+		} else if urlParams.SearchHostname != "" {
+			conditions = append(conditions, "url LIKE (?)")
+			params = append(params, "%"+urlParams.SearchHostname+"%")
+		}
+
+		query = "SELECT * FROM bookmarks"
+		if len(conditions) > 0 {
+			query += " WHERE " + strings.Join(conditions, " AND ")
+		}
 	case "hostname":
 		query = "SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
-		params = []any{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
+		params = []any{urlParams.SearchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
 	case "keyword":
 		query = "SELECT * FROM bookmarks WHERE keywords LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
-		params = []any{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
+		params = []any{urlParams.SearchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
 	case "category":
 		query = "SELECT * FROM bookmarks WHERE category LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
-		params = []any{searchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
+		params = []any{urlParams.SearchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
 	default:
-		return nil, count, fmt.Errorf("unrecognized search type: %s", searchType)
+		return nil, count, fmt.Errorf("unrecognized search type: %s", urlParams.SearchType)
 	}
+
+	log.Println("INFO: built query :", query)
+	log.Println("INFO: built params:", params)
 
 	stmt, err := database.Prepare(query)
 	if err != nil {
@@ -288,20 +327,19 @@ func executeSearchQuery(database *sql.DB, searchType, searchTerm string, pageOff
 	return rows, count, nil
 }
 
-func SearchFor(database *sql.DB, searchType, searchTerm string, pageNumber int) ([]setup.Bookmark, int) {
+func SearchFor(database *sql.DB, urlParams GotURLParams, pageNumber int) ([]setup.Bookmark, int) {
 	var results []setup.Bookmark
 	var result setup.Bookmark
 	var modified time.Time
 
-	if searchTerm == "" {
-		return results, -1
+	if urlParams.SearchTerm != "" {
+		urlParams.SearchTerm = "%" + urlParams.SearchTerm + "%"
 	}
-	searchTerm = "%" + searchTerm + "%"
 	pageOffset := pageNumber * constants.PAGE_UPDATE_LIMIT
 
-	rows, count, err := executeSearchQuery(database, searchType, searchTerm, pageOffset)
+	rows, count, err := executeSearchQuery(database, urlParams, pageOffset)
 	if err != nil {
-		log.Printf("WARN: error executing database query while searching for: %s: %v:\n", searchTerm, err)
+		log.Printf("WARN: error executing database query while searching for: %s: %v:\n", urlParams.SearchTerm, err)
 		return results, -1
 	}
 
@@ -393,6 +431,28 @@ func SearchByUrl(database *sql.DB, searchUrl string) (setup.Bookmark, error) {
 	}
 
 	return urlResult, nil
+}
+
+func AllHostnames(database *sql.DB) ([]string, error) {
+	var allHostnames []string
+
+	rows, err := database.Query("SELECT url FROM bookmarks;")
+	if err != nil {
+		return allHostnames, err
+	}
+
+	hostnamePattern := regexp.MustCompile(`^https?:\/\/([^\/]+)`)
+
+	var bkmHostname string
+	for rows.Next() {
+		rows.Scan(&bkmHostname)
+		matches := hostnamePattern.FindStringSubmatch(bkmHostname)
+		if len(matches) > 1 && !slices.Contains(allHostnames, matches[1]) {
+			allHostnames = append(allHostnames, matches[1])
+		}
+	}
+
+	return allHostnames, nil
 }
 
 func GetAllCategories(database *sql.DB) ([]string, error) {

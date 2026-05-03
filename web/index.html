@@ -125,13 +125,41 @@
         <button onclick="closeSearchDialog();" class="button-svg" id="button-close" title="Close modal"><img class="svg-img" src="static/imgs/close_button.svg" alt="Close button" /></button>
     </div>
     <div id="dialog-search-div" class="dialog-inputs">
-        <form id="search-form" class="fieldinput" action="/" method="get">
-            <label for="general-search-term" class="label-input">Search term</label>
-            <input type="text" name="search-type" value="general" hidden />
-            <input type="text" name="search-term" id="general-search-term" class="input-search" placeholder="&nbsp;" />
+        <form id="search-form" action="/" method="get">
+            <div class="fieldinput">
+                <label for="general-search-term" class="label-input">Search term</label>
+                <input type="text" name="search-type" value="general" hidden />
+                <input type="text" name="search-term" id="general-search-term" class="input-search" />
+            </div>
+            <div class="fieldinput">
+                <label for="general-search-category" class="label-input">Category</label>
+                <datalist id="categories-list-search"></datalist>
+                <input type="text" name="search-category" id="general-search-category" class="input-search" list="categories-list-search" />
+            </div>
+            <div class="pad-like-p">
+                <label for="general-search-category-exclude" class="label-input">Exclude Category</label>
+                <input type="checkbox" name="exclude-search-category" id="general-search-category-exclude" />
+            </div>
+            <div class="fieldinput">
+                <label for="general-search-keyword" class="label-input">Keyword</label>
+                <input type="text" name="search-keyword" id="general-search-keyword" class="input-search" />
+            </div>
+            <div class="pad-like-p">
+                <label for="general-search-keyword-exclude" class="label-input">Exclude Keyword</label>
+                <input type="checkbox" name="exclude-search-keyword" id="general-search-keyword-exclude" />
+            </div>
+            <div class="fieldinput">
+                <label for="general-search-hostname" class="label-input">Hostname</label>
+                <datalist id="hostname-list-search"></datalist>
+                <input type="text" name="search-hostname" id="general-search-hostname" class="input-search" list="hostname-list-search" />
+            </div>
+            <div class="pad-like-p">
+                <label for="general-search-hostname-exclude" class="label-input">Exclude Hostname</label>
+                <input type="checkbox" name="exclude-search-hostname" id="general-search-hostname-exclude" />
+            </div>
         </form>
         <div class="center-text pad-like-p">
-            <button class="button-text" id="search-button" type="submit" title="Search">Search</button>
+            <button class="button-text" id="search-button" type="submit" title="Search" onclick="execSearchForm();">Search</button>
         </div>
     </div>
 </dialog>
@@ -188,43 +216,39 @@
         <span id="bkm-id" hidden></span>
         <div class="fieldinput">
             <label for="update-url" class="label-input">URL<span class="red-text">*</span></label>
-            <textarea class="textarea-no-resize uac-input" id="update-url" placeholder="&nbsp;" rows="1" required></textarea>
+            <textarea class="textarea-no-resize uac-input" id="update-url" rows="1" required></textarea>
         </div>
         <div class="fieldinput">
             <label for="update-title" class="label-input">Title</label>
-            <textarea class="textarea-no-resize uac-input" id="update-title" placeholder="&nbsp;" rows="1"></textarea>
+            <textarea class="textarea-no-resize uac-input" id="update-title" rows="1"></textarea>
         </div>
         <div class="fieldinput">
             <label for="update-note" class="label-input">Notes</label>
-            <textarea class="uac-input" id="update-note" autofocus placeholder="&nbsp;" rows="1"></textarea>
+            <textarea class="uac-input" id="update-note" autofocus rows="1"></textarea>
         </div>
         <div class="fieldinput">
             <label for="update-keywords" class="label-input">Keywords, to, search, bookmark</label>
-            <textarea class="textarea-no-resize uac-input" id="update-keywords" placeholder="&nbsp;" rows="1"></textarea>
+            <textarea class="textarea-no-resize uac-input" id="update-keywords" rows="1"></textarea>
         </div>
         <div class="fieldinput">
             <label for="update-category" class="label-input">Category</label>
             <datalist id="categories-list-update"></datalist>
-            <input type="text" class="uac-input" id="update-category" placeholder="&nbsp;" list="categories-list-update" />
+            <input type="text" class="uac-input" id="update-category" list="categories-list-update" />
         </div>
         <div class="pad-like-p" id="update-archive-div">
             Archive?:
             <input type="checkbox" name="update-archive" id="update-archive" title="Check to archive" onclick="archiveCheckbox()" />
             <label for="update-archive" id="update-archive-label" title="Check to archive">No</label>
         </div>
-        <div class="pad-like-p update-more-options" id="update-snapshotURL-div">
-            <label for="update-snapshotURL" class="label-input">
-                <textarea class="textarea-no-resize uac-input" id="update-snapshotURL" placeholder="&nbsp;" rows="1"></textarea>
-                <span class="input-placeholder">Archive Snapshot URL</span>
-                <span class="focus-bg"></span>
-            </label>
-        </div>
-        <div class="pad-like-p update-more-options" id="update-thumbURL-div">
-            <label for="update-thumbURL" class="label-input">
-                <textarea class="textarea-no-resize uac-input" id="update-thumbURL" placeholder="&nbsp;" rows="1"></textarea>
-                <span class="input-placeholder">Thumbnail Image URL</span>
-                <span class="focus-bg"></span>
-            </label>
+        <div id="update-more-options">
+            <div class="fieldinput" id="update-snapshotURL-div">
+                <label for="update-snapshotURL" class="label-input">Archive Snapshot URL</label>
+                <textarea class="textarea-no-resize uac-input" id="update-snapshotURL" rows="1"></textarea>
+            </div>
+            <div class="fieldinput" id="update-thumbURL-div">
+                <label for="update-thumbURL" class="label-input">Thumbnail Image URL</label>
+                <textarea class="textarea-no-resize uac-input" id="update-thumbURL" rows="1"></textarea>
+            </div>
         </div>
         <p class="red-text button-svg" onclick="toggleMoreOptions();">* required</p>
         <div class="center-text pad-like-p">

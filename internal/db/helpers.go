@@ -15,6 +15,18 @@ import (
 	"dalennod/internal/thumb_url"
 )
 
+type GotURLParams struct {
+	PageNumber            string
+	SearchType            string
+	SearchTerm            string
+	SearchCategory        string
+	ExcludeSearchCategory string
+	SearchKeyword         string
+	ExcludeSearchKeyword  string
+	SearchHostname        string
+	ExcludeSearchHostname string
+}
+
 func PrintRow(bookmarkRow setup.Bookmark) {
 	fmt.Printf("  #%d | %s\n", bookmarkRow.ID, bookmarkRow.Modified)
 	fmt.Println("Title       : ", bookmarkRow.Title)

@@ -17,6 +17,12 @@ const categoriesOptions = async () => {
     return await res.text();
 };
 
+const hostnamesOptions = async () => {
+    const fetchURL = API + "hostnames/";
+    const res = await fetch(fetchURL);
+    return await res.text();
+}
+
 const adjustTextarea = (tar) => {
     tar.style.height = "auto";
     tar.style.height = (tar.scrollHeight + 4) + "px";
@@ -210,15 +216,48 @@ const clearInputs = () => {
     for (let i = 0; i < input.length; ++i) input[i].value = "";
 };
 
+const parseURLParams = () => {
+    const queryString = window.location.search;
+    const urlParams = new URLSearchParams(queryString);
+    const parsedParams = {
+        "general-search-term": urlParams.get("search-term"),
+        "general-search-category": urlParams.get("search-category"),
+        "general-search-category-exclude": urlParams.get("exclude-search-category"),
+        "general-search-keyword": urlParams.get("search-keyword"),
+        "general-search-keyword-exclude": urlParams.get("exclude-search-keyword"),
+        "general-search-hostname": urlParams.get("search-hostname"),
+        "general-search-hostname-exclude": urlParams.get("exclude-search-hostname"),
+    };
+    return parsedParams;
+}
+
+const execSearchForm = () => document.getElementById("search-form").submit();
 const closeSearchDialog = () => document.getElementById("dialog-search").close();
-const openSearchDialog = () => {
+const openSearchDialog = async () => {
     document.getElementById("dialog-search").showModal();
 
     document.getElementById("general-search-term").focus();
     document.getElementById("general-search-term").value = "";
 
+    const parsedParams = parseURLParams();
+    for (let key in parsedParams) {
+        if ((parsedParams[key] !== "" || parsedParams[key] !== null) && !key.includes("exclude")) {
+            document.getElementById(key).value = parsedParams[key];
+        }
+        if ((parsedParams[key] === "on" || parsedParams[key] !== null) && key.includes("exclude"))  {
+            document.getElementById(key).checked = true;
+        } else {
+            document.getElementById(key).checked = false;
+        }
+    }
+
+    const searchCategoryDatalist = document.getElementById("categories-list-search");
+    searchCategoryDatalist.innerHTML = await categoriesOptions();
+    const searchHostnameDatalist = document.getElementById("hostname-list-search");
+    searchHostnameDatalist.innerHTML = await hostnamesOptions();
+
     const openPrefix = "o ";
-    document.getElementById("general-search-term").addEventListener("keydown", async (event) => {
+    document.getElementById("search-form").addEventListener("keydown", async (event) => {
         if (event.key === "Enter") {
             document.getElementById("dialog-search").close();
             event.preventDefault();
@@ -243,7 +282,7 @@ const openSearchDialog = () => {
                     console.error("WARN: Did not find anything to open with input:", searchContent);
                 }
             } else {
-                document.getElementById("search-form").submit();
+                execSearchForm();
             }
         }
     });
@@ -263,12 +302,7 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
-const toggleMoreOptions = () => {
-    const updateMoreOptions = document.querySelectorAll(".update-more-options");
-    updateMoreOptions.forEach((updateOption) => {
-        updateOption.hidden = !updateOption.hidden;
-    });
-};
+const toggleMoreOptions = () => { const updateMoreOptions = document.getElementById("update-more-options"); updateMoreOptions.hidden = !updateMoreOptions.hidden; };
 
 const recentlyInteractedHiddenKey = "recentlyInteractedHidden";
 
@@ -301,7 +335,7 @@ const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocati
     const pageNumberLink = document.createElement("a");
     pageNumberLink.textContent = pageNumber;
     pageNumberLink.title = `Page ${pageNumber}`;
-    pageNumberLink.href = "?"+params.toString();
+    pageNumberLink.href = "?" + params.toString();
 
     if (pageNumber === current) pageNumberLink.classList.add("active");
     paginationNumbers.appendChild(pageNumberLink);

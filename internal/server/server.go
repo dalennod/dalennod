@@ -29,22 +29,22 @@ var (
 	Web                embed.FS
 )
 
-type GotURLParams struct {
-	pageNumber string
-	searchType string
-	searchTerm string
-}
-
-func parseURLParams(r *http.Request) GotURLParams {
-	var gotURLParams GotURLParams
+func parseURLParams(r *http.Request) db.GotURLParams {
+	var gotURLParams db.GotURLParams
 	err := r.ParseForm()
 	if err != nil {
 		log.Println("WARN: error parsing URL params:", err)
 		return gotURLParams
 	}
-	gotURLParams.pageNumber = r.FormValue("page")
-	gotURLParams.searchType = r.FormValue("search-type")
-	gotURLParams.searchTerm = r.FormValue("search-term")
+	gotURLParams.PageNumber = r.FormValue("page")
+	gotURLParams.SearchType = r.FormValue("search-type")
+	gotURLParams.SearchTerm = r.FormValue("search-term")
+	gotURLParams.SearchCategory = r.FormValue("search-category")
+	gotURLParams.ExcludeSearchCategory = r.FormValue("exclude-search-category")
+	gotURLParams.SearchKeyword = r.FormValue("search-keyword")
+	gotURLParams.ExcludeSearchKeyword = r.FormValue("exclude-search-keyword")
+	gotURLParams.SearchHostname = r.FormValue("search-hostname")
+	gotURLParams.ExcludeSearchHostname = r.FormValue("exclude-search-hostname")
 	return gotURLParams
 }
 
@@ -58,24 +58,24 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 		gotURLParams := parseURLParams(r)
 
-		if gotURLParams.pageNumber != "" {
-			webPageTitle = fmt.Sprintf("Page %s | Dalennod", gotURLParams.pageNumber)
-			pageNoValid, err := strconv.Atoi(gotURLParams.pageNumber)
+		if gotURLParams.PageNumber != "" {
+			webPageTitle = fmt.Sprintf("Page %s | Dalennod", gotURLParams.PageNumber)
+			pageNoValid, err := strconv.Atoi(gotURLParams.PageNumber)
 			if err != nil {
-				log.Println("WARN: Invalid page number. Got:", gotURLParams.pageNumber)
+				log.Println("WARN: Invalid page number. Got:", gotURLParams.PageNumber)
 			}
 			pageCount = pageNoValid
 		}
 
-		if gotURLParams.searchType != "" {
+		if gotURLParams.SearchType != "" {
 			webPageTitle = "Search | Dalennod"
-			switch gotURLParams.searchType {
+			switch gotURLParams.SearchType {
 			case "general":
 				openPrefix := "o "
-				searchTermAfter, prefixFound := strings.CutPrefix(gotURLParams.searchTerm, openPrefix)
+				searchTermAfter, prefixFound := strings.CutPrefix(gotURLParams.SearchTerm, openPrefix)
 				if prefixFound && searchTermAfter != "" {
-					gotURLParams.searchTerm = searchTermAfter
-					bookmark := db.OpenSesame(database, gotURLParams.searchTerm)
+					gotURLParams.SearchTerm = searchTermAfter
+					bookmark := db.OpenSesame(database, gotURLParams.SearchTerm)
 					w.Header().Set("Content-Type", "application/json")
 					json.NewEncoder(w).Encode(bookmark)
 					return
@@ -86,18 +86,18 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 			case "keyword":
 				fallthrough
 			case "category":
-				bookmarks, pageCountForSearch = db.SearchFor(database, gotURLParams.searchType, gotURLParams.searchTerm, pageCount)
+				bookmarks, pageCountForSearch = db.SearchFor(database, gotURLParams, pageCount)
 			default:
 				w.WriteHeader(http.StatusBadRequest)
 				fmt.Fprint(w, "ERROR: Unrecognized search type")
-				log.Println("ERROR: Unrecognized search type. Got:", gotURLParams.searchType)
+				log.Println("ERROR: Unrecognized search type. Got:", gotURLParams.SearchType)
 				return
 			}
 		} else {
 			bookmarks = db.ViewAllWebUI(database, pageCount)
 		}
 
-		if gotURLParams.pageNumber == "" && gotURLParams.searchType == "" {
+		if gotURLParams.PageNumber == "" && gotURLParams.SearchType == "" {
 			recentlyInteracted = db.RecentInteractions(database)
 		}
 
@@ -340,6 +340,25 @@ func categoriesHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func hostnamesHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "*")
+
+	if r.Method != http.MethodGet {
+		internalServerErrorHandler(w, r)
+	}
+
+	listCategories, err := db.AllHostnames(database)
+	if err != nil {
+		log.Println("ERROR: getting all hostnames:", err)
+		return
+	}
+
+	for _, category := range listCategories {
+		fmt.Fprintf(w, "<option value=\"%s\"></option>", category)
+	}
+}
+
 func pagesHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		fmt.Fprint(w, db.TotalPageCount(database))
@@ -376,6 +395,7 @@ func Start(data *sql.DB) {
 	mux.HandleFunc("/api/update/{id}", updateHandler)
 	mux.HandleFunc("/api/delete/{id}", deleteHandler)
 	mux.HandleFunc("/api/categories/", categoriesHandler)
+	mux.HandleFunc("/api/hostnames/", hostnamesHandler)
 	mux.HandleFunc("/api/check-url/", checkUrlHandler)
 	mux.HandleFunc("/api/refetch-thumbnail/{id}", refetchThumbnailHandler)
 	mux.HandleFunc("/api/pages/", pagesHandler)
