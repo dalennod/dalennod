@@ -231,6 +231,9 @@ const parseURLParams = () => {
     return parsedParams;
 }
 
+const formKeySearchType = "search-type";
+const formKeySearchTerm = "search-term";
+
 const execSearchForm = () => document.getElementById("search-form").submit();
 const closeSearchDialog = () => document.getElementById("dialog-search").close();
 const openSearchDialog = async () => {
@@ -244,7 +247,7 @@ const openSearchDialog = async () => {
         if ((parsedParams[key] !== "" || parsedParams[key] !== null) && !key.includes("exclude")) {
             document.getElementById(key).value = parsedParams[key];
         }
-        if ((parsedParams[key] === "on" || parsedParams[key] !== null) && key.includes("exclude"))  {
+        if ((parsedParams[key] === "on" || parsedParams[key] !== null) && key.includes("exclude")) {
             document.getElementById(key).checked = true;
         } else {
             document.getElementById(key).checked = false;
@@ -304,32 +307,7 @@ document.addEventListener("keydown", (event) => {
 
 const toggleMoreOptions = () => { const updateMoreOptions = document.getElementById("update-more-options"); updateMoreOptions.hidden = !updateMoreOptions.hidden; };
 
-const recentlyInteractedHiddenKey = "recentlyInteractedHidden";
-
-const toggleRecentlyInteracted = (e) => {
-    const hiddenText = " (Hidden)";
-    let gridViewList;
-    try {
-        gridViewList = e.parentElement.getElementsByClassName("grid-view-list")[0];
-    } catch (e) {
-        console.log("WARN: caught error:", e.message);
-        return;
-    }
-    if (gridViewList.style.display == "none") {
-        gridViewList.style.display = "";
-        e.innerHTML = e.innerHTML.slice(0, -(hiddenText.length));
-        e.outerHTML = e.outerHTML.replace("h5", "h2");
-        localStorage.setItem(recentlyInteractedHiddenKey, false);
-    } else {
-        gridViewList.style.display = "none";
-        e.innerHTML = e.innerHTML + hiddenText;
-        e.outerHTML = e.outerHTML.replace("h2", "h5");
-        localStorage.setItem(recentlyInteractedHiddenKey, true);
-    }
-};
-
-const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocation) => {
-    const params = new URLSearchParams(hrefLocation.search);
+const createPaginationLink = (pageNumber, current, paginationNumbers, params) => {
     params.set("page", pageNumber);
 
     const pageNumberLink = document.createElement("a");
@@ -341,24 +319,20 @@ const createPaginationLink = (pageNumber, current, paginationNumbers, hrefLocati
     paginationNumbers.appendChild(pageNumberLink);
 };
 
-const formKeySearchType = "search-type";
-const formKeySearchTerm = "search-term";
-
 const updateNavATags = (current, totalPages, hrefParams) => {
     const nextPage = current + 1;
     const prevPage = current - 1;
     if (hrefParams.get(formKeySearchType)) {
-        const searchType = hrefParams.get(formKeySearchType);
-        const searchTerm = hrefParams.get(formKeySearchTerm);
-        document.getElementById("root-first-page").href = `/?${formKeySearchType}=${searchType}&${formKeySearchTerm}=${searchTerm}`;
-        document.getElementById("prev-page").href = `/?${formKeySearchType}=${searchType}&${formKeySearchTerm}=${searchTerm}&page=${prevPage}`;
-        document.getElementById("next-page").href = `/?${formKeySearchType}=${searchType}&${formKeySearchTerm}=${searchTerm}&page=${nextPage}`;
-        document.getElementById("last-page").href = `/?${formKeySearchType}=${searchType}&${formKeySearchTerm}=${searchTerm}&page=${totalPages}`;
+        hrefParams.set("page", prevPage);
+        document.getElementById("prev-page").href = "?" + hrefParams.toString();
+        hrefParams.set("page", nextPage);
+        document.getElementById("next-page").href = "?" + hrefParams.toString();
+        hrefParams.set("page", totalPages);
+        document.getElementById("last-page").href = "?" + hrefParams.toString();
+        hrefParams.delete("page");
+        document.getElementById("root-first-page").href = "?" + hrefParams.toString();
 
-        const allBookmarksList = document.getElementById("all-bookmarks-list");
-        searchType === "general"
-            ? allBookmarksList.innerHTML = `<img class="svg-img" src="static/imgs/search_button.svg" alt="Search all bookmark icon" />All Bookmarks with '${searchTerm}'`
-            : allBookmarksList.innerHTML = `<img class="svg-img" src="static/imgs/search_button.svg" alt="Search all bookmark icon" />Bookmarks with '${searchTerm}' in '${searchType}'`;
+        document.getElementById("all-bookmarks-list").innerHTML = `<img class="svg-img" src="static/imgs/search_button.svg" alt="Search all bookmark icon" />Search Results`;
     } else {
         document.getElementById("prev-page").href = `/?page=${prevPage}`;
         document.getElementById("next-page").href = `/?page=${nextPage}`;
@@ -404,7 +378,31 @@ const updatePagination = async () => {
     const end = Math.min(totalPages, currentPage + pagesToShow);
 
     for (let i = start; i <= end; ++i) {
-        createPaginationLink(i, currentPage, paginationNumbers, hrefLocation);
+        createPaginationLink(i, currentPage, paginationNumbers, hrefParams);
+    }
+};
+
+const recentlyInteractedHiddenKey = "recentlyInteractedHidden";
+
+const toggleRecentlyInteracted = (e) => {
+    const hiddenText = " (Hidden)";
+    let gridViewList;
+    try {
+        gridViewList = e.parentElement.getElementsByClassName("grid-view-list")[0];
+    } catch (e) {
+        console.log("WARN: caught error:", e.message);
+        return;
+    }
+    if (gridViewList.style.display == "none") {
+        gridViewList.style.display = "";
+        e.innerHTML = e.innerHTML.slice(0, -(hiddenText.length));
+        e.outerHTML = e.outerHTML.replace("h5", "h2");
+        localStorage.setItem(recentlyInteractedHiddenKey, false);
+    } else {
+        gridViewList.style.display = "none";
+        e.innerHTML = e.innerHTML + hiddenText;
+        e.outerHTML = e.outerHTML.replace("h2", "h5");
+        localStorage.setItem(recentlyInteractedHiddenKey, true);
     }
 };
 
