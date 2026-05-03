@@ -296,6 +296,10 @@ func executeSearchQuery(database *sql.DB, urlParams GotURLParams, pageOffset int
 		if len(conditions) > 0 {
 			query += " WHERE " + strings.Join(conditions, " AND ")
 		}
+
+		query += " ORDER BY id DESC LIMIT (?) OFFSET (?);"
+		params = append(params, constants.PAGE_UPDATE_LIMIT)
+		params = append(params, pageOffset)
 	case "hostname":
 		query = "SELECT * FROM bookmarks WHERE url LIKE (?) ORDER BY id DESC LIMIT (?) OFFSET (?);"
 		params = []any{urlParams.SearchTerm, constants.PAGE_UPDATE_LIMIT, pageOffset}
