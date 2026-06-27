@@ -69,7 +69,7 @@
             {{ end }}
         </div>
         <div class="id-modified pad-like-p">
-            <div><a href="/api/row/{{ .ID }}" target="_blank" title="Bookmark no. {{ .ID }}">[{{ .ID }}]</a></div>
+            <div>ID: <a href="/api/row/{{ .ID }}" target="_blank" title="Bookmark no. {{ .ID }}" class="bookmark-id">{{ .ID }}</a></div>
             <div><span title="Last Modified: {{ .Modified }}">{{ .Modified }}</span></div>
         </div>
     </div>

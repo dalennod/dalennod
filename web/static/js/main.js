@@ -413,9 +413,17 @@ const checkRecentlyInteractedVisibility = () => {
     }
 };
 
+const numberWithComma = () => {
+    const bookmarkIDs = document.querySelectorAll(".bookmark-id");
+    bookmarkIDs.forEach((i) => {
+        i.text = Number(i.text).toLocaleString();
+    })
+};
+
 window.onload = () => {
     root = new URL(location.href).origin;
     API = `${root}/api/`;
     checkRecentlyInteractedVisibility();
     updatePagination();
+    numberWithComma();
 };
